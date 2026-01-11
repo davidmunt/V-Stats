@@ -6,7 +6,6 @@
 /frontend/.env
 /frontend/*.log
 /frontend/.vite
-/frontend/Dockerfile
 
 # ====================
 # BACKEND - FastAPI
@@ -16,7 +15,6 @@
 /backend-fastapi/venv/
 /backend-fastapi/.env
 /backend-fastapi/*.log
-/backend-fastapi/Dockerfile
 
 # ====================
 # BACKEND - Spring Boot
@@ -25,7 +23,6 @@
 /backend-springboot/*.log
 /backend-springboot/*.iml
 /backend-springboot/.idea/
-/backend-springboot/Dockerfile
 
 # ====================
 # GENERAL
@@ -33,7 +30,6 @@
 # IDEs
 .vscode/
 .idea/
-docker-compose.yml
 
 # OS
 .DS_Store
