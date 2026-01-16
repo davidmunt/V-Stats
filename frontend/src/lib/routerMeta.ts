@@ -1,9 +1,12 @@
+import type { UserRole } from "@/interfaces/user.interface";
+
 export interface IRouterMeta {
   name?: string;
   path: string;
   isShow: boolean;
   isCommon?: boolean;
   isAuth?: boolean;
+  role?: UserRole;
   icon?: string;
 }
 
@@ -23,6 +26,13 @@ const routerMeta: RouterMetaType = {
     path: "/auth",
     isShow: true,
     isAuth: false,
+  },
+  AdminDashboardPage: {
+    name: "Admin Dashboard",
+    path: "/admin",
+    isAuth: true,
+    isShow: false,
+    role: "ADMIN",
   },
   NotFoundPage: {
     path: "/*",

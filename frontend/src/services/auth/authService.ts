@@ -1,5 +1,5 @@
-import apiClient from "@/repositories/apiClient";
-import { LoginParam, RegisterParam, UpdateUserParam } from "./authRepository.param";
+import apiClient from "@/services/apiClient";
+import type { LoginParam, RegisterParam, UpdateUserParam } from "./authService.param";
 
 export const login = async ({ email, password }: LoginParam) => {
   return apiClient({

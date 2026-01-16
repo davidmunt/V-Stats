@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLoginMutation } from "@/queries/mutations/useLogin";
+import { useLoginMutation } from "@/mutations/auth/useLogin";
 import { useNavigate } from "react-router-dom";
 
 interface LoginFormProps {

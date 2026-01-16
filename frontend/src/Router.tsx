@@ -1,50 +1,64 @@
 import { lazy, Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
-import routerMeta, { IRouterMeta } from "@/lib/routerMeta";
-import LoadingFallback from "@/components/LoadingFallback";
-import ProtectedRoute from "@/components/HOC/ProtectedRoute";
-import { useQueryErrorResetBoundary } from "@tanstack/react-query";
-import { ErrorBoundary } from "react-error-boundary";
-import ErrorFallback from "@/components/ErrorFallback";
+
 import Layout from "@/components/common/Layout";
+import ProtectedRoute from "@/guards/ProtectedRoute";
+import RoleProtectedRoute from "@/guards/RoleProtectedRoute";
+import LoadingFallback from "@/components/LoadingFallback";
 
-const lazyImport = (pageName: string) => lazy(() => import(`@/pages/${pageName}`));
-
-const assignRouter = Object.keys(routerMeta).map((componentKey: string) => {
-  const props: IRouterMeta = routerMeta[componentKey];
-
-  return {
-    Component: lazyImport(componentKey),
-    props,
-  };
-});
+const HomePage = lazy(() => import("@/pages/HomePage"));
+const AuthPage = lazy(() => import("@/pages/AuthPage"));
+const ProfilePage = lazy(() => import("@/pages/ProfilePage"));
+const AdminDashboardPage = lazy(() => import("@/pages/AdminDashboardPage"));
 
 const Router = () => {
-  const { reset } = useQueryErrorResetBoundary();
-
   return (
-    <Routes>
-      <Route element={<Layout />}>
-        {assignRouter.map(({ Component, props }) => (
+    <Suspense fallback={<LoadingFallback />}>
+      <Routes>
+        <Route element={<Layout />}>
+          {/* Public */}
           <Route
-            key={props.path}
-            path={props.path}
+            path="/auth"
             element={
-              <ProtectedRoute isAuth={props.isAuth}>
-                <Suspense fallback={<LoadingFallback />}>
-                  <ErrorBoundary
-                    onReset={reset}
-                    fallbackRender={({ resetErrorBoundary }) => <ErrorFallback resetErrorBoundary={resetErrorBoundary} />}
-                  >
-                    <Component />
-                  </ErrorBoundary>
-                </Suspense>
+              <ProtectedRoute isAuth={false}>
+                <AuthPage />
               </ProtectedRoute>
             }
           />
-        ))}
-      </Route>
-    </Routes>
+
+          {/* Protected */}
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute isAuth>
+                <HomePage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute isAuth>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Admin */}
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute isAuth>
+                <RoleProtectedRoute allowedRoles={["ADMIN"]}>
+                  <AdminDashboardPage />
+                </RoleProtectedRoute>
+              </ProtectedRoute>
+            }
+          />
+        </Route>
+      </Routes>
+    </Suspense>
   );
 };
 

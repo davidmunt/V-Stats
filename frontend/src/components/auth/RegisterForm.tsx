@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useRegisterMutation } from "@/queries/mutations/useRegister";
+import { useRegisterMutation } from "@/mutations/auth/useRegister";
 
 interface RegisterFormProps {
   onSwitch: () => void;
