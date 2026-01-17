@@ -1,6 +1,6 @@
 import { Navigate, useLocation } from "react-router-dom";
 import type { ReactNode } from "react";
-import { useAuthContext } from "@/contexts/auth/AuthContext";
+import { useAuthContext } from "@/hooks/useAuthContext";
 import LoadingFallback from "@/components/LoadingFallback";
 
 interface ProtectedRouteProps {

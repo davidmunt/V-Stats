@@ -1,7 +1,7 @@
 import { Navigate } from "react-router-dom";
 import type { ReactNode } from "react";
 import { jwtDecode } from "jwt-decode";
-import { useAuthContext } from "@/contexts/auth/AuthContext";
+import { useAuthContext } from "@/hooks/useAuthContext";
 import tokenService from "@/lib/token";
 import { ACCESS_TOKEN_KEY } from "@/constants/token.constant";
 import LoadingFallback from "@/components/LoadingFallback";
