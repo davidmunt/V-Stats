@@ -1,5 +1,5 @@
 module.exports = (app) => {
-  const userController = require("../controllers/user.controller");
+  const userController = require("../controllers/auth.controller");
   const verifyJWT = require("../middleware/verifyJWT");
 
   // Login User
@@ -9,8 +9,10 @@ module.exports = (app) => {
   app.post("/auth/register", userController.registerUser);
 
   // Refresh Token
-  app.post("/auth/refresh", verifyJWT, userController.refreshToken);
+  app.post("/auth/refresh", verifyJWT([]), userController.refreshToken);
 
   // Logout
-  app.post("/auth/logout", verifyJWT, userController.logout);
+  app.post("/auth/logout", verifyJWT([]), userController.logout);
+
+  app.get("/auth/me", verifyJWT([]), userController.getMe);
 };

@@ -5,7 +5,8 @@ const PlayerSchema = mongoose.Schema(
   {
     slug: { type: String, lowercase: true, unique: true },
     name: { type: String, required: true },
-    email: { type: String, unique: true, sparse: true }, // sparse permite nulos aunque sea unique
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
     dorsal: { type: Number, required: true },
     role: {
       type: String,

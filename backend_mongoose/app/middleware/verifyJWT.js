@@ -1,49 +1,64 @@
 const jwt = require("jsonwebtoken");
-const RefreshToken = require("../models/refreshToken.model");
-const RefreshBlacklist = require("../models/blacklistRefresh.model");
 const User = require("../models/user.model");
-const { generateAccessToken } = require("../middleware/authService");
+const LeagueAdmin = require("../models/leagueAdmin.model");
+const Coach = require("../models/coach.model");
+const Analyst = require("../models/analyst.model");
+const Player = require("../models/player.model");
 
-const verifyJWT = async (req, res, next) => {
-  const authHeader = req.headers.authorization || req.headers.Authorization;
-  if (!authHeader || !authHeader.startsWith("Token ") || !authHeader.split(" ")[1]) {
-    return res.status(401).json({ message: "Unauthorized: No token provided" });
-  }
-  const token = authHeader.split(" ")[1];
-  try {
-    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-    if (decoded && decoded.user.role !== "user") return res.status(403).json({ message: "Forbidden: Invalid role" });
-    const loginUser = await User.findOne({ email: decoded.user.email }).exec();
-    if (!loginUser) {
-      return res.status(403).json({ message: "User not found" });
+const verifyJWT = (allowedRoles = []) => {
+  return async (req, res, next) => {
+    const authHeader = req.headers.authorization || req.headers.Authorization;
+
+    if (!authHeader || !authHeader.startsWith("Token ")) {
+      return res.status(401).json({ message: "No autorizado: Token no proporcionado" });
     }
-    const refreshToken = await RefreshToken.findOne({ userId: loginUser._id }).exec();
-    if (!refreshToken) {
-      return res.status(403).json({ message: "Refresh token not found" });
-    }
-    if (refreshToken.expiryDate < Date.now()) {
-      await RefreshBlacklist.create({
-        token: refreshToken.token,
-        userId: loginUser._id,
-        expiryDate: refreshToken.expiryDate,
-      });
-      await RefreshToken.deleteOne({ _id: refreshToken.id });
-      return res.status(403).json({ message: "Refresh token has expired and sent to blacklist" });
-    } else {
-      let accessToken = token;
-      if (decoded.exp < Date.now() / 1000) {
-        accessToken = generateAccessToken(loginUser);
-        res.setHeader("Authorization", `Token ${accessToken}`);
+
+    const token = authHeader.split(" ")[1];
+
+    try {
+      const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+      const { id, role, email } = decoded.user;
+
+      // 1. Verificar si el rol del token está en la lista de permitidos
+      // Si allowedRoles está vacío, cualquier usuario autenticado pasa
+      if (allowedRoles.length > 0 && !allowedRoles.includes(role)) {
+        return res.status(403).json({ message: "Prohibido: No tienes los permisos necesarios" });
       }
-      req.authHeader = authHeader;
-      req.userId = loginUser.id;
+
+      // 2. Buscar al usuario en la colección correcta según su rol
+      let loginUser = null;
+      const modelMap = {
+        user: User,
+        admin: LeagueAdmin,
+        coach: Coach,
+        analyst: Analyst,
+        player: Player,
+      };
+
+      const TargetModel = modelMap[role];
+      if (!TargetModel) {
+        return res.status(403).json({ message: "Rol de token no reconocido" });
+      }
+
+      loginUser = await TargetModel.findById(id).exec();
+
+      if (!loginUser || !loginUser.isActive) {
+        return res.status(403).json({ message: "Usuario no encontrado o inactivo" });
+      }
+
+      // 3. Inyectar datos en la request para los controladores
+      req.userId = loginUser._id;
       req.userEmail = loginUser.email;
-      req.newAccessToken = accessToken;
+      req.userRole = role;
+      req.token = token;
       next();
+    } catch (error) {
+      if (error.name === "TokenExpiredError") {
+        return res.status(401).json({ message: "Token expirado" });
+      }
+      return res.status(403).json({ message: "Token inválido", error: error.message });
     }
-  } catch (error) {
-    return res.status(403).json({ message: "Forbidden: Invalid token", error: error.message });
-  }
+  };
 };
 
 module.exports = verifyJWT;

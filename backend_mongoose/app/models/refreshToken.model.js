@@ -5,8 +5,13 @@ const RefreshTokenSchema = mongoose.Schema(
   {
     user_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
       required: true,
+      refPath: "onModel", // Referencia dinámica
+    },
+    onModel: {
+      type: String,
+      required: true,
+      enum: ["User", "LeagueAdmin", "Coach", "Analyst", "Player"], // Nombres de los modelos
     },
     token: {
       type: String,
@@ -16,11 +21,11 @@ const RefreshTokenSchema = mongoose.Schema(
     expires_at: {
       type: Date,
       required: true,
-      index: { expires: 0 }, // Índice TTL: Borra el documento automáticamente al llegar a esta fecha
+      index: { expires: 0 },
     },
   },
   {
-    timestamps: true, // Esto crea createdAt (tu campo created_at) y updatedAt
+    timestamps: true,
     collection: "RefreshToken",
   }
 );

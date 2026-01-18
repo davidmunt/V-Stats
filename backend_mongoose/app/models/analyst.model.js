@@ -8,10 +8,11 @@ const AnalystSchema = mongoose.Schema(
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     avatar: { type: String, default: "" },
-    team_id: { type: mongoose.Schema.Types.ObjectId, ref: "Team", required: true },
+    team_id: { type: mongoose.Schema.Types.ObjectId, ref: "Team", required: false, default: null },
     dark_mode: { type: Boolean, default: false },
     status: { type: String, default: "active" },
     isActive: { type: Boolean, default: true },
+    refresh_token: { type: mongoose.Schema.Types.ObjectId, ref: "RefreshToken", required: false, default: null },
   },
   { timestamps: true, collection: "Analyst" }
 );
