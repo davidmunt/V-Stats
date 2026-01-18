@@ -52,9 +52,9 @@ services:
     restart: always
     ports:
       - "5173:5173"
-    depends_on:
-      - springboot
-      - fastapi
+    # depends_on:
+    #   - springboot
+    #   - fastapi
 
 volumes:
   postgres_data:
