@@ -1,6 +1,10 @@
-import type { User } from "./user.interface";
+import type { UserRole } from "./user.interface";
 
 export interface Auth {
-  accessToken: string;
-  user: User;
+  token: string;
+  user_type: UserRole;
+  email: string;
+  name: string;
+  id: string;
+  avatar: string;
 }

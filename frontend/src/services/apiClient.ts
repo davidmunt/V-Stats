@@ -10,7 +10,7 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use((request) => {
   const jwtToken = token.getToken(ACCESS_TOKEN_KEY);
   if (jwtToken) {
-    request.headers.Authorization = `Bearer ${jwtToken}`;
+    request.headers.Authorization = `Token ${jwtToken}`;
   }
   return request;
 });
@@ -29,7 +29,7 @@ apiClient.interceptors.response.use(
       token.removeToken(ACCESS_TOKEN_KEY);
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export default apiClient;

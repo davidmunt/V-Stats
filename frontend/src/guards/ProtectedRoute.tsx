@@ -9,13 +9,16 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute = ({ children, isAuth }: ProtectedRouteProps) => {
-  const { isAuthenticated, isLoading } = useAuthContext();
+  const { isAuthenticated, isLoading, user } = useAuthContext();
   const location = useLocation();
   if (isLoading) {
     return <LoadingFallback />;
   }
   if (isAuth && !isAuthenticated) {
     return <Navigate to="/auth" state={{ from: location }} replace />;
+  }
+  if (isAuth === false && isAuthenticated && user?.user_type === "admin") {
+    return <Navigate to="/admin" replace />;
   }
   if (isAuth === false && isAuthenticated) {
     return <Navigate to="/" replace />;

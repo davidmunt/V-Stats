@@ -7,7 +7,7 @@ export interface RegisterParam {
   name: string;
   email: string;
   password: string;
-  user_type: "ADMIN" | "COACH" | "ANALIST" | "PLAYER" | "USER";
+  user_type: "admin" | "coach" | "analyst" | "player" | "user";
 }
 
 export interface UpdateUserParam {

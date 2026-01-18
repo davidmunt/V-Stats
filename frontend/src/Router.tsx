@@ -16,14 +16,7 @@ const Router = () => {
       <Routes>
         <Route element={<Layout />}>
           {/* Public */}
-          <Route
-            path="/auth"
-            element={
-              <ProtectedRoute isAuth={false}>
-                <AuthPage />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/auth" element={<AuthPage />} />
 
           {/* Protected */}
           <Route
@@ -40,7 +33,7 @@ const Router = () => {
             path="/admin"
             element={
               <ProtectedRoute isAuth>
-                <RoleProtectedRoute allowedRoles={["ADMIN"]}>
+                <RoleProtectedRoute allowedRoles={["admin"]}>
                   <AdminDashboardPage />
                 </RoleProtectedRoute>
               </ProtectedRoute>

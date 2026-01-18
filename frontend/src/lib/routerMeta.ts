@@ -32,7 +32,7 @@ const routerMeta: RouterMetaType = {
     path: "/admin",
     isAuth: true,
     isShow: false,
-    role: "ADMIN",
+    role: "admin",
   },
   NotFoundPage: {
     path: "/*",
