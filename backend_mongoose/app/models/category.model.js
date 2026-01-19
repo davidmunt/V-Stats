@@ -18,15 +18,24 @@ const CategorySchema = mongoose.Schema(
       type: String,
       trim: true,
     },
+    image: {
+      type: String,
+      trim: true,
+    },
     isActive: {
       type: Boolean,
       default: true,
+    },
+    status: {
+      type: String,
+      enum: ["active", "inactive"],
+      default: "active",
     },
   },
   {
     timestamps: true,
     collection: "Category",
-  }
+  },
 );
 
 CategorySchema.plugin(uniqueValidator, { msg: "already taken" });
