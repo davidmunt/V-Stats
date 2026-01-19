@@ -2,6 +2,7 @@ export type LeagueStatus = "ACTIVE" | "INACTIVE" | "COMPLETED" | "PENDING";
 
 export interface League {
   id_league: number;
+  slug: string;
   id_category_league: string;
   id_admin: number;
   name: string;
