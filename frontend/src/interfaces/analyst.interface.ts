@@ -1,8 +1,8 @@
 export type AnalystStatus = "ACTIVE" | "INACTIVE" | "SUSPENDED";
 
 export interface Analyst {
-  id_analyst: number;
-  id_team: number;
+  id_analyst: string;
+  id_team: string;
   name: string;
   email: string;
   avatar: string;

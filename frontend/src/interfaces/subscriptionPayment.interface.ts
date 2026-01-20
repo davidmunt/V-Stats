@@ -1,8 +1,8 @@
 export type PaymentStatus = "SUCCEEDED" | "PENDING" | "FAILED" | "REFUNDED";
 
 export interface SubscriptionPayment {
-  id_payment: number;
-  id_user: number;
+  id_payment: string;
+  id_user: string;
   amount: number;
   currency: string;
   payment_method: string;

@@ -1,9 +1,9 @@
 export type LineupStatus = "ACTIVE" | "INACTIVE" | "DRAFT";
 
 export interface Lineup {
-  id_lineup: number;
-  id_match: number;
-  id_team: number;
+  id_lineup: string;
+  id_match: string;
+  id_team: string;
   created_at: Date;
   status: LineupStatus;
   is_active: boolean;

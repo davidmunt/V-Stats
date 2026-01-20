@@ -3,11 +3,11 @@ export type ResultType = "SUCCESS" | "FAIL" | "ACE" | "BLOCKED" | "ERROR";
 
 export interface Action {
   id_action: string;
-  id_match: number;
-  id_set: number;
-  id_team: number;
-  id_player: number;
-  id_point_for_team?: number;
+  id_match: string;
+  id_set: string;
+  id_team: string;
+  id_player: string;
+  id_point_for_team?: string;
   player_position: number;
   action_type: ActionType;
   result: ResultType;

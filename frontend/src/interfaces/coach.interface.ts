@@ -1,8 +1,8 @@
 export type CoachStatus = "ACTIVE" | "INACTIVE" | "SUSPENDED";
 
 export interface Coach {
-  id_coach: number;
-  id_team: number;
+  id_coach: string;
+  id_team: string;
   name: string;
   email: string;
   avatar: string;

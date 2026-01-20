@@ -1,8 +1,8 @@
 export type SubscriptionStatus = "ACTIVE" | "EXPIRED" | "CANCELLED" | "PENDING";
 
 export interface Subscription {
-  id_subscription: number;
-  id_user: number;
+  id_subscription: string;
+  id_user: string;
   start_date: Date;
   end_date: Date;
   auto_renew: boolean;
