@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createCategoryLeague } from "@/services/admin/categoryLeague/adminCategoryLeagueService";
 import type { CreateCategoryLeagueParam } from "@/services/admin/categoryLeague/adminCategoryLeagueService.param";
 import type { CategoryLeague } from "@/interfaces/categoryLeague.interface";
-import { CATEGORY_LEAGUES_QUERY_KEY } from "@/queries/categoryLeague/useCategoryLeagues";
+import { CATEGORY_LEAGUES_QUERY_KEY } from "@/queries/categoryLeagues/useCategoryLeagues";
 
 export const useCreateCategoryLeagueMutation = () => {
   const queryClient = useQueryClient();
