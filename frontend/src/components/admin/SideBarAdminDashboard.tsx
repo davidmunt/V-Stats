@@ -21,7 +21,7 @@ const AdminSidebar = ({ currentView, onViewChange }: AdminSidebarProps) => {
       {/* Navegación */}
       <nav className="flex-1 p-4 flex flex-col gap-2">
         {menuButtons.map((button) => {
-          const isActive = currentView === button.id;
+          const is_active = currentView === button.id;
 
           return (
             <button
@@ -30,7 +30,7 @@ const AdminSidebar = ({ currentView, onViewChange }: AdminSidebarProps) => {
               className={`
                 w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200
                 ${
-                  isActive
+                  is_active
                     ? "bg-blue-50 text-blue-700 shadow-sm border border-blue-100" // Estilo Activo
                     : "text-gray-600 hover:bg-gray-50 hover:text-gray-900" // Estilo Inactivo
                 }
