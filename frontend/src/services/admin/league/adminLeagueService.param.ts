@@ -13,6 +13,8 @@ export interface UpdateLeagueParam {
   category: string;
   season: string;
   image?: string;
+  status: string;
+  is_active: boolean;
 }
 
 export interface DeleteLeagueParam {

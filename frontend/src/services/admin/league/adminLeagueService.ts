@@ -2,26 +2,45 @@ import apiClient from "@/services/apiClient";
 import type { CreateLeagueParam, UpdateLeagueParam, DeleteLeagueParam } from "./adminLeagueService.param";
 import type { League } from "@/interfaces/league.interface";
 
+interface LeaguesResponse {
+  leagues: League[];
+}
+
+interface SingleLeagueResponse {
+  league: League;
+}
+
 export const createLeague = async ({ name, country, category, season, image }: CreateLeagueParam): Promise<League> => {
-  const response = await apiClient.post<League>("/league", {
+  const response = await apiClient.post<SingleLeagueResponse>("/league", {
     name,
     country,
     category,
     season,
     image,
   });
-  return response.data;
+  return response.data.league;
 };
 
-export const updateLeague = async ({ slug, name, country, category, season, image }: UpdateLeagueParam): Promise<League> => {
-  const response = await apiClient.put<League>(`/league/${slug}`, {
+export const updateLeague = async ({
+  slug,
+  name,
+  country,
+  category,
+  season,
+  image,
+  status,
+  is_active,
+}: UpdateLeagueParam): Promise<League> => {
+  const response = await apiClient.put<SingleLeagueResponse>(`/league/${slug}`, {
     name,
     country,
     category,
     season,
     image,
+    status,
+    is_active,
   });
-  return response.data;
+  return response.data.league;
 };
 
 export const deleteLeague = async ({ slug }: DeleteLeagueParam): Promise<void> => {
@@ -29,11 +48,11 @@ export const deleteLeague = async ({ slug }: DeleteLeagueParam): Promise<void> =
 };
 
 export const getMyLeagues = async (): Promise<League[]> => {
-  const response = await apiClient.get<League[]>("/league/my-leagues");
-  return response.data;
+  const response = await apiClient.get<LeaguesResponse>("/league/my-leagues");
+  return response.data.leagues;
 };
 
 export const getLeagueBySlug = async (slug: string): Promise<League> => {
-  const response = await apiClient.get<League>(`/league/${slug}`);
-  return response.data;
+  const response = await apiClient.get<SingleLeagueResponse>(`/league/${slug}`);
+  return response.data.league;
 };

@@ -10,7 +10,7 @@ export interface UpdateCategoryLeagueParam {
   description: string;
   image: string;
   status: string;
-  isActive: boolean;
+  is_active: boolean;
 }
 
 export interface DeleteCategoryLeagueParam {
