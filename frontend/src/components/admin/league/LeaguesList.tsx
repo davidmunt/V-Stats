@@ -2,14 +2,16 @@ import { useLeaguesQuery } from "@/queries/leagues/useLeagues";
 import { useDeleteLeagueMutation } from "@/mutations/leagues/useDelete";
 import type { League } from "@/interfaces/league.interface";
 import LoadingFallback from "@/components/LoadingFallback";
-import { useCategoryLeaguesQuery } from "@/queries/categoryLeague/useCategoryLeagues";
+import { useCategoryLeaguesQuery } from "@/queries/categoryLeagues/useCategoryLeagues";
 
 interface LeaguesListProps {
   onCreate: () => void;
   onEdit: (league: League) => void;
+  onViewDetail: (league: League) => void;
 }
 
-export const LeaguesList = ({ onCreate, onEdit }: LeaguesListProps) => {
+//componente que muestra todas tus ligas creadas
+export const LeaguesList = ({ onCreate, onEdit, onViewDetail }: LeaguesListProps) => {
   const { data: leagues, isLoading, isError } = useLeaguesQuery();
   const { data: categories } = useCategoryLeaguesQuery();
   const deleteMutation = useDeleteLeagueMutation();
@@ -27,7 +29,7 @@ export const LeaguesList = ({ onCreate, onEdit }: LeaguesListProps) => {
   };
 
   if (isLoading) return <LoadingFallback />;
-  if (isError) return <div className="p-4 text-red-500">Error cargando las ligas.</div>;
+  if (isError) return <div className="p-4 text-red-500">Error cargando las ligas...</div>;
 
   return (
     <div className="p-6">
@@ -76,7 +78,7 @@ export const LeaguesList = ({ onCreate, onEdit }: LeaguesListProps) => {
                     </td>
 
                     {/* Nombre */}
-                    <td className="py-3 px-4">
+                    <td className="py-3 px-4" onClick={() => onViewDetail(league)}>
                       <div className="font-medium text-gray-800">{league.name}</div>
                     </td>
 

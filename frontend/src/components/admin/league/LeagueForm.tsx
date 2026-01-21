@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { League } from "@/interfaces/league.interface";
 import { useCreateLeagueMutation } from "@/mutations/leagues/useCreate";
 import { useUpdateLeagueMutation } from "@/mutations/leagues/useUpdate";
-import { useCategoryLeaguesQuery } from "@/queries/categoryLeague/useCategoryLeagues";
+import { useCategoryLeaguesQuery } from "@/queries/categoryLeagues/useCategoryLeagues";
 
 interface LeagueFormProps {
   initialData: League | null;
@@ -10,12 +10,12 @@ interface LeagueFormProps {
   onSuccess: () => void;
 }
 
+//componente formulario para crear o editar una de tus ligas
 export const LeagueForm = ({ initialData, onCancel, onSuccess }: LeagueFormProps) => {
   const isEditing = !!initialData;
   const createMutation = useCreateLeagueMutation();
   const updateMutation = useUpdateLeagueMutation();
 
-  // Obtenemos las categorías para el Select
   const { data: categories, isLoading: isLoadingCats } = useCategoryLeaguesQuery();
 
   const [formData, setFormData] = useState({
