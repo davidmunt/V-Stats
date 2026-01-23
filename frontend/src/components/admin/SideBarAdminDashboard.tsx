@@ -6,16 +6,16 @@ interface AdminSidebarProps {
 const menuButtons = [
   { id: "leagues", label: "Mis Ligas" },
   { id: "categories", label: "Categorías" },
-  { id: "teams", label: "Equipos" },
+  { id: "venues", label: "Sedes" },
 ];
 
+//componente sidebar para el dashboard de admin que muestra según el botón que cliques un menú o otro
 const AdminSidebar = ({ currentView, onViewChange }: AdminSidebarProps) => {
   return (
     <aside className="w-64 bg-white border-r border-gray-200 h-screen flex flex-col sticky top-0">
       {/* Header del Sidebar */}
       <div className="p-6 border-b border-gray-100">
         <h2 className="text-xl font-bold text-gray-800">Panel Admin</h2>
-        <p className="text-xs text-gray-500 mt-1">Gestión de torneos</p>
       </div>
 
       {/* Navegación */}

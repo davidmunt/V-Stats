@@ -9,6 +9,7 @@ interface CategoryFormProps {
   onSuccess: () => void;
 }
 
+//componente formulario para crear o editar una de tus categorias
 export const CategoryForm = ({ initialData, onCancel, onSuccess }: CategoryFormProps) => {
   const isEditing = !!initialData;
   const createMutation = useCreateCategoryLeagueMutation();
@@ -18,8 +19,8 @@ export const CategoryForm = ({ initialData, onCancel, onSuccess }: CategoryFormP
     name: initialData?.name || "",
     description: initialData?.description || "",
     image: initialData?.image || "",
-    isActive: initialData?.isActive ?? true,
-    status: initialData?.status || (initialData?.isActive ? "active" : "inactive"),
+    is_active: initialData?.is_active ?? true,
+    status: initialData?.status || (initialData?.is_active ? "active" : "inactive"),
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -29,7 +30,7 @@ export const CategoryForm = ({ initialData, onCancel, onSuccess }: CategoryFormP
       setFormData((prev) => ({
         ...prev,
         status: value,
-        isActive: value === "active",
+        is_active: value === "active",
       }));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
@@ -112,7 +113,7 @@ export const CategoryForm = ({ initialData, onCancel, onSuccess }: CategoryFormP
             <label className="block text-sm font-medium text-gray-700 mb-1">Estado</label>
             <select
               name="status"
-              value={formData.isActive ? "active" : "inactive"} // Usamos isActive para controlar el value visual
+              value={formData.is_active ? "active" : "inactive"} // Usamos is_active para controlar el value visual
               onChange={handleChange}
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none bg-white"
             >

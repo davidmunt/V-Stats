@@ -1,4 +1,4 @@
-import { useCategoryLeaguesQuery } from "@/queries/categoryLeague/useCategoryLeagues";
+import { useCategoryLeaguesQuery } from "@/queries/categoryLeagues/useCategoryLeagues";
 import { useDeleteCategoryLeagueMutation } from "@/mutations/categoryLeague/useDelete";
 import type { CategoryLeague } from "@/interfaces/categoryLeague.interface";
 import LoadingFallback from "@/components/LoadingFallback";
@@ -8,6 +8,7 @@ interface CategoriesListProps {
   onEdit: (category: CategoryLeague) => void;
 }
 
+//componente que muestra todas tus categorias creadas
 export const CategoriesList = ({ onCreate, onEdit }: CategoriesListProps) => {
   const { data: categories, isLoading, isError } = useCategoryLeaguesQuery();
   const deleteMutation = useDeleteCategoryLeagueMutation();
@@ -77,10 +78,10 @@ export const CategoriesList = ({ onCreate, onEdit }: CategoriesListProps) => {
                     <td className="py-3 px-4">
                       <span
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          category.isActive ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                          category.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
                         }`}
                       >
-                        {category.status || (category.isActive ? "Activo" : "Inactivo")}
+                        {category.status || (category.is_active ? "Activo" : "Inactivo")}
                       </span>
                     </td>
                     {/* Botones de Acción */}
