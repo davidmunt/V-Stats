@@ -39,7 +39,7 @@ export const deleteVenue = async ({ slug }: { slug: string }): Promise<void> => 
 };
 
 export const getMyVenues = async (): Promise<Venue[]> => {
-  const response = await apiClient.get<VenuesResponse>(`/venues`);
+  const response = await apiClient.get<VenuesResponse>(`/venues/my-venues`);
   return response.data.venues;
 };
 

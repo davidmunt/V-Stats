@@ -1,6 +1,7 @@
 import apiClient from "@/services/apiClient";
 import type { CreateTeamParam, UpdateTeamParam, DeleteTeamParam } from "./adminTeamService.param";
 import type { Team } from "@/interfaces/team.interface";
+import type { TeamStanding } from "@/interfaces/teamStanding.interface";
 
 interface TeamsResponse {
   teams: Team[];
@@ -49,6 +50,11 @@ export const deleteTeam = async ({ slug }: DeleteTeamParam): Promise<void> => {
 export const getTeamsFromLeague = async (slug: string): Promise<Team[]> => {
   const response = await apiClient.get<TeamsResponse>(`/league/${slug}/teams`);
   return response.data.teams;
+};
+
+export const getTeamsStandingsFromLeague = async (slug: string): Promise<TeamStanding[]> => {
+  const response = await apiClient.get<TeamStanding[]>(`/league/${slug}/standings`);
+  return response.data;
 };
 
 export const getTeamBySlug = async (slug: string): Promise<Team> => {
