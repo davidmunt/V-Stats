@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteCategoryLeague } from "@/services/admin/categoryLeague/adminCategoryLeagueService";
-import type { DeleteCategoryLeagueParam } from "@/services/admin/categoryLeague/adminCategoryLeagueService.param";
+import { deleteCategoryLeague } from "@/services/categoryLeague/adminCategoryLeagueService";
+import type { DeleteCategoryLeagueParam } from "@/services/categoryLeague/adminCategoryLeagueService.param";
 import type { CategoryLeague } from "@/interfaces/categoryLeague.interface";
 import { CATEGORY_LEAGUES_QUERY_KEY } from "@/queries/categoryLeagues/useCategoryLeagues";
 

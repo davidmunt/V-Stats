@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createTeam } from "@/services/admin/team/adminTeamService";
-import type { CreateTeamParam } from "@/services/admin/team/adminTeamService.param";
+import { createTeam } from "@/services/team/adminTeamService";
+import type { CreateTeamParam } from "@/services/team/adminTeamService.param";
 import type { Team } from "@/interfaces/team.interface";
 import { TEAMS_LIST_QUERY_KEY } from "@/queries/teams/useTeams";
 

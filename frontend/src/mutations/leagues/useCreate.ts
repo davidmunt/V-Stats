@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createLeague } from "@/services/admin/league/adminLeagueService";
-import type { CreateLeagueParam } from "@/services/admin/league/adminLeagueService.param";
+import { createLeague } from "@/services/league/adminLeagueService";
+import type { CreateLeagueParam } from "@/services/league/adminLeagueService.param";
 import type { League } from "@/interfaces/league.interface";
 import { LEAGUES_QUERY_KEY } from "@/queries/leagues/useLeagues";
 
