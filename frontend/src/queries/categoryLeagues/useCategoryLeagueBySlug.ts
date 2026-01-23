@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getCategoryLeagueBySlug } from "@/services/admin/categoryLeague/adminCategoryLeagueService";
+import { getCategoryLeagueBySlug } from "@/services/categoryLeague/adminCategoryLeagueService";
 import type { CategoryLeague } from "@/interfaces/categoryLeague.interface";
 
 export const CATEGORY_LEAGUE_DETAIL_QUERY_KEY = (slug: string) => ["category-leagues", "detail", slug];

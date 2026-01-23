@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getMyCategoryLeagues } from "@/services/admin/categoryLeague/adminCategoryLeagueService";
+import { getMyCategoryLeagues } from "@/services/categoryLeague/adminCategoryLeagueService";
 import type { CategoryLeague } from "@/interfaces/categoryLeague.interface";
 
 export const CATEGORY_LEAGUES_QUERY_KEY = ["category-leagues"];
