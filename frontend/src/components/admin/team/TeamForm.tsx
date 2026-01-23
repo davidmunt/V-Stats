@@ -3,6 +3,8 @@ import type { Team } from "@/interfaces/team.interface";
 import { useCreateTeamMutation } from "@/mutations/teams/useCreate";
 import { useUpdateTeamMutation } from "@/mutations/teams/useUpdate";
 import { useVenuesQuery } from "@/queries/venues/useVenues";
+import { useFreeCoachesQuery, useCoachByIdQuery } from "@/queries/coach/useCoachQueries";
+import { useFreeAnalystsQuery, useAnalystByIdQuery } from "@/queries/analyst/useAnalystQueries";
 
 interface TeamFormProps {
   leagueSlug: string;
@@ -15,6 +17,21 @@ export const TeamForm = ({ leagueSlug, initialData, onCancel, onSuccess }: TeamF
   const isEditing = !!initialData;
   const createMutation = useCreateTeamMutation(leagueSlug);
   const updateMutation = useUpdateTeamMutation(leagueSlug);
+
+  const { data: freeCoaches } = useFreeCoachesQuery();
+  const { data: currentCoach } = useCoachByIdQuery(initialData?.id_coach || null);
+  const { data: freeAnalysts } = useFreeAnalystsQuery();
+  const { data: currentAnalyst } = useAnalystByIdQuery(initialData?.id_analyst || null);
+
+  const allCoaches = [...(freeCoaches || [])];
+  if (currentCoach && !allCoaches.some((c) => c.id_coach === currentCoach.id_coach)) {
+    allCoaches.push(currentCoach);
+  }
+
+  const allAnalysts = [...(freeAnalysts || [])];
+  if (currentAnalyst && !allAnalysts.some((a) => a.id_analyst === currentAnalyst.id_analyst)) {
+    allAnalysts.push(currentAnalyst);
+  }
 
   // Supongamos que traemos las sedes para el select
   const { data: venues } = useVenuesQuery();
@@ -115,23 +132,37 @@ export const TeamForm = ({ leagueSlug, initialData, onCancel, onSuccess }: TeamF
               <div className="border-t col-span-2 my-2"></div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Entrenador (ID/Nombre)</label>
-                <input
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Entrenador</label>
+                <select
                   name="id_coach"
                   value={formData.id_coach || ""}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white"
+                >
+                  <option value="">Sin entrenador asignado</option>
+                  {allCoaches.map((c) => (
+                    <option key={c.id_coach} value={c.id_coach}>
+                      {c.name} {initialData?.id_coach === c.id_coach ? "(Actual)" : ""}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Analista (ID/Nombre)</label>
-                <input
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Analista</label>
+                <select
                   name="id_analyst"
                   value={formData.id_analyst || ""}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white"
+                >
+                  <option value="">Sin analista asignado</option>
+                  {allAnalysts.map((a) => (
+                    <option key={a.id_analyst} value={a.id_analyst}>
+                      {a.name} {initialData?.id_analyst === a.id_analyst ? "(Actual)" : ""}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div>

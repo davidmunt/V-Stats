@@ -3,6 +3,9 @@ import { useLeagueBySlugQuery } from "@/queries/leagues/useLeagueBySlug";
 import { useDeleteTeamMutation } from "@/mutations/teams/useDelete";
 import type { Team } from "@/interfaces/team.interface";
 import LoadingFallback from "@/components/LoadingFallback";
+import { useAssignedAnalystsQuery } from "@/queries/analyst/useAnalystQueries";
+import { useAssignedCoachesQuery } from "@/queries/coach/useCoachQueries";
+import { useVenuesQuery } from "@/queries/venues/useVenues";
 
 interface TeamsListProps {
   leagueSlug: string;
@@ -14,11 +17,31 @@ export const TeamsList = ({ leagueSlug, onCreate, onEdit }: TeamsListProps) => {
   const { data: league } = useLeagueBySlugQuery(leagueSlug);
   const { data: teams, isLoading, isError } = useTeamsQuery(leagueSlug);
   const deleteMutation = useDeleteTeamMutation(leagueSlug);
+  const { data: allAssignedCoaches } = useAssignedCoachesQuery();
+  const { data: allAssignedAnalysts } = useAssignedAnalystsQuery();
+  const { data: allVenues } = useVenuesQuery();
 
   const handleDelete = (slug: string) => {
     if (window.confirm("¿Estás seguro de que quieres eliminar este equipo?")) {
       deleteMutation.mutate({ slug });
     }
+  };
+
+  const getCoachName = (id: string | null) => {
+    if (!id) return "Sin asignar";
+    const coach = allAssignedCoaches?.find((c) => c.id_coach === id);
+    return coach ? coach.name : "No encontrado";
+  };
+
+  const getAnalystName = (id: string | null) => {
+    if (!id) return "Sin analista";
+    const analyst = allAssignedAnalysts?.find((a) => a.id_analyst === id);
+    return analyst ? analyst.name : "No encontrado";
+  };
+
+  const getVenueName = (id: string) => {
+    const venue = allVenues?.find((v) => v.id_venue === id);
+    return venue ? venue.name : "Sede no encontrada";
   };
 
   if (isLoading) return <LoadingFallback />;
@@ -79,18 +102,11 @@ export const TeamsList = ({ leagueSlug, onCreate, onEdit }: TeamsListProps) => {
 
                     {/* Coach y Analista */}
                     <td className="py-4 px-4 text-sm">
-                      <div className="text-gray-700">
-                        <span className="text-gray-400 text-xs">👔</span> {team.id_coach || "Sin asignar"}
-                      </div>
-                      <div className="text-gray-500 text-xs">
-                        <span className="text-gray-400 text-[10px]">📊</span> {team.id_analyst || "Sin analista"}
-                      </div>
+                      <div className="text-gray-700">👔 {getCoachName(team.id_coach)}</div>
+                      <div className="text-gray-500 text-xs mt-1">📊 {getAnalystName(team.id_analyst)}</div>
                     </td>
 
-                    {/* Sede */}
-                    <td className="py-4 px-4 text-sm text-gray-600">
-                      <span className="flex items-center gap-1">📍 {team.id_venue || "Por definir"}</span>
-                    </td>
+                    <td className="py-4 px-4 text-sm text-gray-600">📍 {getVenueName(team.id_venue)}</td>
 
                     {/* Fecha Creado */}
                     <td className="py-4 px-4 text-xs text-gray-500">{new Date(team.created_at).toLocaleDateString()}</td>
