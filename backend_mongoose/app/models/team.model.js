@@ -14,11 +14,6 @@ const TeamSchema = mongoose.Schema(
       required: true,
       trim: true,
     },
-    category: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Category",
-      required: true,
-    },
     coach_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Coach",
@@ -34,6 +29,11 @@ const TeamSchema = mongoose.Schema(
       ref: "League",
       required: true,
     },
+    id_venue: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Venue",
+      required: true, // Lo ponemos obligatorio según tu petición
+    },
     status: {
       type: String,
       default: "active",
@@ -42,7 +42,7 @@ const TeamSchema = mongoose.Schema(
       type: String,
       default: "",
     },
-    isActive: {
+    is_active: {
       type: Boolean,
       default: true,
     },
@@ -50,7 +50,7 @@ const TeamSchema = mongoose.Schema(
   {
     timestamps: true,
     collection: "Team",
-  }
+  },
 );
 
 TeamSchema.plugin(uniqueValidator, { msg: "already taken" });
@@ -65,15 +65,16 @@ TeamSchema.pre("validate", async function (next) {
 TeamSchema.methods.toTeamResponse = function () {
   return {
     slug: this.slug,
-    team_id: this._id,
+    id_team: this._id,
+    id_venue: this.id_venue,
     name: this.name,
     category: this.category,
-    coach_id: this.coach_id,
-    analyst_id: this.analyst_id,
-    league_id: this.league_id,
+    id_coach: this.coach_id,
+    id_analyst: this.analyst_id,
+    id_league: this.league_id,
     status: this.status,
     image: this.image,
-    isActive: this.isActive,
+    is_active: this.is_active,
     createdAt: this.createdAt,
   };
 };

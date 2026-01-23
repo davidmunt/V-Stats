@@ -38,6 +38,11 @@ mongoose
 require("../routes/auth.router.js")(app);
 require("../routes/league.router.js")(app);
 require("../routes/team.router.js")(app);
+require("../routes/categoryLeague.router.js")(app);
+require("../routes/venue.router.js")(app);
+require("../routes/match.router.js")(app);
+require("../routes/coach.router.js")(app);
+require("../routes/analyst.router.js")(app);
 
 const PORT = process.env.PORT || 3001;
 

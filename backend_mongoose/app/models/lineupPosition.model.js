@@ -39,7 +39,7 @@ const LineupPositionSchema = mongoose.Schema(
       type: String,
       default: "active",
     },
-    isActive: {
+    is_active: {
       type: Boolean,
       default: true,
     },
@@ -47,7 +47,7 @@ const LineupPositionSchema = mongoose.Schema(
   {
     timestamps: true,
     collection: "LineupPosition",
-  }
+  },
 );
 
 LineupPositionSchema.plugin(uniqueValidator, { msg: "already taken" });
@@ -70,7 +70,7 @@ LineupPositionSchema.methods.toLineupPositionResponse = function () {
     initial_position: this.initial_position,
     current_position: this.current_position,
     status: this.status,
-    isActive: this.isActive,
+    is_active: this.is_active,
   };
 };
 

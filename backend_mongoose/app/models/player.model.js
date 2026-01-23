@@ -13,11 +13,17 @@ const PlayerSchema = mongoose.Schema(
       enum: ["setter", "middle", "outside", "opposite", "libero"],
       required: true,
     },
+    avatar: {
+      type: String,
+      default: function () {
+        return `https://robohash.org/${this.email || this.name}?set=set1`;
+      },
+    },
     team_id: { type: mongoose.Schema.Types.ObjectId, ref: "Team", required: true },
     status: { type: String, default: "active" },
-    isActive: { type: Boolean, default: true },
+    is_active: { type: Boolean, default: true },
   },
-  { timestamps: true, collection: "Player" }
+  { timestamps: true, collection: "Player" },
 );
 
 PlayerSchema.pre("validate", async function (next) {

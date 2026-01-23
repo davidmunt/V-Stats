@@ -7,14 +7,19 @@ const CoachSchema = mongoose.Schema(
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    avatar: { type: String, default: "" },
+    avatar: {
+      type: String,
+      default: function () {
+        return `https://robohash.org/${this.email || this.name}?set=set1`;
+      },
+    },
     team_id: { type: mongoose.Schema.Types.ObjectId, ref: "Team", required: false, default: null },
     dark_mode: { type: Boolean, default: false },
     status: { type: String, default: "active" },
-    isActive: { type: Boolean, default: true },
+    is_active: { type: Boolean, default: true },
     refresh_token: { type: mongoose.Schema.Types.ObjectId, ref: "RefreshToken", required: false, default: null },
   },
-  { timestamps: true, collection: "Coach" }
+  { timestamps: true, collection: "Coach" },
 );
 
 CoachSchema.pre("validate", async function (next) {

@@ -14,26 +14,52 @@ const createCategory = asyncHandler(async (req, res) => {
     description,
     image: image || "",
     status: "active",
-    isActive: true,
+    is_active: true,
   });
-
-  res.status(201).json({ category: newCategory });
+  const formattedCategory = {
+    id_category_league: newCategory._id,
+    slug: newCategory.slug,
+    name: newCategory.name,
+    description: newCategory.description,
+    image: newCategory.image,
+    status: newCategory.status,
+    is_active: newCategory.is_active,
+  };
+  res.status(201).json({ category: formattedCategory });
 });
 
 const getAllCategories = asyncHandler(async (req, res) => {
-  const categories = await Category.find({ isActive: true }).exec();
-  res.status(200).json({ categories });
+  const categories = await Category.find().exec();
+  const formattedCategories = categories.map((cat) => ({
+    id_category_league: cat._id,
+    slug: cat.slug,
+    name: cat.name,
+    description: cat.description,
+    image: cat.image,
+    status: cat.status,
+    is_active: cat.is_active,
+  }));
+
+  res.status(200).json({ categories: formattedCategories });
 });
 
 const getCategoryBySlug = asyncHandler(async (req, res) => {
   const { slug } = req.params;
-  const category = await Category.findOne({ slug, isActive: true }).exec();
+  const category = await Category.findOne({ slug }).exec();
 
   if (!category) {
     return res.status(404).json({ message: "Categoría no encontrada" });
   }
-
-  res.status(200).json({ category });
+  const formattedCategory = {
+    id_category_league: category._id,
+    slug: category.slug,
+    name: category.name,
+    description: category.description,
+    image: category.image,
+    status: category.status,
+    is_active: category.is_active,
+  };
+  res.status(200).json({ category: formattedCategory });
 });
 
 const updateCategory = asyncHandler(async (req, res) => {
@@ -45,7 +71,7 @@ const updateCategory = asyncHandler(async (req, res) => {
     return res.status(404).json({ message: "Categoría no encontrada" });
   }
 
-  const allowedUpdates = ["name", "description", "image", "status", "isActive"];
+  const allowedUpdates = ["name", "description", "image", "status", "is_active"];
   allowedUpdates.forEach((key) => {
     if (updates[key] !== undefined) category[key] = updates[key];
   });
@@ -55,13 +81,22 @@ const updateCategory = asyncHandler(async (req, res) => {
   }
 
   await category.save();
-  res.status(200).json({ category });
+  const formattedCategory = {
+    id_category_league: category._id,
+    slug: category.slug,
+    name: category.name,
+    description: category.description,
+    image: category.image,
+    status: category.status,
+    is_active: category.is_active,
+  };
+  res.status(200).json({ category: formattedCategory });
 });
 
 const deleteCategory = asyncHandler(async (req, res) => {
   const { slug } = req.params;
 
-  const category = await Category.findOneAndUpdate({ slug }, { isActive: false, status: "inactive" }, { new: true });
+  const category = await Category.findOneAndUpdate({ slug }, { is_active: false, status: "inactive" }, { new: true });
 
   if (!category) {
     return res.status(404).json({ message: "Categoría no encontrada" });

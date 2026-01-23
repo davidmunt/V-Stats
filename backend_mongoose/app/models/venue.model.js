@@ -36,7 +36,12 @@ const VenueSchema = mongoose.Schema(
       type: String,
       default: "available", // available, maintenance, closed
     },
-    isActive: {
+    id_admin: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Admin",
+      required: true,
+    },
+    is_active: {
       type: Boolean,
       default: true,
     },
@@ -44,7 +49,7 @@ const VenueSchema = mongoose.Schema(
   {
     timestamps: true, // Esto crea automáticamente createdAt y updatedAt
     collection: "Venue",
-  }
+  },
 );
 
 // Aplicar el validador de unicidad para el slug
@@ -58,19 +63,20 @@ VenueSchema.pre("validate", async function (next) {
   next();
 });
 
-// Método para formatear la respuesta JSON
 VenueSchema.methods.toVenueResponse = function () {
   return {
-    slug: this.slug,
-    venue_id: this._id,
+    id_venue: this._id, // Transformamos _id en id_venue para el frontend
     name: this.name,
     address: this.address,
     city: this.city,
     capacity: this.capacity,
     indoor: this.indoor,
     status: this.status,
-    isActive: this.isActive,
+    slug: this.slug,
+    is_active: this.is_active,
+    id_admin: this.id_admin,
     createdAt: this.createdAt,
+    updatedAt: this.updatedAt,
   };
 };
 

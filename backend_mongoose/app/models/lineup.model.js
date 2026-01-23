@@ -24,7 +24,7 @@ const LineupSchema = mongoose.Schema(
       enum: ["starting", "final", "modified"],
       default: "starting",
     },
-    isActive: {
+    is_active: {
       type: Boolean,
       default: true,
     },
@@ -32,7 +32,7 @@ const LineupSchema = mongoose.Schema(
   {
     timestamps: true,
     collection: "Lineup",
-  }
+  },
 );
 
 LineupSchema.plugin(uniqueValidator, { msg: "already taken" });
@@ -52,7 +52,7 @@ LineupSchema.methods.toLineupResponse = function () {
     match_id: this.match_id,
     team_id: this.team_id,
     status: this.status,
-    isActive: this.isActive,
+    is_active: this.is_active,
     createdAt: this.createdAt,
   };
 };

@@ -58,7 +58,7 @@ const ActionSchema = mongoose.Schema(
       type: String,
       default: "recorded",
     },
-    isActive: {
+    is_active: {
       type: Boolean,
       default: true,
     },
@@ -66,7 +66,7 @@ const ActionSchema = mongoose.Schema(
   {
     timestamps: true,
     collection: "Action",
-  }
+  },
 );
 
 ActionSchema.plugin(uniqueValidator, { msg: "already taken" });

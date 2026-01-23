@@ -8,14 +8,19 @@ const UserSchema = mongoose.Schema(
     name: { type: String, required: true, trim: true },
     email: { type: String, required: true, unique: true, lowercase: true },
     password: { type: String, required: true },
-    avatar: { type: String, default: "" },
+    avatar: {
+      type: String,
+      default: function () {
+        return `https://robohash.org/${this.email || this.name}?set=set1`;
+      },
+    },
     premium: { type: Boolean, default: false },
     dark_mode: { type: Boolean, default: false },
     status: { type: String, default: "active" },
-    isActive: { type: Boolean, default: true },
+    is_active: { type: Boolean, default: true },
     refresh_token: { type: mongoose.Schema.Types.ObjectId, ref: "RefreshToken", required: false, default: null },
   },
-  { timestamps: true, collection: "User" }
+  { timestamps: true, collection: "User" },
 );
 
 UserSchema.plugin(uniqueValidator, { msg: "already taken" });

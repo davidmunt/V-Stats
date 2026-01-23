@@ -37,7 +37,7 @@ const SubscriptionPaymentSchema = mongoose.Schema(
       enum: ["succeeded", "pending", "failed", "refunded"],
       default: "pending",
     },
-    isActive: {
+    is_active: {
       type: Boolean,
       default: true,
     },
@@ -45,7 +45,7 @@ const SubscriptionPaymentSchema = mongoose.Schema(
   {
     timestamps: true, // Gestiona created_at automáticamente
     collection: "SubscriptionPayment",
-  }
+  },
 );
 
 SubscriptionPaymentSchema.plugin(uniqueValidator, { msg: "already exists" });
@@ -70,7 +70,7 @@ SubscriptionPaymentSchema.methods.toPaymentResponse = function () {
     stripe_payment_id: this.stripe_payment_id,
     status: this.status,
     createdAt: this.createdAt,
-    isActive: this.isActive,
+    is_active: this.is_active,
   };
 };
 

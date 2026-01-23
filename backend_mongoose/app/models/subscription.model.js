@@ -36,7 +36,7 @@ const SubscriptionSchema = mongoose.Schema(
       enum: ["active", "expired", "cancelled", "pending"],
       default: "active",
     },
-    isActive: {
+    is_active: {
       type: Boolean,
       default: true,
     },
@@ -44,7 +44,7 @@ const SubscriptionSchema = mongoose.Schema(
   {
     timestamps: true, // Gestiona created_at
     collection: "Subscription",
-  }
+  },
 );
 
 SubscriptionSchema.plugin(uniqueValidator, { msg: "already taken" });
@@ -71,7 +71,7 @@ SubscriptionSchema.methods.toSubscriptionResponse = function () {
     auto_renew: this.auto_renew,
     active: this.active && !isExpired, // Es activa si el flag está en true Y no ha pasado la fecha
     status: isExpired ? "expired" : this.status,
-    isActive: this.isActive,
+    is_active: this.is_active,
     createdAt: this.createdAt,
   };
 };

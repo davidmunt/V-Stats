@@ -35,7 +35,7 @@ const SetSchema = mongoose.Schema(
       type: Date,
       default: null,
     },
-    isActive: {
+    is_active: {
       type: Boolean,
       default: true,
     },
@@ -43,7 +43,7 @@ const SetSchema = mongoose.Schema(
   {
     timestamps: true,
     collection: "Set",
-  }
+  },
 );
 
 SetSchema.plugin(uniqueValidator, { msg: "already taken" });
@@ -66,7 +66,7 @@ SetSchema.methods.toSetResponse = function () {
     visitor_points: this.visitor_points,
     status: this.status,
     finished_at: this.finished_at,
-    isActive: this.isActive,
+    is_active: this.is_active,
   };
 };
 

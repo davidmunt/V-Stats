@@ -42,7 +42,7 @@ const verifyJWT = (allowedRoles = []) => {
 
       loginUser = await TargetModel.findById(id).exec();
 
-      if (!loginUser || !loginUser.isActive) {
+      if (!loginUser || !loginUser.is_active) {
         return res.status(403).json({ message: "Usuario no encontrado o inactivo" });
       }
 

@@ -40,7 +40,7 @@ const LiberoSubstitutionSchema = mongoose.Schema(
       enum: ["in", "out", "completed"], // "in" cuando entra el líbero, "out" cuando regresa el jugador original
       default: "completed",
     },
-    isActive: {
+    is_active: {
       type: Boolean,
       default: true,
     },
@@ -48,7 +48,7 @@ const LiberoSubstitutionSchema = mongoose.Schema(
   {
     timestamps: true, // Esto cubre tu campo created_at
     collection: "LiberoSubstitution",
-  }
+  },
 );
 
 LiberoSubstitutionSchema.plugin(uniqueValidator, { msg: "already taken" });
@@ -73,7 +73,7 @@ LiberoSubstitutionSchema.methods.toLiberoSubstitutionResponse = function () {
     position: this.position,
     status: this.status,
     createdAt: this.createdAt,
-    isActive: this.isActive,
+    is_active: this.is_active,
   };
 };
 

@@ -42,7 +42,7 @@ const LeagueSchema = mongoose.Schema(
       type: String,
       default: "",
     },
-    isActive: {
+    is_active: {
       type: Boolean,
       default: true,
     },
@@ -50,7 +50,7 @@ const LeagueSchema = mongoose.Schema(
   {
     timestamps: true,
     collection: "League",
-  }
+  },
 );
 
 // Aplicar el validador de unicidad para el slug
@@ -76,7 +76,7 @@ LeagueSchema.methods.toLeagueResponse = async function () {
     admin_id: this.admin_id,
     status: this.status,
     image: this.image,
-    isActive: this.isActive,
+    is_active: this.is_active,
     createdAt: this.createdAt,
   };
 };
