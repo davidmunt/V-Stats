@@ -1,0 +1,19 @@
+package com.vstats.vstats.infrastructure.repositories;
+
+import com.vstats.vstats.domain.entities.PlayerEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface PlayerRepository extends JpaRepository<PlayerEntity, Long> {
+    Optional<PlayerEntity> findBySlug(String slug);
+    
+    // Filtrar por el equipo (String format)
+    List<PlayerEntity> findAllByIdTeam(String idTeam);
+    
+    // Buscar por email si necesitas validar login/perfil único
+    Optional<PlayerEntity> findByEmail(String email);
+}

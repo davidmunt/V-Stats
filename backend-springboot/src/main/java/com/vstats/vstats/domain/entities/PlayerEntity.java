@@ -32,11 +32,7 @@ public class PlayerEntity {
     @Column(unique = true)
     private String email;
 
-    private String password;
     private String avatar;
-
-    @Column(name = "refresh_token")
-    private String refreshToken;
 
     @Builder.Default
     @Column(name = "is_active")

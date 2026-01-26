@@ -6,12 +6,15 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
-public class CategoryResponse {
+public class PlayerResponse {
     private String slug;
     private String name;
-    private String description;
-    private String image;
-    private Boolean isActive;
+    private Integer dorsal;
+    private String role;
+    private String idTeam;
+    private String email;
+    private String avatar;
     private String status;
+    private Boolean isActive;
     private LocalDateTime createdAt;
 }

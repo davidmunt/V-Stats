@@ -6,12 +6,14 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
-public class CategoryResponse {
+public class LeagueResponse {
     private String slug;
     private String name;
-    private String description;
+    private String country;
+    private String season;
     private String image;
-    private Boolean isActive;
+    private String categoryName;
     private String status;
+    private Boolean isActive;
     private LocalDateTime createdAt;
 }
