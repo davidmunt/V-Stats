@@ -54,6 +54,16 @@ export const getMatchesFromLeague = async (slug: string): Promise<Match[]> => {
   return response.data.matches;
 };
 
+export const getMatchesForCoach = async (slug: string): Promise<Match[]> => {
+  const response = await apiClient.get<MatchesResponse>(`/matches/coach/${slug}`);
+  return response.data.matches;
+};
+
+export const getNextMatchForCoach = async (slug: string): Promise<Match> => {
+  const response = await apiClient.get<SingleMatchResponse>(`/match/next/coach/${slug}`);
+  return response.data.match;
+};
+
 export const getMatchBySlug = async (slug: string): Promise<Match> => {
   const response = await apiClient.get<SingleMatchResponse>(`/match/${slug}`);
   return response.data.match;
