@@ -1,5 +1,3 @@
-export type LineupPositionStatus = "ACTIVE" | "INACTIVE" | "SUBSTITUTED";
-
 export interface LineupPosition {
   id_lineup_position: string;
   id_lineup: string;
@@ -7,6 +5,6 @@ export interface LineupPosition {
   is_on_court: boolean;
   initial_position: number;
   current_position?: number;
-  status: LineupPositionStatus;
+  status: string;
   is_active: boolean;
 }

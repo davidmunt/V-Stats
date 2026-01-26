@@ -8,4 +8,5 @@ export interface User {
   dark_mode: boolean;
   user_type: UserRole;
   accessToken: string;
+  slug: string;
 }

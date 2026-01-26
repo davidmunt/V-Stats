@@ -7,4 +7,5 @@ export interface Auth {
   name: string;
   id: string;
   avatar: string;
+  slug: string;
 }

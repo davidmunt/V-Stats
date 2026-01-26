@@ -3,6 +3,7 @@ export type PlayerStatus = "ACTIVE" | "INACTIVE" | "INJURED" | "SUSPENDED";
 
 export interface Player {
   id_player: string;
+  slug: string;
   id_team: string;
   name: string;
   dorsal: number;

@@ -2,6 +2,7 @@ export type LeagueAdminStatus = "ACTIVE" | "INACTIVE" | "SUSPENDED";
 
 export interface LeagueAdmin {
   id_admin: string;
+  slug: string;
   name: string;
   email: string;
   password?: string;
