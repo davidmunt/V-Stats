@@ -7,20 +7,14 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "categories")
-@Getter @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class CategoryEntity {
+@Table(name = "users")
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_category")
-    private Long idCategory;
-
-    @Column(name = "id_admin", nullable = false)
-    private String idAdmin;
+    @Column(name = "id_user")
+    private Long idUser;
 
     @Column(nullable = false, unique = true)
     private String slug;
@@ -28,10 +22,21 @@ public class CategoryEntity {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
-    private String description;
+    @Column(nullable = false, unique = true)
+    private String email;
 
-    private String image;
+    private String password;
+    private String avatar;
+
+    @Column(name = "refresh_token")
+    private String refreshToken;
+
+    @Builder.Default
+    private Boolean premium = false;
+
+    @Builder.Default
+    @Column(name = "dark_mode")
+    private Boolean darkMode = false;
 
     @Builder.Default
     @Column(name = "is_active")

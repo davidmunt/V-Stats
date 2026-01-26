@@ -9,9 +9,5 @@ import java.util.Optional;
 @Repository
 public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> {
     
-    // Spring Data JPA crea la query SQL automáticamente al leer el nombre del método:
-    // "SELECT * FROM categories WHERE slug = ?"
     Optional<CategoryEntity> findBySlug(String slug);
-
-    // No hace falta poner save(), delete(), findAll()... ¡ya vienen incluidos!
 }

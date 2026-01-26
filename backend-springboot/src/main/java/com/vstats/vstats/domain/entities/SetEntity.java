@@ -7,31 +7,38 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "categories")
+@Table(name = "sets")
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CategoryEntity {
+public class SetEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_category")
-    private Long idCategory;
-
-    @Column(name = "id_admin", nullable = false)
-    private String idAdmin;
+    @Column(name = "id_set")
+    private Long idSet;
 
     @Column(nullable = false, unique = true)
     private String slug;
 
-    @Column(nullable = false)
-    private String name;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_match", nullable = false)
+    private MatchEntity match;
 
-    @Column(nullable = false)
-    private String description;
+    @Column(name = "set_number", nullable = false)
+    private Integer setNumber;
 
-    private String image;
+    @Column(name = "local_points")
+    @Builder.Default
+    private Integer localPoints = 0;
+
+    @Column(name = "visitor_points")
+    @Builder.Default
+    private Integer visitorPoints = 0;
+
+    @Column(name = "finished_at")
+    private LocalDateTime finishedAt;
 
     @Builder.Default
     @Column(name = "is_active")

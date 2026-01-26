@@ -7,31 +7,31 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "categories")
-@Getter @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class CategoryEntity {
+@Table(name = "venues")
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+public class VenueEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_category")
-    private Long idCategory;
-
-    @Column(name = "id_admin", nullable = false)
-    private String idAdmin;
+    @Column(name = "id_venue")
+    private Long idVenue;
 
     @Column(nullable = false, unique = true)
     private String slug;
 
+    @Column(name = "id_admin", nullable = false)
+    private String idAdmin;
+
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
-    private String description;
+    private String address;
 
-    private String image;
+    private String city;
+
+    private Integer capacity;
+
+    private Boolean indoor;
 
     @Builder.Default
     @Column(name = "is_active")

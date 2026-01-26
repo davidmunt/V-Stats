@@ -7,31 +7,39 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "categories")
+@Table(name = "teams")
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CategoryEntity {
+public class TeamEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_category")
-    private Long idCategory;
-
-    @Column(name = "id_admin", nullable = false)
-    private String idAdmin;
-
-    @Column(nullable = false, unique = true)
-    private String slug;
+    @Column(name = "id_team")
+    private Long idTeam;
 
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
-    private String description;
+    @Column(nullable = false, unique = true)
+    private String slug;
 
     private String image;
+
+    @Column(name = "id_coach")
+    private String idCoach; // Formato String
+
+    @Column(name = "id_analyst")
+    private String idAnalyst; // Formato String
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_league", nullable = false)
+    private LeagueEntity league;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_category", nullable = false)
+    private CategoryEntity category;
 
     @Builder.Default
     @Column(name = "is_active")

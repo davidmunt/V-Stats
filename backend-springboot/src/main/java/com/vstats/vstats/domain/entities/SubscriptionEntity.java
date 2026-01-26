@@ -7,31 +7,29 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "categories")
-@Getter @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class CategoryEntity {
+@Table(name = "subscriptions")
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+public class SubscriptionEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_category")
-    private Long idCategory;
-
-    @Column(name = "id_admin", nullable = false)
-    private String idAdmin;
+    @Column(name = "id_subscription")
+    private Long idSubscription;
 
     @Column(nullable = false, unique = true)
     private String slug;
 
-    @Column(nullable = false)
-    private String name;
+    @Column(name = "id_user", nullable = false)
+    private String idUser;
 
-    @Column(nullable = false)
-    private String description;
+    @Column(name = "start_date")
+    private LocalDateTime startDate;
 
-    private String image;
+    @Column(name = "end_date")
+    private LocalDateTime endDate;
+
+    @Column(name = "auto_renew")
+    private Boolean autoRenew;
 
     @Builder.Default
     @Column(name = "is_active")

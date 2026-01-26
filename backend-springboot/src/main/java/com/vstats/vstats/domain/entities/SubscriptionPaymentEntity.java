@@ -5,40 +5,40 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
+import java.math.BigDecimal;
 
 @Entity
-@Table(name = "categories")
-@Getter @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class CategoryEntity {
+@Table(name = "subscription_payments")
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+public class SubscriptionPaymentEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_category")
-    private Long idCategory;
-
-    @Column(name = "id_admin", nullable = false)
-    private String idAdmin;
+    @Column(name = "id_payment")
+    private Long idPayment;
 
     @Column(nullable = false, unique = true)
     private String slug;
 
-    @Column(nullable = false)
-    private String name;
+    @Column(name = "id_user", nullable = false)
+    private String idUser;
 
-    @Column(nullable = false)
-    private String description;
+    private BigDecimal amount;
 
-    private String image;
+    private String currency;
+
+    @Column(name = "payment_method")
+    private String paymentMethod;
+
+    @Column(name = "id_stripe_payment")
+    private String idStripePayment;
 
     @Builder.Default
     @Column(name = "is_active")
     private Boolean isActive = true;
 
     @Builder.Default
-    private String status = "active";
+    private String status = "completed";
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
