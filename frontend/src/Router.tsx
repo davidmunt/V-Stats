@@ -9,6 +9,8 @@ import LoadingFallback from "@/components/LoadingFallback";
 const HomePage = lazy(() => import("@/pages/HomePage"));
 const AuthPage = lazy(() => import("@/pages/AuthPage"));
 const AdminDashboardPage = lazy(() => import("@/pages/AdminDashboardPage"));
+const AnalystDashboardPage = lazy(() => import("@/pages/AnalystDashboardPage"));
+const CoachDashboardPage = lazy(() => import("@/pages/CoachDashboardPage"));
 
 const Router = () => {
   return (
@@ -35,6 +37,30 @@ const Router = () => {
               <ProtectedRoute isAuth>
                 <RoleProtectedRoute allowedRoles={["admin"]}>
                   <AdminDashboardPage />
+                </RoleProtectedRoute>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Analyst */}
+          <Route
+            path="/analyst"
+            element={
+              <ProtectedRoute isAuth>
+                <RoleProtectedRoute allowedRoles={["analyst"]}>
+                  <AnalystDashboardPage />
+                </RoleProtectedRoute>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Coach */}
+          <Route
+            path="/coach"
+            element={
+              <ProtectedRoute isAuth>
+                <RoleProtectedRoute allowedRoles={["coach"]}>
+                  <CoachDashboardPage />
                 </RoleProtectedRoute>
               </ProtectedRoute>
             }
