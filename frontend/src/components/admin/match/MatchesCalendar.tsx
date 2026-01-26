@@ -10,7 +10,6 @@ import { useMatchesQuery } from "@/queries/match/useMatches";
 import type { Match } from "@/interfaces/match.interface";
 import LoadingFallback from "@/components/LoadingFallback";
 
-// Configuración del localizador para el calendario (Idioma Español)
 const locales = {
   es: es,
 };
@@ -35,7 +34,7 @@ export const MatchesCalendar = ({ leagueSlug, onCreate, onEdit }: MatchesCalenda
   const events = (matches || []).map((match) => ({
     title: match.name,
     start: new Date(match.date),
-    end: new Date(new Date(match.date).getTime() + 60 * 60 * 1000), // +1 hora
+    end: new Date(new Date(match.date).getTime() + 60 * 60 * 1000),
     resource: match,
   }));
 
@@ -60,7 +59,7 @@ export const MatchesCalendar = ({ leagueSlug, onCreate, onEdit }: MatchesCalenda
           events={events}
           startAccessor="start"
           endAccessor="end"
-          views={[Views.MONTH, Views.AGENDA]} // Solo mes y agenda para administración
+          views={[Views.MONTH, Views.AGENDA]}
           culture="es"
           messages={{
             next: "Sig.",
@@ -70,15 +69,13 @@ export const MatchesCalendar = ({ leagueSlug, onCreate, onEdit }: MatchesCalenda
             agenda: "Agenda",
             noEventsInRange: "No hay partidos en este rango.",
           }}
-          // Al hacer click en un "cuadradito" (evento)
           onSelectEvent={(event) => onEdit(event.resource)}
-          // Estilos personalizados para los eventos
           eventPropGetter={(event) => {
             const status = event.resource.status;
-            let bgColor = "#3b82f6"; // Blue 500 por defecto (SCHEDULED)
-            if (status === "LIVE") bgColor = "#ef4444"; // Red 500
-            if (status === "FINISHED") bgColor = "#10b981"; // Green 500
-            if (status === "CANCELLED") bgColor = "#6b7280"; // Gray 500
+            let bgColor = "#3b82f6";
+            if (status === "LIVE") bgColor = "#ef4444";
+            if (status === "FINISHED") bgColor = "#10b981";
+            if (status === "CANCELLED") bgColor = "#6b7280";
 
             return {
               style: {

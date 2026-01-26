@@ -1,5 +1,5 @@
-import { useState } from "react"; // 1. Quitamos useEffect
-import type { ReactNode } from "react"; // 2. Import "type-only" para ReactNode
+import { useState } from "react";
+import type { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "./AuthContext";
 import tokenService from "@/lib/token";
@@ -28,10 +28,7 @@ const AuthProvider = ({ children }: Props) => {
   const login = async (email: string, password: string) => {
     const response = await loginMutation.mutateAsync({ email, password });
     setHasToken(true);
-    // 3. CORRECCIÓN: Según tu interfaz Auth, user_type está DENTRO del objeto user.
-    // Tu interfaz es: { token: string; user: User }
     if (response.user_type === "admin") {
-      // Asegúrate de usar minúscula si tu tipo es "admin"
       navigate("/admin");
     } else if (response.user_type === "coach") {
       navigate("/coach");
@@ -45,11 +42,9 @@ const AuthProvider = ({ children }: Props) => {
   };
 
   const register = async (data: { email: string; password: string; name: string; user_type: UserRole }) => {
-    // 4. CORRECCIÓN: No asignamos 'const response =' porque no la usábamos
     const response = await registerMutation.mutateAsync(data);
     setHasToken(true);
     if (response.user_type === "admin") {
-      // Asegúrate de usar minúscula si tu tipo es "admin"
       navigate("/admin");
     } else if (response.user_type === "coach") {
       navigate("/coach");

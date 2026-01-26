@@ -23,24 +23,22 @@ export const TeamForm = ({ leagueSlug, initialData, onCancel, onSuccess }: TeamF
   const { data: freeAnalysts } = useFreeAnalystsQuery();
   const { data: currentAnalyst } = useAnalystByIdQuery(initialData?.id_analyst || null);
 
-  const allCoaches = [...(freeCoaches || [])];
+  const allCoaches = freeCoaches || [];
   if (currentCoach && !allCoaches.some((c) => c.id_coach === currentCoach.id_coach)) {
     allCoaches.push(currentCoach);
   }
 
-  const allAnalysts = [...(freeAnalysts || [])];
+  const allAnalysts = freeAnalysts || [];
   if (currentAnalyst && !allAnalysts.some((a) => a.id_analyst === currentAnalyst.id_analyst)) {
     allAnalysts.push(currentAnalyst);
   }
 
-  // Supongamos que traemos las sedes para el select
   const { data: venues } = useVenuesQuery();
 
   const [formData, setFormData] = useState({
     name: initialData?.name || "",
     image: initialData?.image || "",
     id_venue: initialData?.id_venue || "",
-    // Campos solo para update (pero inicializados)
     id_coach: initialData?.id_coach || "",
     id_analyst: initialData?.id_analyst || "",
     status: initialData?.status || "active",
@@ -66,7 +64,7 @@ export const TeamForm = ({ leagueSlug, initialData, onCancel, onSuccess }: TeamF
           name: formData.name,
           image: formData.image,
           id_venue: formData.id_venue,
-          id_league: leagueSlug, // Se asocia a la liga actual
+          id_league: leagueSlug,
         });
       }
       onSuccess();

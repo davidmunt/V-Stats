@@ -4,7 +4,7 @@ import { LeaguesManager } from "@/components/admin/league/LeaguesManager";
 import { VenuesManager } from "@/components/admin/venue/VenuesManager";
 import Sidebar from "@/components/reutilizables/SideBarDashboards";
 
-const AdminDashboardPage = () => {
+const AnalystDashboardPage = () => {
   const [currentView, setCurrentView] = useState<string>("leagues");
 
   return (
@@ -19,4 +19,4 @@ const AdminDashboardPage = () => {
   );
 };
 
-export default AdminDashboardPage;
+export default AnalystDashboardPage;

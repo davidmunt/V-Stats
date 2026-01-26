@@ -15,11 +15,7 @@ interface MatchFormProps {
 
 export const MatchForm = ({ leagueSlug, initialData, onCancel, onSuccess }: MatchFormProps) => {
   const isEditing = !!initialData;
-
-  // Queries para llenar los selectores
   const { data: teams, isLoading: isLoadingTeams } = useTeamsQuery(leagueSlug);
-
-  // Mutations
   const createMutation = useCreateMatchMutation(leagueSlug);
   const updateMutation = useUpdateMatchMutation(leagueSlug);
   const deleteMutation = useDeleteMatchMutation(leagueSlug);

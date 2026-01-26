@@ -48,7 +48,6 @@ export const CoachMatchesCalendar = ({ coachSlug }: { coachSlug: string }) => {
             agenda: "Agenda",
             noEventsInRange: "No hay partidos programados.",
           }}
-          // DESHABILITADO: Eliminamos onSelectEvent para que no se pueda editar
           eventPropGetter={(event) => {
             const status = event.resource.status;
             let bgColor = "#3b82f6";
@@ -61,7 +60,7 @@ export const CoachMatchesCalendar = ({ coachSlug }: { coachSlug: string }) => {
                 borderRadius: "6px",
                 fontSize: "12px",
                 border: "none",
-                cursor: "default", // Cambiamos el cursor a flecha normal
+                cursor: "default",
               },
             };
           }}

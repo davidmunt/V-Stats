@@ -10,12 +10,8 @@ export const useCreateLeagueMutation = () => {
   return useMutation({
     mutationFn: (data: CreateLeagueParam) => createLeague(data),
     onSuccess: (newLeague) => {
-      // MAGIA AQUÍ: Actualizamos la caché manualmente
       queryClient.setQueryData<League[]>(LEAGUES_QUERY_KEY, (oldLeagues) => {
-        // Si no había ligas cargadas, creamos el array con la nueva
         if (!oldLeagues) return [newLeague];
-
-        // Si ya había, devolvemos un NUEVO array con la nueva liga al final
         return [...oldLeagues, newLeague];
       });
     },

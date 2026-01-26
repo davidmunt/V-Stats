@@ -34,6 +34,20 @@ const routerMeta: RouterMetaType = {
     isShow: false,
     role: "admin",
   },
+  AnalystDashboardPage: {
+    name: "Coach Dashboard",
+    path: "/coach",
+    isAuth: true,
+    isShow: false,
+    role: "coach",
+  },
+  CoachDashboardPage: {
+    name: "Coach Dashboard",
+    path: "/coach",
+    isAuth: true,
+    isShow: false,
+    role: "coach",
+  },
   NotFoundPage: {
     path: "/*",
     isShow: false,

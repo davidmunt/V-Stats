@@ -3,28 +3,24 @@ import type { Team } from "@/interfaces/team.interface";
 import { useLeagueBySlugQuery } from "@/queries/leagues/useLeagueBySlug";
 import LoadingFallback from "@/components/LoadingFallback";
 
-// Importación de tus componentes
 import { TeamsList } from "@/components/admin/team/TeamsList";
 import { TeamForm } from "@/components/admin/team/TeamForm";
-import { LeagueTable } from "./LeagueTable"; // El que hicimos de posiciones
-import { LeagueMatchesManager } from "./LeagueMatchesManager"; // El manager de partidos
+import { LeagueTable } from "./LeagueTable";
+import { LeagueMatchesManager } from "./LeagueMatchesManager";
 
 interface LeagueDetailProps {
   slug: string;
   onBack: () => void;
 }
 
-// Ampliamos las vistas posibles
 type LeagueView = "teams_list" | "teams_form" | "matches" | "table";
 
 export const LeagueDetail = ({ slug, onBack }: LeagueDetailProps) => {
   const { data: league, isLoading } = useLeagueBySlugQuery(slug);
 
-  // Estado principal de navegación
   const [view, setView] = useState<LeagueView>("teams_list");
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
 
-  // --- Funciones para Equipos ---
   const handleCreateTeam = () => {
     setSelectedTeam(null);
     setView("teams_form");
@@ -80,7 +76,7 @@ export const LeagueDetail = ({ slug, onBack }: LeagueDetailProps) => {
                 : "border-transparent text-gray-500 hover:text-gray-700"
             }`}
           >
-            🛡️ Equipos
+            Equipos
           </button>
           <button
             onClick={() => setView("matches")}
@@ -88,7 +84,7 @@ export const LeagueDetail = ({ slug, onBack }: LeagueDetailProps) => {
               view === "matches" ? "border-blue-600 text-blue-600" : "border-transparent text-gray-500 hover:text-gray-700"
             }`}
           >
-            📅 Fechas Partidos
+            Fechas Partidos
           </button>
           <button
             onClick={() => setView("table")}
@@ -96,7 +92,7 @@ export const LeagueDetail = ({ slug, onBack }: LeagueDetailProps) => {
               view === "table" ? "border-blue-600 text-blue-600" : "border-transparent text-gray-500 hover:text-gray-700"
             }`}
           >
-            📊 Tabla de Posiciones
+            Tabla de Posiciones
           </button>
         </div>
       </div>

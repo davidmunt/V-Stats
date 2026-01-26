@@ -6,7 +6,6 @@ const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
 });
 
-//peticion
 apiClient.interceptors.request.use((request) => {
   const jwtToken = token.getToken(ACCESS_TOKEN_KEY);
   if (jwtToken) {
@@ -15,7 +14,6 @@ apiClient.interceptors.request.use((request) => {
   return request;
 });
 
-//respuesta
 apiClient.interceptors.response.use(
   (response) => {
     return response;

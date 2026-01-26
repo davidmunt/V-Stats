@@ -23,9 +23,7 @@ const RoleProtectedRoute = ({ children, allowedRoles }: Props) => {
   if (!isAuthenticated) {
     return <Navigate to="/auth" replace />;
   }
-  // 1️⃣ Fuente principal: user del backend
   let role = user?.user_type;
-  // 2️⃣ Fallback: token
   if (!role) {
     const rawToken = tokenService.getToken(ACCESS_TOKEN_KEY);
     if (!rawToken) return <Navigate to="/auth" replace />;

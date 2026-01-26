@@ -20,6 +20,12 @@ const ProtectedRoute = ({ children, isAuth }: ProtectedRouteProps) => {
   if (isAuth === false && isAuthenticated && user?.user_type === "admin") {
     return <Navigate to="/admin" replace />;
   }
+  if (isAuth === false && isAuthenticated && user?.user_type === "coach") {
+    return <Navigate to="/coach" replace />;
+  }
+  if (isAuth === false && isAuthenticated && user?.user_type === "analyst") {
+    return <Navigate to="/analyst" replace />;
+  }
   if (isAuth === false && isAuthenticated) {
     return <Navigate to="/" replace />;
   }
