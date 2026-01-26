@@ -69,6 +69,7 @@ const registerUser = asyncHandler(async (req, res) => {
     name: newUser.name,
     id: newUser._id,
     avatar: newUser.avatar,
+    slug: newUser.slug,
     // añade aquí cualquier otro campo que necesites (ej. avatar, etc)
   });
 });
@@ -119,6 +120,7 @@ const userLogin = asyncHandler(async (req, res) => {
     name: foundUser.name,
     id: foundUser._id,
     avatar: foundUser.avatar || "",
+    slug: foundUser.slug,
   });
 });
 
@@ -202,6 +204,7 @@ const getMe = asyncHandler(async (req, res) => {
     token: req.token,
     user_type: userRole,
     email: foundUser.email,
+    slug: foundUser.slug,
     name: foundUser.name,
     id: foundUser._id,
     avatar: foundUser.avatar || "",

@@ -1,29 +1,18 @@
 const mongoose = require("mongoose");
 const slugify = require("slugify");
 
-const PlayerSchema = mongoose.Schema(
+const PlayerSchema = new mongoose.Schema(
   {
+    name: { type: String, required: true, trim: true },
     slug: { type: String, lowercase: true, unique: true },
-    name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
     dorsal: { type: Number, required: true },
-    role: {
-      type: String,
-      enum: ["setter", "middle", "outside", "opposite", "libero"],
-      required: true,
-    },
-    avatar: {
-      type: String,
-      default: function () {
-        return `https://robohash.org/${this.email || this.name}?set=set1`;
-      },
-    },
+    role: { type: String, required: true },
+    image: { type: String, default: "" },
     team_id: { type: mongoose.Schema.Types.ObjectId, ref: "Team", required: true },
     status: { type: String, default: "active" },
     is_active: { type: Boolean, default: true },
   },
-  { timestamps: true, collection: "Player" },
+  { timestamps: true },
 );
 
 PlayerSchema.pre("validate", async function (next) {
@@ -35,12 +24,15 @@ PlayerSchema.pre("validate", async function (next) {
 
 PlayerSchema.methods.toPlayerResponse = function () {
   return {
+    id_player: this._id,
     slug: this.slug,
-    player_id: this._id,
     name: this.name,
     dorsal: this.dorsal,
     role: this.role,
-    team_id: this.team_id,
+    image: this.image,
+    id_team: this.team_id,
+    status: this.status,
+    is_active: this.is_active,
   };
 };
 

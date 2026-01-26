@@ -3,6 +3,7 @@ const Match = require("../models/match.model");
 const League = require("../models/league.model");
 const Team = require("../models/team.model");
 const Venue = require("../models/venue.model");
+const Coach = require("../models/coach.model");
 
 const createMatch = asyncHandler(async (req, res) => {
   const { leagueSlug } = req.params;
@@ -83,6 +84,64 @@ const getMatchBySlug = asyncHandler(async (req, res) => {
   res.status(200).json({ match: match.toMatchResponse() });
 });
 
+const getCoachMatches = asyncHandler(async (req, res) => {
+  const { slug } = req.params;
+
+  // 1. Buscamos al coach y su equipo
+  const coach = await Coach.findOne({ slug }).select("team_id");
+  if (!coach || !coach.team_id) {
+    return res.status(404).json({ message: "El coach no tiene un equipo asignado" });
+  }
+
+  // 2. Buscamos partidos donde el equipo sea local O visitante
+  const matches = await Match.find({
+    $or: [{ local_team_id: coach.team_id }, { visitor_team_id: coach.team_id }],
+    is_active: true,
+  })
+    .populate("local_team_id", "name image slug")
+    .populate("visitor_team_id", "name image slug")
+    .populate("venue_id", "name city")
+    .sort({ date: 1 }); // Ordenados por fecha próxima
+
+  res.status(200).json({
+    matches: matches.map((m) => m.toMatchResponse()),
+  });
+});
+
+const getNextMatch = asyncHandler(async (req, res) => {
+  const { slug } = req.params;
+
+  // 1. Buscamos al coach para obtener su equipo
+  const coach = await Coach.findOne({ slug }).select("team_id");
+  if (!coach || !coach.team_id) {
+    return res.status(404).json({ message: "El coach no tiene equipo asignado" });
+  }
+
+  // 2. Buscamos el partido más cercano en el tiempo
+  const nextMatch = await Match.findOne({
+    $or: [{ local_team_id: coach.team_id }, { visitor_team_id: coach.team_id }],
+    status: "scheduled", // Solo partidos programados
+    date: { $gte: new Date() }, // Fecha igual o posterior a la actual
+    is_active: true,
+  })
+    .populate("local_team_id", "name image slug")
+    .populate("visitor_team_id", "name image slug")
+    .populate("venue_id", "name city")
+    .sort({ date: 1 }) // Orden ascendente (el más cercano primero)
+    .exec();
+
+  if (!nextMatch) {
+    return res.status(200).json({
+      match: null,
+      message: "No hay partidos próximos programados",
+    });
+  }
+
+  res.status(200).json({
+    match: nextMatch.toMatchResponse(),
+  });
+});
+
 const updateMatch = asyncHandler(async (req, res) => {
   const { leagueSlug, matchSlug } = req.params;
   const updates = req.body;
@@ -135,6 +194,8 @@ module.exports = {
   createMatch,
   getMatchesByLeague,
   getMatchBySlug,
+  getCoachMatches,
+  getNextMatch,
   updateMatch,
   deleteMatch,
 };

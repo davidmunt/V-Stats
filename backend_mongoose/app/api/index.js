@@ -43,6 +43,8 @@ require("../routes/venue.router.js")(app);
 require("../routes/match.router.js")(app);
 require("../routes/coach.router.js")(app);
 require("../routes/analyst.router.js")(app);
+require("../routes/player.router.js")(app);
+require("../routes/lineup.router.js")(app);
 
 const PORT = process.env.PORT || 3001;
 

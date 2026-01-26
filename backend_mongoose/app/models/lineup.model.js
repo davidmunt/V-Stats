@@ -47,13 +47,12 @@ LineupSchema.pre("validate", async function (next) {
 
 LineupSchema.methods.toLineupResponse = function () {
   return {
+    id_lineup: this._id,
     slug: this.slug,
-    lineup_id: this._id,
-    match_id: this.match_id,
-    team_id: this.team_id,
+    id_match: this.match_id,
+    id_team: this.team_id,
     status: this.status,
     is_active: this.is_active,
-    createdAt: this.createdAt,
   };
 };
 

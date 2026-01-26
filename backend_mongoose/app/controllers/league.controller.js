@@ -3,6 +3,8 @@ const League = require("../models/league.model");
 const Coach = require("../models/coach.model");
 const Analyst = require("../models/analyst.model");
 const slugify = require("slugify");
+const Match = require("../models/match.model");
+const Team = require("../models/team.model");
 
 // Crear Liga
 const createLeague = asyncHandler(async (req, res) => {
@@ -45,11 +47,45 @@ const getMyLeagues = asyncHandler(async (req, res) => {
 // Obtener una liga por Slug
 const getLeagueBySlug = asyncHandler(async (req, res) => {
   const { slug } = req.params;
-  const league = await League.findOne({ slug, admin_id: req.userId, is_active: true }).populate("category").exec();
+
+  // Quitamos admin_id de la búsqueda para que el Coach pueda verla
+  const league = await League.findOne({ slug, is_active: true }).populate("category").exec();
+
   if (!league) {
     return res.status(404).json({ message: "Liga no encontrada" });
   }
+
   res.status(200).json({ league: await league.toLeagueResponse() });
+});
+
+const getCoachLeague = asyncHandler(async (req, res) => {
+  const { slug } = req.params;
+
+  // 1. Buscamos al coach y poblamos el equipo y la liga en una sola cadena
+  const coach = await Coach.findOne({ slug }).populate({
+    path: "team_id",
+    populate: {
+      path: "league_id",
+    },
+  });
+
+  if (!coach || !coach.team_id || !coach.team_id.league_id) {
+    return res.status(404).json({ message: "No se encontró la liga para este coach" });
+  }
+
+  const league = coach.team_id.league_id;
+
+  res.status(200).json({
+    league: {
+      id_league: league._id,
+      name: league.name,
+      slug: league.slug,
+      description: league.description,
+      image: league.image,
+      start_date: league.start_date,
+      end_date: league.end_date,
+    },
+  });
 });
 
 // Actualizar Liga
@@ -93,6 +129,7 @@ module.exports = {
   createLeague,
   getMyLeagues,
   getLeagueBySlug,
+  getCoachLeague,
   updateLeague,
   deleteLeague,
 };

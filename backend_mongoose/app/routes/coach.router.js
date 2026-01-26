@@ -8,5 +8,5 @@ module.exports = (app) => {
   // Obtener coach por slug
   app.get("/coach/:slug", verifyJWT(["admin", "coach", "analyst"]), coachController.getCoachBySlug);
 
-  app.get("/coaches/assigned", verifyJWT(["admin"]), coachController.getAssignedCoaches);
+  app.get("/coaches/assigned", verifyJWT(["admin", "coach"]), coachController.getAssignedCoaches);
 };

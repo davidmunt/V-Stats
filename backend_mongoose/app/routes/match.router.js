@@ -9,6 +9,11 @@ module.exports = (app) => {
 
   app.get("/match/:slug", verifyJWT([]), matchController.getMatchBySlug);
 
+  // Obtener los partidos del equipo que entrena el coach
+  app.get("/matches/coach/:slug", verifyJWT(["coach"]), matchController.getCoachMatches);
+
+  app.get("/match/next/coach/:slug", verifyJWT(["coach"]), matchController.getNextMatch);
+
   app.put("/:leagueSlug/match/:matchSlug", verifyJWT(["admin"]), matchController.updateMatch);
 
   app.delete("/:leagueSlug/match/:matchSlug", verifyJWT(["admin"]), matchController.deleteMatch);

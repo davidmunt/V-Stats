@@ -4,9 +4,9 @@ const verifyJWT = require("../middleware/verifyJWT");
 module.exports = (app) => {
   app.post("/team", verifyJWT(["admin"]), teamController.createTeam);
 
-  app.get("/league/:leagueSlug/teams", verifyJWT(["admin"]), teamController.getTeamsByLeague);
+  app.get("/league/:leagueSlug/teams", verifyJWT(["admin", "coach"]), teamController.getTeamsByLeague);
 
-  app.get("/team/:slug", verifyJWT(["admin"]), teamController.getTeamBySlug);
+  app.get("/team/:slug", verifyJWT(["admin", "coach"]), teamController.getTeamBySlug);
 
   app.get("/my-team", verifyJWT(["coach", "analyst"]), teamController.getMyAssignedTeam);
 

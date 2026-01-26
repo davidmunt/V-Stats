@@ -42,7 +42,7 @@ const getTeamsByLeague = asyncHandler(async (req, res) => {
   const { leagueSlug } = req.params;
 
   // 1. Encontrar la liga y validar propiedad
-  const league = await League.findOne({ slug: leagueSlug, admin_id: req.userId });
+  const league = await League.findOne({ slug: leagueSlug });
   if (!league) {
     return res.status(404).json({ message: "Liga no encontrada o no tienes acceso" });
   }
