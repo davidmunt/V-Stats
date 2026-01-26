@@ -7,7 +7,8 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 public class CategoryResponse {
-    private String slug;
+private String slug_category;
+    private String slug_admin;
     private String name;
     private String description;
     private String image;

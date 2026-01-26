@@ -1,6 +1,6 @@
 package com.vstats.vstats.presentation.controllers;
 
-import com.vstats.vstats.presentation.requests.VenueRequest;
+import com.vstats.vstats.presentation.requests.venue.*;
 import com.vstats.vstats.presentation.responses.VenueResponse;
 import com.vstats.vstats.application.services.VenueService;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/venues")
@@ -18,27 +19,33 @@ public class VenueController {
     private final VenueService venueService;
 
     @PostMapping
-    public ResponseEntity<VenueResponse> createVenue(@RequestBody VenueRequest request) {
-        return new ResponseEntity<>(venueService.createVenue(request), HttpStatus.CREATED);
+    public ResponseEntity<Map<String, VenueResponse>> create(@RequestBody CreateVenueRequest request) {
+        return new ResponseEntity<>(Map.of("venue", venueService.createVenue(request)), HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<List<VenueResponse>> getAllVenues() {
-        return ResponseEntity.ok(venueService.getAllVenues());
+    public ResponseEntity<Map<String, List<VenueResponse>>> getAll() {
+        return ResponseEntity.ok(Map.of("venues", venueService.getAllVenues()));
+    }
+
+    @GetMapping("/admin/{slugAdmin}")
+    public ResponseEntity<Map<String, List<VenueResponse>>> getByAdmin(@PathVariable String slugAdmin) {
+        List<VenueResponse> venues = venueService.getVenuesByAdminSlug(slugAdmin);
+        return ResponseEntity.ok(Map.of("venues", venues));
     }
 
     @GetMapping("/{slug}")
-    public ResponseEntity<VenueResponse> getVenueBySlug(@PathVariable String slug) {
-        return ResponseEntity.ok(venueService.getVenueBySlug(slug));
+    public ResponseEntity<Map<String, VenueResponse>> getBySlug(@PathVariable String slug) {
+        return ResponseEntity.ok(Map.of("venue", venueService.getVenueBySlug(slug)));
     }
 
     @PutMapping("/{slug}")
-    public ResponseEntity<VenueResponse> updateVenue(@PathVariable String slug, @RequestBody VenueRequest request) {
-        return ResponseEntity.ok(venueService.updateVenue(slug, request));
+    public ResponseEntity<Map<String, VenueResponse>> update(@PathVariable String slug, @RequestBody UpdateVenueRequest request) {
+        return ResponseEntity.ok(Map.of("venue", venueService.updateVenue(slug, request)));
     }
 
     @DeleteMapping("/{slug}")
-    public ResponseEntity<Void> deleteVenue(@PathVariable String slug) {
+    public ResponseEntity<Void> delete(@PathVariable String slug) {
         venueService.deleteVenue(slug);
         return ResponseEntity.noContent().build();
     }

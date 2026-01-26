@@ -11,9 +11,7 @@ import java.util.Optional;
 public interface PlayerRepository extends JpaRepository<PlayerEntity, Long> {
     Optional<PlayerEntity> findBySlug(String slug);
     
-    // Filtrar por el equipo (String format)
     List<PlayerEntity> findAllByIdTeam(String idTeam);
     
-    // Buscar por email si necesitas validar login/perfil único
     Optional<PlayerEntity> findByEmail(String email);
 }

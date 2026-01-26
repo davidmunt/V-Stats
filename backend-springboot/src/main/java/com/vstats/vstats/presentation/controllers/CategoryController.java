@@ -1,14 +1,16 @@
 package com.vstats.vstats.presentation.controllers;
 
-import com.vstats.vstats.presentation.requests.CategoryRequest;
-import com.vstats.vstats.presentation.responses.CategoryResponse;
 import com.vstats.vstats.application.services.CategoryService;
+import com.vstats.vstats.presentation.requests.category.CreateCategoryRequest;
+import com.vstats.vstats.presentation.requests.category.UpdateCategoryRequest;
+import com.vstats.vstats.presentation.responses.CategoryResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/categories")
@@ -18,23 +20,28 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @PostMapping
-    public ResponseEntity<CategoryResponse> create(@RequestBody CategoryRequest request) {
-        return new ResponseEntity<>(categoryService.createCategory(request), HttpStatus.CREATED);
+    public ResponseEntity<Map<String, CategoryResponse>> create(@RequestBody CreateCategoryRequest request) {
+        return new ResponseEntity<>(Map.of("category", categoryService.createCategory(request)), HttpStatus.CREATED);
     }
 
-    @GetMapping("/admin/{idAdmin}")
-    public ResponseEntity<List<CategoryResponse>> getByAdmin(@PathVariable String idAdmin) {
-        return ResponseEntity.ok(categoryService.getAllCategoriesByAdmin(idAdmin));
+    @GetMapping
+    public ResponseEntity<Map<String, List<CategoryResponse>>> getAll() {
+        return ResponseEntity.ok(Map.of("categories", categoryService.getAllCategories()));
     }
 
     @GetMapping("/{slug}")
-    public ResponseEntity<CategoryResponse> getBySlug(@PathVariable String slug) {
-        return ResponseEntity.ok(categoryService.getCategoryBySlug(slug));
+    public ResponseEntity<Map<String, CategoryResponse>> getBySlug(@PathVariable String slug) {
+        return ResponseEntity.ok(Map.of("category", categoryService.getCategoryBySlug(slug)));
+    }
+
+    @GetMapping("/admin/{slugAdmin}")
+    public ResponseEntity<Map<String, List<CategoryResponse>>> getByAdmin(@PathVariable String slugAdmin) {
+        return ResponseEntity.ok(Map.of("categories", categoryService.getCategoriesByAdminSlug(slugAdmin)));
     }
 
     @PutMapping("/{slug}")
-    public ResponseEntity<CategoryResponse> update(@PathVariable String slug, @RequestBody CategoryRequest request) {
-        return ResponseEntity.ok(categoryService.updateCategory(slug, request));
+    public ResponseEntity<Map<String, CategoryResponse>> update(@PathVariable String slug, @RequestBody UpdateCategoryRequest request) {
+        return ResponseEntity.ok(Map.of("category", categoryService.updateCategory(slug, request)));
     }
 
     @DeleteMapping("/{slug}")

@@ -7,8 +7,8 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 public class VenueResponse {
-    private Long idVenue;
-    private String slug;
+    private String slug_venue;
+    private String slug_admin;
     private String name;
     private String address;
     private String city;

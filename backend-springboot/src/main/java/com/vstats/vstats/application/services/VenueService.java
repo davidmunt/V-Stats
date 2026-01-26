@@ -1,8 +1,10 @@
 package com.vstats.vstats.application.services;
 
 import com.vstats.vstats.domain.entities.VenueEntity;
+import com.vstats.vstats.domain.entities.LeagueAdminEntity;
 import com.vstats.vstats.infrastructure.repositories.VenueRepository;
-import com.vstats.vstats.presentation.requests.VenueRequest;
+import com.vstats.vstats.infrastructure.repositories.LeagueAdminRepository;
+import com.vstats.vstats.presentation.requests.venue.*;
 import com.vstats.vstats.presentation.responses.VenueResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,9 +21,13 @@ import java.util.stream.Collectors;
 public class VenueService {
 
     private final VenueRepository venueRepository;
+    private final LeagueAdminRepository adminRepository;
 
     @Transactional
-    public VenueResponse createVenue(VenueRequest request) {
+    public VenueResponse createVenue(CreateVenueRequest request) {
+        LeagueAdminEntity admin = adminRepository.findBySlug(request.getSlugAdmin())
+                .orElseThrow(() -> new RuntimeException("Administrador no encontrado"));
+
         String slug = generateSlug(request.getName());
         
         VenueEntity venue = VenueEntity.builder()
@@ -31,56 +37,83 @@ public class VenueService {
                 .city(request.getCity())
                 .capacity(request.getCapacity())
                 .indoor(request.getIndoor())
-                .idAdmin(request.getIdAdmin())
+                .idAdmin(admin.getIdAdmin().toString())
                 .isActive(true)
                 .status("active")
                 .build();
 
-        return mapToResponse(venueRepository.save(venue));
+        return mapToResponse(venueRepository.save(venue), admin.getSlug());
     }
 
     public List<VenueResponse> getAllVenues() {
         return venueRepository.findAll().stream()
-                .filter(v -> !"deleted".equals(v.getStatus())) // Opcional: no mostrar borrados
-                .map(this::mapToResponse)
+                .filter(v -> !"deleted".equals(v.getStatus()))
+                .map(v -> {
+                    String adminSlug = adminRepository.findById(Long.parseLong(v.getIdAdmin()))
+                            .map(LeagueAdminEntity::getSlug)
+                            .orElse("unknown");
+                    return mapToResponse(v, adminSlug);
+                })
+                .collect(Collectors.toList()); 
+    }
+
+    public List<VenueResponse> getVenuesByAdminSlug(String slugAdmin) {
+        LeagueAdminEntity admin = adminRepository.findBySlug(slugAdmin)
+                .orElseThrow(() -> new RuntimeException("Administrador no encontrado con el slug: " + slugAdmin));
+
+        return venueRepository.findAllByIdAdmin(admin.getIdAdmin().toString()).stream()
+                .filter(v -> !"deleted".equals(v.getStatus()))
+                .map(v -> mapToResponse(v, slugAdmin))
                 .collect(Collectors.toList());
     }
 
     public VenueResponse getVenueBySlug(String slug) {
         VenueEntity venue = venueRepository.findBySlug(slug)
-                .orElseThrow(() -> new RuntimeException("Sede no encontrada con slug: " + slug));
-        return mapToResponse(venue);
+                .orElseThrow(() -> new RuntimeException("Sede no encontrada"));
+
+        String adminSlug = adminRepository.findById(Long.parseLong(venue.getIdAdmin()))
+                .map(LeagueAdminEntity::getSlug)
+                .orElse("unknown");
+
+        return mapToResponse(venue, adminSlug);
     }
 
     @Transactional
-    public VenueResponse updateVenue(String slug, VenueRequest request) {
+    public VenueResponse updateVenue(String slug, UpdateVenueRequest request) {
         VenueEntity venue = venueRepository.findBySlug(slug)
-                .orElseThrow(() -> new RuntimeException("No se puede actualizar, no existe: " + slug));
+                .orElseThrow(() -> new RuntimeException("Sede no encontrada"));
 
         venue.setName(request.getName());
         venue.setAddress(request.getAddress());
         venue.setCity(request.getCity());
         venue.setCapacity(request.getCapacity());
         venue.setIndoor(request.getIndoor());
-        // El slug no lo solemos cambiar para no romper enlaces, pero podrías regenerarlo aquí.
 
-        return mapToResponse(venueRepository.save(venue));
+        if (request.getStatus() != null) {
+            venue.setStatus(request.getStatus().toLowerCase());
+            venue.setIsActive("active".equals(venue.getStatus()));
+        }
+
+        String adminSlug = adminRepository.findById(Long.parseLong(venue.getIdAdmin()))
+                .map(LeagueAdminEntity::getSlug)
+                .orElse("unknown");
+
+        return mapToResponse(venueRepository.save(venue), adminSlug);
     }
 
     @Transactional
     public void deleteVenue(String slug) {
         VenueEntity venue = venueRepository.findBySlug(slug)
-                .orElseThrow(() -> new RuntimeException("No se puede borrar, no existe: " + slug));
-        
+                .orElseThrow(() -> new RuntimeException("Sede no encontrada"));
         venue.setIsActive(false);
         venue.setStatus("deleted");
         venueRepository.save(venue);
     }
 
-    private VenueResponse mapToResponse(VenueEntity entity) {
+    private VenueResponse mapToResponse(VenueEntity entity, String adminSlug) {
         return VenueResponse.builder()
-                .idVenue(entity.getIdVenue())
-                .slug(entity.getSlug())
+                .slug_venue(entity.getSlug())
+                .slug_admin(adminSlug)
                 .name(entity.getName())
                 .address(entity.getAddress())
                 .city(entity.getCity())
@@ -93,11 +126,8 @@ public class VenueService {
     }
 
     private String generateSlug(String input) {
-        Pattern NONLATIN = Pattern.compile("[^\\w-]");
-        Pattern WHITESPACE = Pattern.compile("[\\s]");
-        String nowhitespace = WHITESPACE.matcher(input).replaceAll("-");
+        String nowhitespace = input.replaceAll("\\s", "-");
         String normalized = Normalizer.normalize(nowhitespace, Normalizer.Form.NFD);
-        String slug = NONLATIN.matcher(normalized).replaceAll("");
-        return slug.toLowerCase(Locale.ENGLISH);
+        return Pattern.compile("[^\\w-]").matcher(normalized).replaceAll("").toLowerCase(Locale.ENGLISH);
     }
 }
