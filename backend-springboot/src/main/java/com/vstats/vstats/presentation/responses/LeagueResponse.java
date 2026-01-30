@@ -7,10 +7,10 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 public class LeagueResponse {
-    private String slug;
+    private String slug_league;
+    private String slug_season;
     private String name;
     private String country;
-    private String season;
     private String image;
     private String categoryName;
     private String status;

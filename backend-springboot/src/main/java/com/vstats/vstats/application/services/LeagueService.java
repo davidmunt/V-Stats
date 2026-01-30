@@ -1,10 +1,9 @@
 package com.vstats.vstats.application.services;
 
-import com.vstats.vstats.domain.entities.CategoryEntity;
-import com.vstats.vstats.domain.entities.LeagueEntity;
-import com.vstats.vstats.infrastructure.repositories.CategoryRepository;
-import com.vstats.vstats.infrastructure.repositories.LeagueRepository;
-import com.vstats.vstats.presentation.requests.CreateLeagueRequest;
+import com.vstats.vstats.domain.entities.*;
+import com.vstats.vstats.infrastructure.repositories.*;
+import com.vstats.vstats.presentation.requests.league.CreateLeagueRequest;
+import com.vstats.vstats.presentation.requests.league.UpdateLeagueRequest;
 import com.vstats.vstats.presentation.responses.LeagueResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,71 +20,118 @@ import java.util.stream.Collectors;
 public class LeagueService {
 
     private final LeagueRepository leagueRepository;
+    private final SeasonRepository seasonRepository;
     private final CategoryRepository categoryRepository;
+    private final SeasonLeagueRepository seasonLeagueRepository;
+    private final LeagueAdminRepository adminRepository;
 
     @Transactional
     public LeagueResponse createLeague(CreateLeagueRequest request) {
-        // 1. Buscamos la categoría
-        CategoryEntity category = categoryRepository.findById(request.getIdCategory())
-                .orElseThrow(() -> new RuntimeException("Categoría no encontrada con ID: " + request.getIdCategory()));
-
-        // 2. Generamos slug y creamos entidad
-        String slug = generateSlug(request.getName() + "-" + request.getSeason());
+        LeagueAdminEntity admin = adminRepository.findBySlug(request.getSlugAdmin())
+                .orElseThrow(() -> new RuntimeException("Admin no encontrado"));
         
-        LeagueEntity league = LeagueEntity.builder()
-                .name(request.getName())
-                .country(request.getCountry())
-                .season(request.getSeason())
-                .image(request.getImage())
-                .idAdmin(request.getIdAdmin())
+        CategoryEntity category = categoryRepository.findBySlug(request.getSlugCategory())
+                .orElseThrow(() -> new RuntimeException("Categoría no encontrada"));
+
+        SeasonEntity currentSeason = seasonRepository.findByIsActiveTrue()
+                .orElseThrow(() -> new RuntimeException("No hay una temporada activa configurada en el sistema"));
+
+        String leagueSlug = generateSlug(request.getName());
+        LeagueEntity league = leagueRepository.findBySlug(leagueSlug)
+                .orElseGet(() -> leagueRepository.save(
+                    LeagueEntity.builder()
+                        .name(request.getName())
+                        .slug(leagueSlug)
+                        .country(request.getCountry())
+                        .image(request.getImage())
+                        .idAdmin(admin.getIdAdmin().toString())
+                        .build()
+                ));
+
+        SeasonLeagueEntity seasonLeague = SeasonLeagueEntity.builder()
+                .league(league)
+                .season(currentSeason)
                 .category(category)
-                .slug(slug)
+                .status("active")
                 .build();
 
-        return mapToResponse(leagueRepository.save(league));
+        return mapToResponse(seasonLeagueRepository.save(seasonLeague));
     }
 
-    public List<LeagueResponse> getLeaguesByAdmin(String idAdmin) {
-        return leagueRepository.findAllByIdAdmin(idAdmin).stream()
-                .filter(l -> !"deleted".equals(l.getStatus()))
+    public List<LeagueResponse> getAllLeagues() {
+        return seasonLeagueRepository.findAllBySeason_IsActiveTrue().stream()
+                .filter(sl -> !"deleted".equals(sl.getStatus()))
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
-    public LeagueResponse getBySlug(String slug) {
-        return leagueRepository.findBySlug(slug)
+    public List<LeagueResponse> getLeaguesByAdminSlug(String slugAdmin) {
+        return seasonLeagueRepository.findAllBySeason_IsActiveTrue().stream()
+                .filter(sl -> sl.getLeague().getIdAdmin().equals(getAdminIdBySlug(slugAdmin)))
+                .filter(sl -> !"deleted".equals(sl.getStatus()))
                 .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    public LeagueResponse getLeagueBySlug(String slug) {
+        SeasonLeagueEntity sl = seasonLeagueRepository.findByLeague_SlugAndSeason_IsActiveTrue(slug)
+                .orElseThrow(() -> new RuntimeException("Liga no encontrada para la temporada actual"));
+        return mapToResponse(sl);
+    }
+
+    @Transactional
+    public LeagueResponse updateLeague(String slug, UpdateLeagueRequest request) {
+        SeasonLeagueEntity sl = seasonLeagueRepository.findByLeague_SlugAndSeason_IsActiveTrue(slug)
                 .orElseThrow(() -> new RuntimeException("Liga no encontrada"));
+
+        sl.getLeague().setName(request.getName());
+        sl.getLeague().setCountry(request.getCountry());
+        sl.getLeague().setImage(request.getImage());
+
+            CategoryEntity newCat = categoryRepository.findBySlug(request.getSlugCategory())
+                    .orElseThrow(() -> new RuntimeException("Nueva categoría no encontrada"));
+            sl.setCategory(newCat);
+
+        if (request.getStatus() != null) {
+            sl.setStatus(request.getStatus().toLowerCase());
+        }
+
+        return mapToResponse(seasonLeagueRepository.save(sl));
     }
 
     @Transactional
     public void deleteLeague(String slug) {
-        LeagueEntity league = leagueRepository.findBySlug(slug)
+        SeasonLeagueEntity sl = seasonLeagueRepository.findByLeague_SlugAndSeason_IsActiveTrue(slug)
                 .orElseThrow(() -> new RuntimeException("Liga no encontrada"));
-        league.setStatus("deleted");
-        league.setIsActive(false);
-        league.setBoxedAt(java.time.LocalDateTime.now());
-        leagueRepository.save(league);
+        sl.setStatus("deleted");
+        seasonLeagueRepository.save(sl);
     }
 
-    private LeagueResponse mapToResponse(LeagueEntity entity) {
+    // --- Mapeo y Auxiliares ---
+
+    private String getAdminIdBySlug(String slug) {
+        return adminRepository.findBySlug(slug)
+                .orElseThrow(() -> new RuntimeException("Admin no encontrado"))
+                .getIdAdmin().toString();
+    }
+
+    private LeagueResponse mapToResponse(SeasonLeagueEntity sl) {
         return LeagueResponse.builder()
-                .slug(entity.getSlug())
-                .name(entity.getName())
-                .country(entity.getCountry())
-                .season(entity.getSeason())
-                .image(entity.getImage())
-                .categoryName(entity.getCategory().getName())
-                .status(entity.getStatus())
-                .isActive(entity.getIsActive())
-                .createdAt(entity.getCreatedAt())
+                .slug_league(sl.getLeague().getSlug())
+                .slug_season(sl.getSeason().getName())
+                .name(sl.getLeague().getName())
+                .country(sl.getLeague().getCountry())
+                .image(sl.getLeague().getImage())
+                .categoryName(sl.getCategory().getName())
+                .status(sl.getStatus())
+                .isActive("active".equals(sl.getStatus()))
+                .createdAt(sl.getCreatedAt())
                 .build();
     }
 
     private String generateSlug(String input) {
         String nowhitespace = input.replaceAll("\\s", "-");
         String normalized = Normalizer.normalize(nowhitespace, Normalizer.Form.NFD);
-        String slug = Pattern.compile("[^\\w-]").matcher(normalized).replaceAll("");
-        return slug.toLowerCase(Locale.ENGLISH);
+        return Pattern.compile("[^\\w-]").matcher(normalized).replaceAll("").toLowerCase(Locale.ENGLISH);
     }
 }

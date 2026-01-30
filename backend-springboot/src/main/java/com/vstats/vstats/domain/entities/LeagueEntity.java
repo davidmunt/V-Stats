@@ -28,13 +28,10 @@ public class LeagueEntity {
     @Column(nullable = false)
     private String country;
 
-    @Column(nullable = false)
-    private String season;
-
     private String image;
 
     @Column(name = "id_admin", nullable = false)
-    private String idAdmin; // Formato String
+    private String idAdmin; 
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_category", nullable = false)
