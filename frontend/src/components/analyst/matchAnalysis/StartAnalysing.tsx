@@ -56,7 +56,7 @@ export const StartAnalysing = ({ match, analystSlug }: StartAnalysingProps) => {
           disabled={startMutation.isPending}
           className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-lg active:scale-95 disabled:opacity-50"
         >
-          {startMutation.isPending ? "Iniciando..." : "DAR PITIDO INICIAL"}
+          {startMutation.isPending ? "Iniciando..." : "Empezar"}
         </button>
       )}
     </div>

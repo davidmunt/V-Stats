@@ -25,7 +25,7 @@ export const Scoreboard = ({ matchSlug }: ScoreboardProps) => {
 
   const handleAddPoint = async (teamId: string) => {
     try {
-      await addPoint.mutateAsync({ setSlug: actualSet.id_set, teamId });
+      await addPoint.mutateAsync({ setSlug: actualSet.slug, id_team: teamId, id_point_for_team: teamId, action_type: "POINT_ADJUSTMENT" });
     } catch (error: unknown) {
       const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || "Error";
       Swal.fire({
@@ -37,38 +37,26 @@ export const Scoreboard = ({ matchSlug }: ScoreboardProps) => {
     }
   };
 
-  const handleRemovePoint = async (teamSlug: string, teamName: string) => {
-    const result = await Swal.fire({
-      title: `¿Eliminar última acción?`,
-      text: `Se restará un punto a ${teamName} y se borrará su última jugada.`,
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#ef4444",
-      confirmButtonText: "Sí, borrar",
-    });
-
-    if (result.isConfirmed) {
-      try {
-        await deletePoint.mutateAsync({
-          setSlug: actualSet.id_set,
-          teamSlug: teamSlug,
-        });
-      } catch (error: unknown) {
-        const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || "Error";
-        Swal.fire({
-          title: "Error",
-          text: message,
-          icon: "error",
-          confirmButtonColor: "#ef4444",
-        });
-      }
+  const handleRemovePoint = async (teamSlug: string) => {
+    try {
+      await deletePoint.mutateAsync({
+        setSlug: actualSet.slug,
+        teamSlug: teamSlug,
+      });
+    } catch (error: unknown) {
+      const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || "Error";
+      Swal.fire({
+        title: "Error",
+        text: message,
+        icon: "error",
+        confirmButtonColor: "#ef4444",
+      });
     }
   };
 
   return (
     <div className="bg-slate-900 text-white p-6 rounded-2xl shadow-xl border-b-4 border-blue-600">
       <div className="flex justify-between items-center max-w-5xl mx-auto">
-        {/* EQUIPO LOCAL */}
         <div className="flex flex-col items-center gap-3 flex-1">
           <div className="w-16 h-16 rounded-full bg-white/10 p-2 border border-white/20">
             <img src={teamHome.image} alt={teamHome.name} className="w-full h-full object-contain" />
@@ -76,7 +64,7 @@ export const Scoreboard = ({ matchSlug }: ScoreboardProps) => {
           <span className="font-bold text-sm uppercase tracking-wider text-center">{teamHome.name}</span>
           <div className="flex items-center gap-4">
             <button
-              onClick={() => handleRemovePoint(teamHome.slug, teamHome.name)}
+              onClick={() => handleRemovePoint(teamHome.slug)}
               className="w-8 h-8 flex items-center justify-center rounded-full bg-red-500/20 hover:bg-red-500 transition-colors text-red-500 hover:text-white"
             >
               -
@@ -94,10 +82,6 @@ export const Scoreboard = ({ matchSlug }: ScoreboardProps) => {
         <div className="flex flex-col items-center px-10 border-x border-white/10">
           <span className="text-blue-400 font-bold text-xs tracking-widest uppercase">Set</span>
           <span className="text-5xl font-mono font-bold mt-1">{actualSet.set_number}</span>
-          <div className="mt-4 flex flex-col items-center">
-            <span className="text-[10px] text-gray-400 uppercase">Estado</span>
-            <span className="text-xs font-bold text-green-400">{actualSet.status}</span>
-          </div>
         </div>
 
         <div className="flex flex-col items-center gap-3 flex-1">
@@ -114,7 +98,7 @@ export const Scoreboard = ({ matchSlug }: ScoreboardProps) => {
             </button>
             <span className="text-6xl font-black tabular-nums">{actualSet.visitor_points}</span>
             <button
-              onClick={() => handleRemovePoint(teamAway.slug, teamAway.name)}
+              onClick={() => handleRemovePoint(teamAway.slug)}
               className="w-8 h-8 flex items-center justify-center rounded-full bg-red-500/20 hover:bg-red-500 transition-colors text-red-500 hover:text-white"
             >
               -
