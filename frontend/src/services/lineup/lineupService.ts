@@ -1,5 +1,5 @@
 import apiClient from "@/services/apiClient";
-import type { Lineup } from "@/interfaces/lineup.interface";
+import type { MatchLineupsResponse, Lineup } from "@/interfaces/lineup.interface";
 import type { LineupPosition } from "@/interfaces/lineupPosition.interface";
 import type { Player } from "@/interfaces/player.interface";
 import type { SaveLineupParam, UpdateLineupPositionParam } from "./lineupService.param";
@@ -39,7 +39,7 @@ export const getLineupByTeam = async (matchSlug: string, teamSlug: string): Prom
   return response.data;
 };
 
-export const getMatchLineups = async (matchSlug: string): Promise<AllLineupsResponse> => {
-  const response = await apiClient.get<AllLineupsResponse>(`/lineups/${matchSlug}`);
-  return response.data;
+export const getMatchLineups = async (matchSlug: string): Promise<MatchLineupsResponse> => {
+  const response = await apiClient.get<{ lineups: MatchLineupsResponse }>(`/lineups/${matchSlug}`);
+  return response.data.lineups;
 };

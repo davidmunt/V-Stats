@@ -1,6 +1,7 @@
 import apiClient from "@/services/apiClient";
 import type { CreateMatchParam, UpdateMatchParam } from "./matchService.param";
 import type { Match } from "@/interfaces/match.interface";
+import type { Team } from "@/interfaces/team.interface";
 
 interface MatchesResponse {
   matches: Match[];
@@ -8,6 +9,10 @@ interface MatchesResponse {
 
 interface SingleMatchResponse {
   match: Match;
+}
+
+interface TeamsResponse {
+  teams: Team[];
 }
 
 export const createMatch = async ({ slug, name, image, id_team_local, id_team_visitor, date }: CreateMatchParam): Promise<Match> => {
@@ -62,6 +67,20 @@ export const getMatchesForCoach = async (slug: string): Promise<Match[]> => {
 export const getNextMatchForCoach = async (slug: string): Promise<Match> => {
   const response = await apiClient.get<SingleMatchResponse>(`/match/next/coach/${slug}`);
   return response.data.match;
+};
+
+export const getNextMatchForAnalyst = async (slug: string): Promise<Match> => {
+  const response = await apiClient.get<SingleMatchResponse>(`/match/next/analyst/${slug}`);
+  return response.data.match;
+};
+
+export const getTeamsFromMatch = async (slug: string): Promise<Team[]> => {
+  const response = await apiClient.get<TeamsResponse>(`/match/${slug}/teams`);
+  return response.data.teams;
+};
+
+export const startMatch = async (matchSlug: string): Promise<void> => {
+  await apiClient.patch(`/match/${matchSlug}/start`);
 };
 
 export const getMatchBySlug = async (slug: string): Promise<Match> => {

@@ -52,6 +52,11 @@ export const getTeamsFromLeague = async (slug: string): Promise<Team[]> => {
   return response.data.teams;
 };
 
+export const getTeamsFromMatch = async (slug: string): Promise<Team[]> => {
+  const response = await apiClient.get<TeamsResponse>(`/match/${slug}/teams`);
+  return response.data.teams;
+};
+
 export const getTeamsStandingsFromLeague = async (slug: string): Promise<TeamStanding[]> => {
   const response = await apiClient.get<TeamStanding[]>(`/league/${slug}/standings`);
   return response.data;

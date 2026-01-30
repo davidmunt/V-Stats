@@ -52,6 +52,11 @@ export const getPlayersFromAnalist = async (slug: string): Promise<Player[]> => 
   return response.data.players;
 };
 
+export const getPlayersFromMatch = async (slug: string): Promise<Player[]> => {
+  const response = await apiClient.get<PlayersResponse>(`/match/${slug}/players`);
+  return response.data.players;
+};
+
 export const getPlayerBySlug = async (slug: string): Promise<Player> => {
   const response = await apiClient.get<SinglePlayerResponse>(`/player/${slug}`);
   return response.data.player;
