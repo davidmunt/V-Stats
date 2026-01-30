@@ -29,7 +29,7 @@ public class CoachEntity {
     private String avatar;
 
     @Column(name = "id_team")
-    private String idTeam; // String format
+    private String idTeam;
 
     @Column(name = "refresh_token")
     private String refreshToken;
