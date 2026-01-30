@@ -3,15 +3,11 @@ package com.vstats.vstats.domain.entities;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "teams")
-@Getter @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class TeamEntity {
 
     @Id
@@ -27,35 +23,7 @@ public class TeamEntity {
 
     private String image;
 
-    @Column(name = "id_coach")
-    private String idCoach; // Formato String
-
-    @Column(name = "id_analyst")
-    private String idAnalyst; // Formato String
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_league", nullable = false)
-    private LeagueEntity league;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_category", nullable = false)
-    private CategoryEntity category;
-
-    @Builder.Default
-    @Column(name = "is_active")
-    private Boolean isActive = true;
-
-    @Builder.Default
-    private String status = "active";
-
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
-    @Column(name = "boxed_at")
-    private LocalDateTime boxedAt;
 }
