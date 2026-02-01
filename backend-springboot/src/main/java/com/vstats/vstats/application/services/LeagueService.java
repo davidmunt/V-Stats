@@ -65,13 +65,13 @@ public class LeagueService {
                 .collect(Collectors.toList());
     }
 
-    public List<LeagueResponse> getLeaguesByAdminSlug(String slugAdmin) {
-        return seasonLeagueRepository.findAllBySeason_IsActiveTrue().stream()
-                .filter(sl -> sl.getLeague().getIdAdmin().equals(getAdminIdBySlug(slugAdmin)))
+        public List<LeagueResponse> getLeaguesByAdminSlug(String slugAdmin) {
+        String adminId = getAdminIdBySlug(slugAdmin);
+        return seasonLeagueRepository.findAllByLeague_IdAdminAndSeason_IsActiveTrue(adminId).stream()
                 .filter(sl -> !"deleted".equals(sl.getStatus()))
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
-    }
+        }
 
     public LeagueResponse getLeagueBySlug(String slug) {
         SeasonLeagueEntity sl = seasonLeagueRepository.findByLeague_SlugAndSeason_IsActiveTrue(slug)

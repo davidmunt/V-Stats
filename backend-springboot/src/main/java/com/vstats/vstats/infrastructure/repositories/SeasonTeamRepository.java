@@ -10,12 +10,14 @@ import java.util.Optional;
 
 @Repository
 public interface SeasonTeamRepository extends JpaRepository<SeasonTeamEntity, Long> {
-
     List<SeasonTeamEntity> findAllBySeason_IsActiveTrue();
 
     Optional<SeasonTeamEntity> findByTeam_SlugAndSeason_IsActiveTrue(String slug);
 
-    Optional<SeasonTeamEntity> findByTeam_IdTeamAndSeason_IdSeason(Long idteam, Long idSeason);
+    Optional<SeasonTeamEntity> findByTeam_IdTeamAndSeason_IdSeason(Long idTeam, Long idSeason);
     
     List<SeasonTeamEntity> findAllByLeague_IdAdminAndSeason_IsActiveTrue(String idAdmin);
+
+    // ESTE ES EL MÉTODO QUE TENÍAS EN EL OTRO REPO, MUÉVELO AQUÍ:
+    List<SeasonTeamEntity> findAllByLeague_SlugAndSeason_IsActiveTrue(String leagueSlug);
 }

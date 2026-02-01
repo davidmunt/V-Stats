@@ -64,9 +64,10 @@ public class TeamService {
     }
 
     public List<TeamResponse> getTeamsByAdminSlug(String slugAdmin) {
-        return seasonTeamRepository.findAllBySeason_IsActiveTrue().stream()
-                .filter(sl -> sl.getLeague().getIdAdmin().equals(getAdminIdBySlug(slugAdmin)))
-                .filter(sl -> !"deleted".equals(sl.getStatus()))
+        String adminId = getAdminIdBySlug(slugAdmin);
+        
+        return seasonTeamRepository.findAllByLeague_IdAdminAndSeason_IsActiveTrue(adminId).stream()
+                .filter(ts -> !"deleted".equals(ts.getStatus()))
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }

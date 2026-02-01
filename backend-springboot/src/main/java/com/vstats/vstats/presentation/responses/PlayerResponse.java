@@ -8,17 +8,15 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @Data
 @Builder
 @JsonInclude(JsonInclude.Include.ALWAYS)
-public class TeamResponse {
-    private String slug_league;
+public class PlayerResponse {
     private String slug_team;
     private String slug_season;
-    private String slug_coach;
-    private String slug_analist;
-    private String slug_venue;
+    private String slug_player;
     private String name;
-    private String season_name;
-    private String image;
-    private String status;
+    private String email;
+    private String dorsal;
+    private String role;
+    private String avatar;
     private Boolean isActive;
     private LocalDateTime createdAt;
 }

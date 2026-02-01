@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SeasonRepository extends JpaRepository<SeasonEntity, Long> {
-    Optional<SeasonEntity> findBySlug(String slug);
+    // Optional<SeasonEntity> findBySlug(String slug);
     Optional<SeasonEntity> findByIsActiveTrue();
     Optional<SeasonEntity> findByName(String name);
 }

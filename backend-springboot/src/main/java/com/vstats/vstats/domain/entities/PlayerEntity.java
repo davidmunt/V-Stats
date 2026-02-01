@@ -3,14 +3,12 @@ package com.vstats.vstats.domain.entities;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "players")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class PlayerEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_player")
@@ -21,13 +19,6 @@ public class PlayerEntity {
 
     @Column(nullable = false)
     private String name;
-
-    private Integer dorsal;
-
-    private String role; // setter, middle, etc.
-
-    @Column(name = "id_team")
-    private String idTeam; // String format
 
     @Column(unique = true)
     private String email;
@@ -44,11 +35,4 @@ public class PlayerEntity {
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
-    @Column(name = "boxed_at")
-    private LocalDateTime boxedAt;
 }
