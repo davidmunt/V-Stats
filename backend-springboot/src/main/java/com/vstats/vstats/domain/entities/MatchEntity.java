@@ -35,10 +35,10 @@ public class MatchEntity {
     private TeamEntity visitorTeam;
 
     @Column(name = "id_venue")
-    private String idVenue; // String format
+    private String idVenue; 
 
     @Column(name = "id_admin_creator", nullable = false)
-    private String idAdminCreator; // String format
+    private String idAdminCreator;
 
     @Column(nullable = false)
     private LocalDateTime date;
