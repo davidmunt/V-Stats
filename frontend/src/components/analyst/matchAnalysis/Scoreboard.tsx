@@ -1,7 +1,7 @@
 import { useActualSetQuery } from "@/queries/set/useActualSet";
 import { useMatchTeamsQuery } from "@/queries/match/useMatchTeams";
-import { useAddPointMutation } from "@/mutations/points/useAddPoint";
-import { useDeleteLastPointMutation } from "@/mutations/points/useDeleteLastPoint";
+import { useAddPointMutation } from "@/mutations/actions/useAddPoint";
+import { useDeleteLastPointMutation } from "@/mutations/actions/useDeleteLastPoint";
 import LoadingFallback from "@/components/LoadingFallback";
 import Swal from "sweetalert2";
 

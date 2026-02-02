@@ -46,12 +46,10 @@ export const MatchAnalysisManager = ({ analystSlug }: { analystSlug: string }) =
         </div>
         <div className="lg:col-span-4 h-full">
           {selectedPosition ? (
-            // Agregamos el Fragment para envolver ambos paneles
             <>
               <SubstitutionPanel
                 idLineup={lineups?.home?.id_team === selectedPosition.id_team ? lineups.home.id_lineup : lineups?.away?.id_lineup || ""}
                 selectedPosition={selectedPosition}
-                // Pasamos todas las posiciones (unimos las de casa y fuera para que el panel busque)
                 allPositions={[...(lineups?.home?.positions || []), ...(lineups?.away?.positions || [])]}
                 onSuccess={() => setSelectedPosition(null)}
               />
@@ -66,7 +64,6 @@ export const MatchAnalysisManager = ({ analystSlug }: { analystSlug: string }) =
             </>
           ) : (
             <div className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl h-[500px] flex flex-col items-center justify-center text-center p-8">
-              <div className="text-5xl mb-4 opacity-20">🖱️</div>
               <p className="text-gray-400 font-medium">Selecciona un jugador para registrar una accion</p>
             </div>
           )}
