@@ -70,18 +70,22 @@ const registerUser = asyncHandler(async (req, res) => {
     id: newUser._id,
     avatar: newUser.avatar,
     slug: newUser.slug,
+    id_team: null,
     // añade aquí cualquier otro campo que necesites (ej. avatar, etc)
   });
 });
 
 const userLogin = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
+
   if (!email || !password) {
     return res.status(400).json({ message: "Email y contraseña requeridos" });
   }
+
   let foundUser = null;
   let userType = null;
   let modelName = null;
+
   const modelsToSearch = [
     { model: User, type: "user", name: "User" },
     { model: LeagueAdmin, type: "admin", name: "LeagueAdmin" },
@@ -89,6 +93,7 @@ const userLogin = asyncHandler(async (req, res) => {
     { model: Analyst, type: "analyst", name: "Analyst" },
     { model: Player, type: "player", name: "Player" },
   ];
+
   for (const item of modelsToSearch) {
     foundUser = await item.model.findOne({ email }).exec();
     if (foundUser) {
@@ -97,11 +102,15 @@ const userLogin = asyncHandler(async (req, res) => {
       break;
     }
   }
+
   if (!foundUser) return res.status(404).json({ message: "Usuario no encontrado" });
+
   const match = await argon2.verify(foundUser.password, password);
   if (!match) return res.status(401).json({ message: "Contraseña incorrecta" });
+
   const accessToken = generateAccessToken(foundUser, userType);
   const refreshTokenValue = generateRefreshToken(foundUser, userType);
+
   const tokenDoc = await RefreshToken.findOneAndUpdate(
     { user_id: foundUser._id },
     {
@@ -111,8 +120,10 @@ const userLogin = asyncHandler(async (req, res) => {
     },
     { upsert: true, new: true },
   );
+
   foundUser.refresh_token = tokenDoc._id;
   await foundUser.save();
+
   res.status(200).json({
     token: accessToken,
     user_type: userType,
@@ -121,6 +132,8 @@ const userLogin = asyncHandler(async (req, res) => {
     id: foundUser._id,
     avatar: foundUser.avatar || "",
     slug: foundUser.slug,
+    // Verificamos si tiene team_id (Analistas, Coaches, Players)
+    id_team: foundUser.team_id || null,
   });
 });
 
@@ -177,8 +190,8 @@ const logout = asyncHandler(async (req, res) => {
 
 const getMe = asyncHandler(async (req, res) => {
   const { userId, userRole } = req;
-  let foundUser = null;
   let model;
+
   switch (userRole) {
     case "admin":
       model = LeagueAdmin;
@@ -196,10 +209,13 @@ const getMe = asyncHandler(async (req, res) => {
       model = User;
       break;
   }
-  foundUser = await model.findById(userId).exec();
+
+  const foundUser = await model.findById(userId).exec();
+
   if (!foundUser) {
     return res.status(404).json({ message: "Usuario no encontrado" });
   }
+
   res.status(200).json({
     token: req.token,
     user_type: userRole,
@@ -207,6 +223,8 @@ const getMe = asyncHandler(async (req, res) => {
     slug: foundUser.slug,
     name: foundUser.name,
     id: foundUser._id,
+    // Mapeo consistente: team_id del modelo -> id_team del JSON
+    id_team: foundUser.team_id || null,
     avatar: foundUser.avatar || "",
     ...(userRole === "player" && {
       dorsal: foundUser.dorsal,

@@ -4,6 +4,10 @@ const League = require("../models/league.model");
 const Team = require("../models/team.model");
 const Venue = require("../models/venue.model");
 const Coach = require("../models/coach.model");
+const Analyst = require("../models/analyst.model");
+const Player = require("../models/player.model");
+const Lineup = require("../models/lineup.model");
+const LineupPosition = require("../models/lineupPosition.model");
 
 const createMatch = asyncHandler(async (req, res) => {
   const { leagueSlug } = req.params;
@@ -127,7 +131,7 @@ const getNextMatch = asyncHandler(async (req, res) => {
     .populate("local_team_id", "name image slug")
     .populate("visitor_team_id", "name image slug")
     .populate("venue_id", "name city")
-    .sort({ date: 1 }) // Orden ascendente (el más cercano primero)
+    .sort({ date: 1 })
     .exec();
 
   if (!nextMatch) {
@@ -139,6 +143,166 @@ const getNextMatch = asyncHandler(async (req, res) => {
 
   res.status(200).json({
     match: nextMatch.toMatchResponse(),
+  });
+});
+
+const getNextMatchAnalyst = asyncHandler(async (req, res) => {
+  const { slug } = req.params;
+
+  const analyst = await Analyst.findOne({ slug }).select("team_id");
+  if (!analyst || !analyst.team_id) {
+    return res.status(404).json({ message: "Analista no encontrado" });
+  }
+
+  const teamId = analyst.team_id;
+
+  // 1. Prioridad: ¿Hay algo en LIVE?
+  let match = await Match.findOne({
+    $or: [{ local_team_id: teamId }, { visitor_team_id: teamId }],
+    status: "live",
+    is_active: true,
+  }).populate("local_team_id visitor_team_id venue_id");
+
+  // 2. Si no hay LIVE, buscamos el "siguiente" razonable
+  if (!match) {
+    // CALCULAMOS EL INICIO DE HOY (00:00:00)
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+
+    match = await Match.findOne({
+      $or: [{ local_team_id: teamId }, { visitor_team_id: teamId }],
+      status: "scheduled",
+      // Buscamos partidos de hoy (aunque ya haya pasado la hora) o futuros
+      date: { $gte: todayStart },
+      is_active: true,
+    })
+      .populate("local_team_id visitor_team_id venue_id")
+      .sort({ date: 1 }); // El más antiguo de los futuros (el más cercano)
+  }
+
+  if (!match) {
+    return res.status(200).json({
+      match: null,
+      message: "No hay partidos para hoy ni próximos.",
+    });
+  }
+
+  res.status(200).json({
+    match: match.toMatchResponse(),
+  });
+});
+
+const getMatchDataForAnalysis = asyncHandler(async (req, res) => {
+  const { matchSlug } = req.params;
+
+  // 1. Buscamos el partido y populamos los equipos
+  const match = await Match.findOne({ slug: matchSlug }).populate("local_team_id").populate("visitor_team_id");
+
+  if (!match) return res.status(404).json({ message: "Partido no encontrado" });
+
+  // 2. Buscamos los jugadores de ambos equipos
+  const players = await Player.find({
+    id_team: { $in: [match.local_team_id._id, match.visitor_team_id._id] },
+    is_active: true,
+  });
+
+  // 3. Buscamos las alineaciones activas
+  const lineups = await Lineup.find({
+    match_id: match._id,
+    is_active: true,
+  });
+
+  // 4. Buscamos las posiciones (con los datos del jugador populados)
+  const lineupPositions = await LineupPosition.find({
+    lineup_id: { $in: lineups.map((l) => l._id) },
+    is_active: true,
+  }).populate("player_id");
+
+  // --- TRANSFORMACIONES PARA LIMPIAR DATOS ---
+
+  // A) Formatear Equipos: _id -> id_team
+  const formatTeam = (team) => ({
+    id_team: team._id,
+    name: team.name,
+    slug: team.slug,
+    image: team.image,
+    coach_id: team.coach_id,
+    analyst_id: team.analyst_id,
+    // No incluimos __v, createdAt, etc.
+  });
+
+  // B) Formatear Jugadores: _id -> id_player
+  const formatPlayer = (p) => ({
+    id_player: p._id,
+    id_team: p.id_team,
+    name: p.name,
+    slug: p.slug,
+    dorsal: p.dorsal,
+    role: p.role,
+    image: p.image,
+  });
+
+  // C) Formatear Posiciones (Aplanado, igual que en getMatchLineups)
+  const formatPosition = (pos) => {
+    const p = pos.player_id; // Objeto player populado
+    return {
+      id_lineup_position: pos._id,
+      id_lineup: pos.lineup_id,
+      slug: pos.slug,
+      initial_position: pos.initial_position,
+      current_position: pos.current_position,
+      is_on_court: pos.is_on_court,
+      // Datos planos del jugador
+      id_player: p ? p._id : null,
+      name: p ? p.name : null,
+      dorsal: p ? p.dorsal : null,
+      role: p ? p.role : null,
+      image: p ? p.image : null,
+    };
+  };
+
+  // --- RESPUESTA ---
+  res.status(200).json({
+    // Aplicamos el formato a los equipos local y visitante
+    teams: [formatTeam(match.local_team_id), formatTeam(match.visitor_team_id)],
+    // Limpiamos la lista de jugadores
+    players: players.map(formatPlayer),
+    // Devolvemos las alineaciones (puedes añadir .map si quieres limpiar _id aquí también)
+    lineups: lineups.map((l) => ({
+      id_lineup: l._id,
+      id_team: l.team_id,
+      status: l.status,
+      slug: l.slug,
+    })),
+    // Limpiamos y aplanamos las posiciones
+    positions: lineupPositions.map(formatPosition),
+  });
+});
+
+const startMatch = asyncHandler(async (req, res) => {
+  const { matchSlug } = req.params;
+
+  const match = await Match.findOne({ slug: matchSlug });
+  if (!match) return res.status(404).json({ message: "Partido no encontrado" });
+
+  // Si el partido ya está LIVE, no hacemos nada, simplemente devolvemos OK
+  // Esto evita errores si el segundo analista pulsa el botón
+  if (match.status === "live") {
+    return res.status(200).json({ message: "El partido ya está en vivo", status: match.status });
+  }
+
+  // Si ya terminó, tampoco lo movemos a live
+  if (match.status === "finished") {
+    return res.status(400).json({ message: "El partido ya ha finalizado" });
+  }
+
+  // Cambiamos el estado a live
+  match.status = "live";
+  await match.save();
+
+  res.status(200).json({
+    message: "Partido empezado correctamente",
+    status: match.status,
   });
 });
 
@@ -196,6 +360,9 @@ module.exports = {
   getMatchBySlug,
   getCoachMatches,
   getNextMatch,
+  getNextMatchAnalyst,
+  getMatchDataForAnalysis,
+  startMatch,
   updateMatch,
   deleteMatch,
 };

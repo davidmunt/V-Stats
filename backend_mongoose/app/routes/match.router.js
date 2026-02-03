@@ -14,6 +14,14 @@ module.exports = (app) => {
 
   app.get("/match/next/coach/:slug", verifyJWT(["coach"]), matchController.getNextMatch);
 
+  app.get("/match/next/analyst/:slug", verifyJWT(["analyst"]), matchController.getNextMatchAnalyst);
+
+  // Obtener toda la información necesaria para el panel de análisis
+  app.get("/match/:matchSlug/teams", verifyJWT(["admin", "analyst"]), matchController.getMatchDataForAnalysis);
+
+  // Cambiar estado a LIVE (seguro para múltiples analistas)
+  app.patch("/match/:matchSlug/start", verifyJWT(["admin", "analyst"]), matchController.startMatch);
+
   app.put("/:leagueSlug/match/:matchSlug", verifyJWT(["admin"]), matchController.updateMatch);
 
   app.delete("/:leagueSlug/match/:matchSlug", verifyJWT(["admin"]), matchController.deleteMatch);

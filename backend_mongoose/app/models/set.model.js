@@ -28,7 +28,6 @@ const SetSchema = mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["in_progress", "finished", "canceled"],
       default: "in_progress",
     },
     finished_at: {

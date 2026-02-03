@@ -21,7 +21,6 @@ const LineupSchema = mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["starting", "final", "modified"],
       default: "starting",
     },
     is_active: {

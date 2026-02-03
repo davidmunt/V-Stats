@@ -27,23 +27,21 @@ const ActionSchema = mongoose.Schema(
     player_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Player",
-      required: true,
+      required: false,
     },
     player_position: {
       type: Number,
       min: 1,
       max: 6,
-      required: true,
+      required: false,
     },
     action_type: {
       type: String,
-      enum: ["serve", "reception", "set", "attack", "block", "dig", "error"],
-      required: true,
+      required: false,
     },
     result: {
       type: String,
-      enum: ["success", "fail", "ace", "blocked", "error", "positive", "negative"],
-      required: true,
+      required: false,
     },
     point_for_team_id: {
       type: mongoose.Schema.Types.ObjectId,

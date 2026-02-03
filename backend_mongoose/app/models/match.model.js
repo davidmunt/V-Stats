@@ -40,7 +40,6 @@ const MatchSchema = mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["scheduled", "live", "finished", "cancelled"],
       default: "scheduled",
     },
     current_set: {

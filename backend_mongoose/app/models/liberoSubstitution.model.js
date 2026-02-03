@@ -37,7 +37,6 @@ const LiberoSubstitutionSchema = mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["in", "out", "completed"], // "in" cuando entra el líbero, "out" cuando regresa el jugador original
       default: "completed",
     },
     is_active: {

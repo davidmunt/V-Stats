@@ -35,7 +35,6 @@ const LeagueSchema = mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["pending", "active", "finished"],
       default: "active",
     },
     image: {

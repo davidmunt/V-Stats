@@ -45,6 +45,9 @@ require("../routes/coach.router.js")(app);
 require("../routes/analyst.router.js")(app);
 require("../routes/player.router.js")(app);
 require("../routes/lineup.router.js")(app);
+require("../routes/action.router.js")(app);
+require("../routes/set.router.js")(app);
+require("../routes/stats.router.js")(app);
 
 const PORT = process.env.PORT || 3001;
 
