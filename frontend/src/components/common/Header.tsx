@@ -7,16 +7,13 @@ const Header = () => {
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
       <div className="container mx-auto px-6 h-16 flex justify-between items-center">
-        {/* IZQUIERDA: Logo */}
-        <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+        <Link to={`/${user?.user_type}`} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
           <img src="/2.png" alt="Logo" className="h-10 w-auto object-contain" />
         </Link>
 
-        {/* DERECHA: Perfil o Login */}
         <div className="flex items-center gap-6">
           {isAuthenticated && user ? (
             <div className="flex items-center gap-4">
-              {/* Enlace al Perfil (Avatar + Nombre) */}
               <Link to={`/profile/${user.id}`} className="flex items-center gap-3 group border-r border-gray-200 pr-4">
                 <div className="text-right hidden sm:block">
                   <p className="text-sm font-medium text-gray-900 group-hover:text-blue-600 transition-colors">{user.name}</p>
@@ -29,13 +26,11 @@ const Header = () => {
                 />
               </Link>
 
-              {/* Botón Logout */}
               <button onClick={logout} className="text-sm font-medium text-gray-600 hover:text-red-600 transition-colors">
                 Cerrar Sesión
               </button>
             </div>
           ) : (
-            /* Si no está autenticado, mostramos botón de Login */
             <Link
               to="/auth"
               className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-medium transition-all shadow-sm active:scale-95"

@@ -10,7 +10,7 @@ export interface League {
   season: string;
   created_at: Date;
   updated_at: Date;
-  status: LeagueStatus;
+  status: string;
   image: string;
   is_active: boolean;
 }

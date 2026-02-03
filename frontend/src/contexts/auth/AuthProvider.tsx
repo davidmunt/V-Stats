@@ -26,35 +26,13 @@ const AuthProvider = ({ children }: Props) => {
   const registerMutation = useRegisterMutation();
 
   const login = async (email: string, password: string) => {
-    const response = await loginMutation.mutateAsync({ email, password });
+    await loginMutation.mutateAsync({ email, password });
     setHasToken(true);
-    if (response.user_type === "admin") {
-      navigate("/admin");
-    } else if (response.user_type === "coach") {
-      navigate("/coach");
-    } else if (response.user_type === "analyst") {
-      navigate("/analyst");
-    } else if (response.user_type === "player") {
-      navigate("/player");
-    } else {
-      navigate("/");
-    }
   };
 
   const register = async (data: { email: string; password: string; name: string; user_type: UserRole }) => {
-    const response = await registerMutation.mutateAsync(data);
+    await registerMutation.mutateAsync(data);
     setHasToken(true);
-    if (response.user_type === "admin") {
-      navigate("/admin");
-    } else if (response.user_type === "coach") {
-      navigate("/coach");
-    } else if (response.user_type === "analyst") {
-      navigate("/analyst");
-    } else if (response.user_type === "player") {
-      navigate("/player");
-    } else {
-      navigate("/");
-    }
   };
 
   const logout = () => {

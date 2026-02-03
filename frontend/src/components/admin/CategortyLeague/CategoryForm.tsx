@@ -63,13 +63,11 @@ export const CategoryForm = ({ initialData, onCancel, onSuccess }: CategoryFormP
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-      {/* Título Dinámico */}
       <h2 className="text-xl font-bold text-gray-800 mb-6">
         {isEditing ? `Editar Categoría: ${initialData.name}` : "Crear Nueva Categoría"}
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* --- CAMPOS COMUNES --- */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
           <input
@@ -107,7 +105,6 @@ export const CategoryForm = ({ initialData, onCancel, onSuccess }: CategoryFormP
           />
         </div>
 
-        {/* --- CAMPOS SOLO VISIBLES EN UPDATE --- */}
         {isEditing && (
           <div className="p-4 bg-gray-50 rounded-md border border-gray-100">
             <label className="block text-sm font-medium text-gray-700 mb-1">Estado</label>
@@ -117,14 +114,12 @@ export const CategoryForm = ({ initialData, onCancel, onSuccess }: CategoryFormP
               onChange={handleChange}
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none bg-white"
             >
-              <option value="active">🟢 Activo</option>
-              <option value="inactive">🔴 Inactivo</option>
+              <option value="active">Activo</option>
+              <option value="inactive">Inactivo</option>
             </select>
-            <p className="text-xs text-gray-500 mt-1">Las categorías inactivas no se mostrarán en la app pública.</p>
           </div>
         )}
 
-        {/* --- BOTONES DE ACCIÓN --- */}
         <div className="flex gap-3 pt-4 border-t border-gray-100 mt-6">
           <button
             type="button"

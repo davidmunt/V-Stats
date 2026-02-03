@@ -49,10 +49,11 @@ interface VolleyballCourtProps {
 }
 
 export const VolleyballCourt = ({ lineupState }: VolleyballCourtProps) => {
+  console.log("VolleyballCourt lineupState:", lineupState);
   return (
     <div className="bg-orange-100 p-6 rounded-2xl border-4 border-white shadow-inner relative overflow-hidden">
       <div className="absolute inset-x-0 top-0 h-4 bg-gray-300 flex items-center justify-center text-xs font-bold text-gray-500 tracking-widest">
-        RED (NET)
+        PLANTILLA TITULAR
       </div>
       <div className="absolute top-1/3 inset-x-0 h-0.5 bg-white opacity-60"></div>
       <div className="grid grid-cols-3 gap-4 mt-6 max-w-lg mx-auto">

@@ -5,6 +5,7 @@ import { useUpdateMatchMutation } from "@/mutations/matches/useUpdate";
 import { useDeleteMatchMutation } from "@/mutations/matches/useDelete";
 import type { Match } from "@/interfaces/match.interface";
 import LoadingFallback from "@/components/LoadingFallback";
+import Swal from "sweetalert2";
 
 interface MatchFormProps {
   leagueSlug: string;
@@ -37,16 +38,19 @@ export const MatchForm = ({ leagueSlug, initialData, onCancel, onSuccess }: Matc
   };
 
   const handleDelete = async () => {
-    if (window.confirm("¿Estás seguro de que quieres eliminar este partido?")) {
-      await deleteMutation.mutateAsync({ slug: leagueSlug, matchSlug: initialData!.slug });
-      onSuccess();
-    }
+    await deleteMutation.mutateAsync({ slug: leagueSlug, matchSlug: initialData!.slug });
+    onSuccess();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.id_team_local === formData.id_team_visitor) {
-      alert("El equipo local y el visitante no pueden ser el mismo.");
+      Swal.fire({
+        title: "Error",
+        text: "El equipo local y el visitante no pueden ser el mismo.",
+        icon: "error",
+        confirmButtonColor: "#ef4444",
+      });
       return;
     }
 
@@ -81,7 +85,6 @@ export const MatchForm = ({ leagueSlug, initialData, onCancel, onSuccess }: Matc
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Nombre e Imagen */}
           <div className="col-span-2">
             <label className="block text-sm font-semibold text-gray-700">Nombre del Encuentro</label>
             <input
@@ -99,7 +102,6 @@ export const MatchForm = ({ leagueSlug, initialData, onCancel, onSuccess }: Matc
             <input name="image" value={formData.image} onChange={handleChange} className="w-full border p-2 rounded mt-1" />
           </div>
 
-          {/* Selectores de Equipos */}
           <div>
             <label className="block text-sm font-semibold text-gray-700">Equipo Local</label>
             <select
@@ -136,8 +138,6 @@ export const MatchForm = ({ leagueSlug, initialData, onCancel, onSuccess }: Matc
             </select>
           </div>
 
-          {/* Fecha */}
-
           <div>
             <label className="block text-sm font-semibold text-gray-700">Fecha y Hora</label>
             <input
@@ -150,7 +150,6 @@ export const MatchForm = ({ leagueSlug, initialData, onCancel, onSuccess }: Matc
             />
           </div>
 
-          {/* Campos Extra de Edición */}
           {isEditing && (
             <>
               <div>
@@ -184,7 +183,6 @@ export const MatchForm = ({ leagueSlug, initialData, onCancel, onSuccess }: Matc
           )}
         </div>
 
-        {/* --- ACCIONES --- */}
         <div className="flex flex-col sm:flex-row justify-between gap-3 pt-6 border-t">
           <div className="flex gap-3 order-2 sm:order-1">
             <button type="button" onClick={onCancel} className="px-5 py-2 border rounded-lg hover:bg-gray-50">

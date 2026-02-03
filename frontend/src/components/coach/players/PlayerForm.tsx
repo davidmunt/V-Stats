@@ -48,7 +48,7 @@ export const PlayerForm = ({ initialData, onCancel, onSuccess }: PlayerFormProps
           title: "Actualizado",
           text: "Los datos del jugador se han guardado correctamente.",
           icon: "success",
-          timer: 2000,
+          timer: 800,
           showConfirmButton: false,
         });
       } else {
@@ -60,7 +60,7 @@ export const PlayerForm = ({ initialData, onCancel, onSuccess }: PlayerFormProps
           title: "Jugador Creado",
           text: `${formData.name} ya forma parte de la plantilla.`,
           icon: "success",
-          timer: 2000,
+          timer: 800,
           showConfirmButton: false,
         });
       }
@@ -86,7 +86,6 @@ export const PlayerForm = ({ initialData, onCancel, onSuccess }: PlayerFormProps
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Nombre */}
           <div className="col-span-2 md:col-span-1">
             <label className="block text-sm font-semibold text-gray-700 mb-1">Nombre Completo</label>
             <input
@@ -99,7 +98,6 @@ export const PlayerForm = ({ initialData, onCancel, onSuccess }: PlayerFormProps
             />
           </div>
 
-          {/* Dorsal */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">Dorsal (#)</label>
             <input
@@ -114,7 +112,6 @@ export const PlayerForm = ({ initialData, onCancel, onSuccess }: PlayerFormProps
             />
           </div>
 
-          {/* Rol / Posición */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">Posición en Campo</label>
             <select
@@ -131,7 +128,6 @@ export const PlayerForm = ({ initialData, onCancel, onSuccess }: PlayerFormProps
             </select>
           </div>
 
-          {/* URL Imagen */}
           <div className="col-span-2">
             <label className="block text-sm font-semibold text-gray-700 mb-1">URL de la Foto</label>
             <input
@@ -143,7 +139,6 @@ export const PlayerForm = ({ initialData, onCancel, onSuccess }: PlayerFormProps
             />
           </div>
 
-          {/* Estado y Visibilidad (Solo en edición) */}
           {isEditing && (
             <>
               <div className="col-span-2 md:col-span-1">
@@ -178,7 +173,6 @@ export const PlayerForm = ({ initialData, onCancel, onSuccess }: PlayerFormProps
           )}
         </div>
 
-        {/* Botones */}
         <div className="flex gap-3 pt-6 border-t border-gray-100 mt-4">
           <button
             type="button"

@@ -27,11 +27,9 @@ export const ActionPanel = ({ setSlug, selectedPosition, teamLocalId, teamVisito
     setShowPicker(true);
   };
 
-  // PASO 2: Esta función la llama el CoordinatePicker cuando el usuario hace los 2 clics
   const handleSaveWithCoords = async (coords: { start_x: number; start_y: number; end_x: number; end_y: number }) => {
     if (!selectedType || !tempResult) return;
 
-    // Calculamos el punto según el resultado guardado
     let pointForTeamId: string | null = null;
     if (tempResult === "++") {
       pointForTeamId = selectedPosition.id_team;
@@ -48,10 +46,9 @@ export const ActionPanel = ({ setSlug, selectedPosition, teamLocalId, teamVisito
         result: tempResult,
         player_position: selectedPosition.current_position,
         id_point_for_team: pointForTeamId,
-        ...coords, // Aquí inyectamos start_x, start_y, etc.
+        ...coords,
       });
 
-      // Limpiamos todo
       setSelectedType(null);
       setTempResult(null);
       setShowPicker(false);

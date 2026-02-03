@@ -1,16 +1,8 @@
 import { Navigate } from "react-router-dom";
 import type { ReactNode } from "react";
-import { jwtDecode } from "jwt-decode";
 import { useAuthContext } from "@/hooks/useAuthContext";
-import tokenService from "@/lib/token";
-import { ACCESS_TOKEN_KEY } from "@/constants/token.constant";
 import LoadingFallback from "@/components/LoadingFallback";
 import type { UserRole } from "@/interfaces/user.interface";
-
-interface JwtPayload {
-  user_type?: UserRole;
-  role?: UserRole;
-}
 
 interface Props {
   children: ReactNode;
@@ -19,24 +11,17 @@ interface Props {
 
 const RoleProtectedRoute = ({ children, allowedRoles }: Props) => {
   const { user, isAuthenticated, isLoading } = useAuthContext();
+
   if (isLoading) return <LoadingFallback />;
-  if (!isAuthenticated) {
+
+  if (!isAuthenticated || !user) {
     return <Navigate to="/auth" replace />;
   }
-  let role = user?.user_type;
-  if (!role) {
-    const rawToken = tokenService.getToken(ACCESS_TOKEN_KEY);
-    if (!rawToken) return <Navigate to="/auth" replace />;
-    try {
-      const decoded = jwtDecode<JwtPayload>(rawToken);
-      role = decoded.user_type ?? decoded.role;
-    } catch {
-      return <Navigate to="/auth" replace />;
-    }
-  }
-  if (!role || !allowedRoles.includes(role)) {
+
+  if (!allowedRoles.includes(user.user_type)) {
     return <Navigate to="/" replace />;
   }
+
   return <>{children}</>;
 };
 

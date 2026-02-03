@@ -1,12 +1,11 @@
-export type SetStatus = "PENDING" | "IN_PROGRESS" | "FINISHED";
-
 export interface Set {
+  slug: string;
   id_set: string;
   id_match: string;
   set_number: number;
   local_points: number;
   visitor_points: number;
   finished_at: Date;
-  status: SetStatus;
+  status: string;
   is_active: boolean;
 }

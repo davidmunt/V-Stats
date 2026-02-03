@@ -8,5 +8,6 @@ export interface User {
   dark_mode: boolean;
   user_type: UserRole;
   accessToken: string;
+  id_team: string;
   slug: string;
 }

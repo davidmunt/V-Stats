@@ -46,7 +46,7 @@ const DraggablePlayer = ({ player }: DraggablePlayerProps) => {
         <div className="text-sm font-bold text-gray-900 truncate">{player.name}</div>
         <div className="text-[10px] uppercase font-bold text-gray-500">{player.role}</div>
       </div>
-      <div className="font-black text-lg px-2 text-gray-400">⋮⋮</div> {/* Icono de agarre */}
+      <div className="font-black text-lg px-2 text-gray-400">⋮⋮</div>
     </div>
   );
 };
@@ -61,40 +61,45 @@ export const PlayerBench = ({ allPlayers, lineupState }: PlayerBenchProps) => {
     id: "bench",
   });
 
+  // Dentro de PlayerBench.tsx
   const playerIdsOnCourt = Object.values(lineupState)
-    .filter((p): p is Player => p !== null)
+    .filter((p): p is Player => Boolean(p && p.id_player)) // Doble comprobación
     .map((p) => p.id_player);
 
-  const benchPlayers = allPlayers.filter((p) => !playerIdsOnCourt.includes(p.id_player));
+  const benchPlayers = (allPlayers || []).filter((p) => {
+    if (!p || !p.id_player) return false;
+    return !playerIdsOnCourt.includes(p.id_player);
+  });
 
   return (
     <div
       ref={setNodeRef}
       className={`
-        bg-gray-50 p-6 rounded-2xl border-2 transition-colors min-h-[300px]
+        bg-gray-50 p-6 rounded-2xl border-2 transition-colors min-h-[300px] relative
         ${isOver ? "border-red-400 bg-red-50" : "border-gray-200"}
       `}
     >
       <div className="flex justify-between items-center mb-4">
-        <h3 className="font-bold text-gray-800 flex items-center gap-2">
-          <span></span> Banquillo (Disponibles)
-        </h3>
+        <h3 className="font-bold text-gray-800 flex items-center gap-2">JUGADORES DISPONIBLES</h3>
         <span className="text-xs bg-gray-200 px-2 py-1 rounded-full font-bold">{benchPlayers.length} jugadores</span>
       </div>
+
       {benchPlayers.length === 0 ? (
         <div className="text-center text-gray-400 text-sm mt-10">Toda la plantilla está en la pista.</div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
           {benchPlayers
-            .sort((a, b) => a.dorsal - b.dorsal)
-            .map((player) => (
-              <DraggablePlayer key={player.id_player} player={player} />
-            ))}
+            .sort((a, b) => (a.dorsal || 0) - (b.dorsal || 0))
+            .map((player) =>
+              // Verificación final antes de renderizar el Draggable
+              player?.id_player ? <DraggablePlayer key={player.id_player} player={player} /> : null,
+            )}
         </div>
       )}
+
       {isOver && (
         <div className="absolute inset-0 bg-red-100/80 backdrop-blur-sm flex items-center justify-center rounded-2xl border-2 border-red-500 z-10">
-          <span className="font-bold text-red-700 text-lg">Soltar aquí para quitar de la pista</span>
+          <span className="font-bold text-red-700 text-lg">Quitar de la pista</span>
         </div>
       )}
     </div>

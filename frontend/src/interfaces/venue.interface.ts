@@ -9,6 +9,6 @@ export interface Venue {
   capacity: number;
   indoor: boolean;
   created_at: Date;
-  status: VenueStatus;
+  status: string;
   is_active: boolean;
 }

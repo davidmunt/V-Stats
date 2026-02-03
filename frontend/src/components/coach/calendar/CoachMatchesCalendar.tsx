@@ -28,8 +28,7 @@ export const CoachMatchesCalendar = ({ coachSlug }: { coachSlug: string }) => {
   return (
     <div className="p-6 space-y-4 bg-white rounded-xl border border-gray-200 shadow-sm">
       <div className="mb-4">
-        <h2 className="text-xl font-bold text-gray-800">Mi Calendario de Partidos</h2>
-        <p className="text-sm text-gray-500">Consulta las próximas fechas de tu equipo</p>
+        <h2 className="text-xl font-bold text-gray-800">Calendario de Partidos</h2>
       </div>
 
       <div className="h-[600px] border rounded-lg p-2">

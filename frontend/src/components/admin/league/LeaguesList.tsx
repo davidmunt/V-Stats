@@ -23,9 +23,7 @@ export const LeaguesList = ({ onCreate, onEdit, onViewDetail }: LeaguesListProps
   };
 
   const handleDelete = (slug: string) => {
-    if (window.confirm("¿Estás seguro de que quieres eliminar esta liga?")) {
-      deleteMutation.mutate({ slug });
-    }
+    deleteMutation.mutate({ slug });
   };
 
   if (isLoading) return <LoadingFallback />;
@@ -36,7 +34,6 @@ export const LeaguesList = ({ onCreate, onEdit, onViewDetail }: LeaguesListProps
       <div className="flex justify-between items-center mb-6">
         <div>
           <h2 className="text-2xl font-bold text-gray-800">Ligas</h2>
-          <p className="text-sm text-gray-500">Gestiona las competiciones y sus temporadas</p>
         </div>
         <button
           onClick={onCreate}
@@ -66,7 +63,6 @@ export const LeaguesList = ({ onCreate, onEdit, onViewDetail }: LeaguesListProps
               <tbody className="divide-y divide-gray-100">
                 {leagues.map((league) => (
                   <tr key={league.id_league} className="hover:bg-gray-50 transition-colors">
-                    {/* Imagen */}
                     <td className="py-3 px-4">
                       <div className="w-10 h-10 rounded bg-gray-100 border border-gray-200 overflow-hidden">
                         {league.image ? (
@@ -77,35 +73,30 @@ export const LeaguesList = ({ onCreate, onEdit, onViewDetail }: LeaguesListProps
                       </div>
                     </td>
 
-                    {/* Nombre */}
                     <td className="py-3 px-4" onClick={() => onViewDetail(league)}>
                       <div className="font-medium text-gray-800">{league.name}</div>
                     </td>
 
-                    {/* temporada */}
                     <td className="py-3 px-4">
                       <div className="font-medium text-gray-800">{league.season}</div>
                     </td>
 
-                    {/* Categoria */}
                     <td className="py-3 px-4">
                       <div className="font-medium text-gray-800">{getCategoryName(league.id_category_league)}</div>
                     </td>
 
-                    {/* País y Temporada */}
                     <td className="py-3 px-4">
                       <div className="text-sm text-gray-700">{league.country}</div>
                     </td>
 
-                    {/* Estado con Badge de colores según LeagueStatus */}
                     <td className="py-3 px-4">
                       <span
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${
-                          league.status === "ACTIVE"
+                          league.status === "active"
                             ? "bg-green-100 text-green-700"
-                            : league.status === "COMPLETED"
+                            : league.status === "completed"
                               ? "bg-blue-100 text-blue-700"
-                              : league.status === "PENDING"
+                              : league.status === "pending"
                                 ? "bg-yellow-100 text-yellow-700"
                                 : "bg-red-100 text-red-700"
                         }`}
@@ -114,7 +105,6 @@ export const LeaguesList = ({ onCreate, onEdit, onViewDetail }: LeaguesListProps
                       </span>
                     </td>
 
-                    {/* Acciones */}
                     <td className="py-3 px-4 text-right">
                       <div className="flex justify-end gap-2">
                         <button

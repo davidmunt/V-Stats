@@ -41,7 +41,6 @@ export const LeagueDetail = ({ slug, onBack }: LeagueDetailProps) => {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
-      {/* 1. CABECERA DE LA LIGA */}
       <div className="bg-white border-b p-6 shadow-sm">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-5">
@@ -58,14 +57,13 @@ export const LeagueDetail = ({ slug, onBack }: LeagueDetailProps) => {
             <div>
               <h1 className="text-2xl font-bold text-gray-900">{league.name}</h1>
               <p className="text-xs text-gray-500">
-                {league.country} • {league.season}
+                {league.country} - {league.season}
               </p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* 2. BOTONES DE NAVEGACIÓN (TABS) */}
       <div className="bg-white border-b px-6">
         <div className="max-w-7xl mx-auto flex gap-1">
           <button
@@ -97,20 +95,13 @@ export const LeagueDetail = ({ slug, onBack }: LeagueDetailProps) => {
         </div>
       </div>
 
-      {/* 3. ÁREA DE CONTENIDO (CONTENEDOR ÚNICO) */}
       <div className="flex-1 p-6">
         <div className="max-w-7xl mx-auto">
-          {/* VISTAS DE EQUIPOS */}
           {view === "teams_list" && <TeamsList leagueSlug={slug} onCreate={handleCreateTeam} onEdit={handleEditTeam} />}
-
           {view === "teams_form" && (
             <TeamForm leagueSlug={slug} initialData={selectedTeam} onCancel={handleBackToTeamsList} onSuccess={handleBackToTeamsList} />
           )}
-
-          {/* VISTA DE PARTIDOS (Gestionada por su propio Manager) */}
           {view === "matches" && <LeagueMatchesManager leagueSlug={slug} />}
-
-          {/* VISTA DE TABLA DE POSICIONES */}
           {view === "table" && <LeagueTable leagueSlug={slug} />}
         </div>
       </div>

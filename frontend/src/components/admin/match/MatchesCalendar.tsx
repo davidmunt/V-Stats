@@ -46,7 +46,6 @@ export const MatchesCalendar = ({ leagueSlug, onCreate, onEdit }: MatchesCalenda
       <div className="flex justify-between items-center mb-4">
         <div>
           <h2 className="text-xl font-bold text-gray-800">Calendario de Partidos</h2>
-          <p className="text-sm text-gray-500">Gestiona la programación de la liga</p>
         </div>
         <button onClick={onCreate} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
           + Programar Partido

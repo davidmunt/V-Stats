@@ -34,7 +34,7 @@ export const LineupManager = ({ coachSlug }: LineupManagerProps) => {
     7: null,
   });
   useEffect(() => {
-    if (existingLineupData && existingLineupData.positions.length > 0) {
+    if (existingLineupData && existingLineupData.positions && existingLineupData.positions.length > 0) {
       const baseState: Record<number, Player | null> = {
         1: null,
         2: null,
@@ -46,14 +46,29 @@ export const LineupManager = ({ coachSlug }: LineupManagerProps) => {
       };
 
       existingLineupData.positions.forEach((pos) => {
-        if (pos.initial_position >= 1 && pos.initial_position <= 7) {
-          baseState[pos.initial_position] = pos.player;
+        const positionKey = pos.current_position || pos.initial_position;
+
+        if (positionKey >= 1 && positionKey <= 7) {
+          baseState[positionKey] = {
+            id_player: pos.id_player,
+            name: pos.name,
+            dorsal: pos.dorsal,
+            role: pos.role,
+            image: pos.image,
+            slug: "",
+            id_team: existingLineupData.lineup.id_team,
+            status: "active",
+            is_active: true,
+          } as Player;
         }
       });
+
+      console.log("Setting lineupState from backend:", baseState);
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setLineupState(baseState);
     }
   }, [existingLineupData]);
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over) return;
@@ -112,7 +127,7 @@ export const LineupManager = ({ coachSlug }: LineupManagerProps) => {
         text: "La alineación titular se ha guardado correctamente para el partido.",
         icon: "success",
         confirmButtonColor: "#10b981",
-        timer: 2500,
+        timer: 800,
         showConfirmButton: false,
       });
     } catch (error: unknown) {
@@ -128,9 +143,9 @@ export const LineupManager = ({ coachSlug }: LineupManagerProps) => {
   };
   if (isLoadingMatch || isLoadingPlayers || isLoadingLineup) return <LoadingFallback />;
   if (!nextMatch) return <div className="p-6 text-gray-500">No hay próximos partidos programados.</div>;
+  console.log("LineupManager rendering with lineupState:", lineupState);
   return (
     <div className="space-y-6">
-      {/* Cabecera del Partido */}
       <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold text-gray-800">Próximo Partido</h2>
@@ -146,12 +161,9 @@ export const LineupManager = ({ coachSlug }: LineupManagerProps) => {
           {saveMutation.isPending ? "Guardando..." : "Confirmar Titulares"}
         </button>
       </div>
-      {/* ÁREA DE DRAG & DROP */}
       <DndContext onDragEnd={handleDragEnd}>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-          {/* Izquierda: La Pista (Zonas de Soltado) */}
           <VolleyballCourt lineupState={lineupState} />
-          {/* Derecha/Abajo: El Banquillo (Jugadores Arrastrables) */}
           <PlayerBench allPlayers={players || []} lineupState={lineupState} />
         </div>
       </DndContext>

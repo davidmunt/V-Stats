@@ -6,6 +6,7 @@ import { useCurrentUserQuery } from "@/queries/auth/useCurrentUser";
 import { useCoachLeagueQuery } from "@/queries/leagues/useCoachLeague";
 import { CoachStandings } from "@/components/coach/standings/CoachStandings";
 import { CoachMatchesCalendar } from "@/components/coach/calendar/CoachMatchesCalendar";
+import { StatsManager } from "@/components/coach/stats/StatsManager";
 
 const CoachDashboardPage = () => {
   const [currentView, setCurrentView] = useState<string>("players");
@@ -20,6 +21,7 @@ const CoachDashboardPage = () => {
         {currentView === "lineup" && <LineupManager coachSlug={coach?.slug || "slug"} />}
         {currentView === "positionTable" && <CoachStandings leagueSlug={league?.slug || ""} />}
         {currentView === "calendar" && <CoachMatchesCalendar coachSlug={coach?.slug || ""} />}
+        {currentView === "stats" && <StatsManager />}
       </main>
     </div>
   );

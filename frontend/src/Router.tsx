@@ -17,10 +17,15 @@ const Router = () => {
     <Suspense fallback={<LoadingFallback />}>
       <Routes>
         <Route element={<Layout />}>
-          {/* Public */}
-          <Route path="/auth" element={<AuthPage />} />
+          <Route
+            path="/auth"
+            element={
+              <ProtectedRoute isAuth={false}>
+                <AuthPage />
+              </ProtectedRoute>
+            }
+          />
 
-          {/* Protected */}
           <Route
             path="/"
             element={
@@ -30,7 +35,6 @@ const Router = () => {
             }
           />
 
-          {/* Admin */}
           <Route
             path="/admin"
             element={
@@ -42,7 +46,6 @@ const Router = () => {
             }
           />
 
-          {/* Analyst */}
           <Route
             path="/analyst"
             element={
@@ -54,7 +57,6 @@ const Router = () => {
             }
           />
 
-          {/* Coach */}
           <Route
             path="/coach"
             element={

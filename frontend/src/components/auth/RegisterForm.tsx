@@ -18,8 +18,6 @@ const RegisterForm = ({ onSwitch }: RegisterFormProps) => {
     { id: "admin", label: "Admin" },
     { id: "coach", label: "Coach" },
     { id: "analyst", label: "Analyst" },
-    { id: "player", label: "Player" },
-    { id: "user", label: "User" },
   ];
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
@@ -46,31 +44,67 @@ const RegisterForm = ({ onSwitch }: RegisterFormProps) => {
   return (
     <>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <input type="text" placeholder="Username" value={name} onChange={(e) => setName(e.target.value)} required />
-        <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-        <h3 className="text-lg font-bold">Selecciona Tipo de Usuario:</h3>
-        <div className="user_type_div flex gap-2 flex-wrap">
+        <input
+          type="text"
+          placeholder="Username"
+          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
+        <input
+          type="email"
+          placeholder="Email"
+          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+
+        <h3 className="text-sm font-black text-gray-500 uppercase tracking-wider mt-2">Selecciona Tipo de Usuario:</h3>
+
+        <div className="user_type_div flex gap-4 flex-wrap p-2 bg-gray-50 rounded-xl">
           {options.map((option) => (
-            <label key={option.id} className="user_type flex items-center gap-2 cursor-pointer">
+            <label key={option.id} className="user_type flex items-center gap-2 cursor-pointer group">
               <input
                 type="radio"
                 name="userType"
                 value={option.id}
                 checked={user_type === option.id}
                 onChange={handleChange}
-                className="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500 cursor-pointer"
               />
-              <span className="text-gray-700 capitalize">{option.label}</span>
+              <span
+                className={`text-sm font-medium capitalize transition-colors ${user_type === option.id ? "text-blue-600 font-bold" : "text-gray-600 group-hover:text-gray-800"}`}
+              >
+                {option.label}
+              </span>
             </label>
           ))}
         </div>
-        <button type="submit">{isLoading ? "Creando cuenta..." : "Register"}</button>
-        {error && <p style={{ color: "red" }}>{error}</p>}
+
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-blue-100 transition-all active:scale-[0.98] disabled:opacity-50 mt-2"
+        >
+          {isLoading ? "Creando cuenta..." : "Register"}
+        </button>
+
+        {error && <p className="text-red-500 text-sm font-medium text-center">{error}</p>}
       </form>
-      <p>
+
+      <p className="text-center mt-6 text-gray-600 text-sm">
         Already have an account?{" "}
-        <button type="button" onClick={onSwitch}>
+        <button type="button" onClick={onSwitch} className="text-blue-600 font-bold hover:underline">
           Login
         </button>
       </p>

@@ -10,11 +10,13 @@ export const useLoginMutation = () => {
 
   return useMutation({
     mutationFn: (data: LoginParam) => login(data),
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       tokenService.setToken(ACCESS_TOKEN_KEY, data.token);
-      queryClient.invalidateQueries({
+      await queryClient.resetQueries({
         queryKey: CURRENT_USER_QUERY_KEY,
+        exact: true,
       });
+      queryClient.setQueryData(CURRENT_USER_QUERY_KEY, data);
     },
   });
 };

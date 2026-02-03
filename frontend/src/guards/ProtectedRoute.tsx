@@ -11,24 +11,23 @@ interface ProtectedRouteProps {
 const ProtectedRoute = ({ children, isAuth }: ProtectedRouteProps) => {
   const { isAuthenticated, isLoading, user } = useAuthContext();
   const location = useLocation();
-  if (isLoading) {
-    return <LoadingFallback />;
-  }
+
+  if (isLoading) return <LoadingFallback />;
+
   if (isAuth && !isAuthenticated) {
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
-  if (isAuth === false && isAuthenticated && user?.user_type === "admin") {
-    return <Navigate to="/admin" replace />;
+
+  if (isAuth === false && isAuthenticated && user) {
+    const routes: Record<string, string> = {
+      admin: "/admin",
+      coach: "/coach",
+      analyst: "/analyst",
+      player: "/player",
+    };
+    return <Navigate to={routes[user.user_type] || "/"} replace />;
   }
-  if (isAuth === false && isAuthenticated && user?.user_type === "coach") {
-    return <Navigate to="/coach" replace />;
-  }
-  if (isAuth === false && isAuthenticated && user?.user_type === "analyst") {
-    return <Navigate to="/analyst" replace />;
-  }
-  if (isAuth === false && isAuthenticated) {
-    return <Navigate to="/" replace />;
-  }
+
   return <>{children}</>;
 };
 

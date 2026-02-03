@@ -9,6 +9,6 @@ export interface Player {
   dorsal: number;
   role: PlayerRole;
   image: string;
-  status: PlayerStatus;
+  status: string;
   is_active: boolean;
 }

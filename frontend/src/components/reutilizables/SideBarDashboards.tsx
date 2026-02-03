@@ -21,16 +21,12 @@ const Sidebar = ({ currentView, onViewChange }: SidebarProps) => {
         ? [
             { id: "players", label: "Mis Jugadores" },
             { id: "lineup", label: "Plantilla Titular" },
-            { id: "statistics", label: "Estadisticas Equipo" },
+            { id: "stats", label: "Estadísticas" },
             { id: "positionTable", label: "Tabla de Posiciones" },
             { id: "calendar", label: "Calendario de Partidos" },
           ]
         : user?.user_type === "analyst"
-          ? [
-              { id: "match", label: "Empezar analisis Partido" },
-              { id: "statistics", label: "Estadisticas Equipo" },
-              { id: "positionTable", label: "Tabla de Posiciones" },
-            ]
+          ? [{ id: "match", label: "Empezar analisis Partido" }]
           : [];
 
   return (

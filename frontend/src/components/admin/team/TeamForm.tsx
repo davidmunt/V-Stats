@@ -3,8 +3,10 @@ import type { Team } from "@/interfaces/team.interface";
 import { useCreateTeamMutation } from "@/mutations/teams/useCreate";
 import { useUpdateTeamMutation } from "@/mutations/teams/useUpdate";
 import { useVenuesQuery } from "@/queries/venues/useVenues";
-import { useFreeCoachesQuery, useCoachByIdQuery } from "@/queries/coach/useCoachQueries";
-import { useFreeAnalystsQuery, useAnalystByIdQuery } from "@/queries/analyst/useAnalystQueries";
+import { useFreeCoachesQuery } from "@/queries/coach/useFreeCoaches";
+import { useCoachByIdQuery } from "@/queries/coach/useCoachDetail";
+import { useFreeAnalystsQuery } from "@/queries/analyst/useFreeAnalysts";
+import { useAnalystDetailQuery } from "@/queries/analyst/useAnalystDetail";
 
 interface TeamFormProps {
   leagueSlug: string;
@@ -21,7 +23,7 @@ export const TeamForm = ({ leagueSlug, initialData, onCancel, onSuccess }: TeamF
   const { data: freeCoaches } = useFreeCoachesQuery();
   const { data: currentCoach } = useCoachByIdQuery(initialData?.id_coach || null);
   const { data: freeAnalysts } = useFreeAnalystsQuery();
-  const { data: currentAnalyst } = useAnalystByIdQuery(initialData?.id_analyst || null);
+  const { data: currentAnalyst } = useAnalystDetailQuery(initialData?.id_analyst || null);
 
   const allCoaches = freeCoaches || [];
   if (currentCoach && !allCoaches.some((c) => c.id_coach === currentCoach.id_coach)) {
@@ -83,7 +85,6 @@ export const TeamForm = ({ leagueSlug, initialData, onCancel, onSuccess }: TeamF
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* --- SIEMPRE VISIBLES --- */}
           <div className="col-span-2">
             <label className="block text-sm font-semibold text-gray-700 mb-1">Nombre del Equipo</label>
             <input
@@ -96,7 +97,7 @@ export const TeamForm = ({ leagueSlug, initialData, onCancel, onSuccess }: TeamF
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Sede (Venue)</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">Sede</label>
             <select
               name="id_venue"
               value={formData.id_venue}
@@ -124,7 +125,6 @@ export const TeamForm = ({ leagueSlug, initialData, onCancel, onSuccess }: TeamF
             />
           </div>
 
-          {/* --- SOLO EN UPDATE --- */}
           {isEditing && (
             <>
               <div className="border-t col-span-2 my-2"></div>

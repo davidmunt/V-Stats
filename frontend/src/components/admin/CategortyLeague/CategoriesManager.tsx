@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { CategoryLeague } from "@/interfaces/categoryLeague.interface";
-import { CategoriesList } from "./CategoriesList";
-import { CategoryForm } from "./CategoryForm";
+import { CategoriesList } from "@/components/admin/CategortyLeague/CategoriesList";
+import { CategoryForm } from "@/components/admin/CategortyLeague/CategoryForm";
 
 //componente principal que controla el componente visible de las categorias
 export const CategoriesManager = () => {

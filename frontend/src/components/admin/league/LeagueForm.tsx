@@ -71,7 +71,6 @@ export const LeagueForm = ({ initialData, onCancel, onSuccess }: LeagueFormProps
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Nombre de la Liga */}
           <div className="col-span-2 md:col-span-1">
             <label className="block text-sm font-medium text-gray-700 mb-1">Nombre de la Liga</label>
             <input
@@ -85,7 +84,6 @@ export const LeagueForm = ({ initialData, onCancel, onSuccess }: LeagueFormProps
             />
           </div>
 
-          {/* Selector de Categoría */}
           <div className="col-span-2 md:col-span-1">
             <label className="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
             <select
@@ -104,7 +102,6 @@ export const LeagueForm = ({ initialData, onCancel, onSuccess }: LeagueFormProps
             </select>
           </div>
 
-          {/* País */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">País</label>
             <input
@@ -118,7 +115,6 @@ export const LeagueForm = ({ initialData, onCancel, onSuccess }: LeagueFormProps
             />
           </div>
 
-          {/* Temporada */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Temporada</label>
             <input
@@ -134,7 +130,6 @@ export const LeagueForm = ({ initialData, onCancel, onSuccess }: LeagueFormProps
           </div>
         </div>
 
-        {/* Imagen */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">URL del Logo/Imagen</label>
           <input
@@ -147,7 +142,6 @@ export const LeagueForm = ({ initialData, onCancel, onSuccess }: LeagueFormProps
           />
         </div>
 
-        {/* Campos exclusivos de Edición */}
         {isEditing && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-blue-50 rounded-md border border-blue-100">
             <div>
@@ -160,7 +154,6 @@ export const LeagueForm = ({ initialData, onCancel, onSuccess }: LeagueFormProps
               >
                 <option value="active">Activo</option>
                 <option value="inactive">Inactivo</option>
-                <option value="scheduled">Programado</option>
               </select>
             </div>
             <div>
@@ -178,7 +171,6 @@ export const LeagueForm = ({ initialData, onCancel, onSuccess }: LeagueFormProps
           </div>
         )}
 
-        {/* Botones */}
         <div className="flex gap-3 pt-4 border-t border-gray-100">
           <button
             type="button"

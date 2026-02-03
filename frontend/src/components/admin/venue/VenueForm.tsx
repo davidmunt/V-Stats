@@ -70,7 +70,6 @@ export const VenueForm = ({ initialData, onCancel, onSuccess }: VenueFormProps) 
       <h2 className="text-xl font-bold text-gray-800 mb-6">{isEditing ? `Editar Sede: ${initialData.name}` : "Registrar Nueva Sede"}</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* --- CAMPOS COMUNES --- */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-1">Nombre de la Sede</label>
@@ -139,7 +138,6 @@ export const VenueForm = ({ initialData, onCancel, onSuccess }: VenueFormProps) 
           </div>
         </div>
 
-        {/* --- CAMPOS SOLO EN UPDATE --- */}
         {isEditing && (
           <div className="p-4 bg-gray-50 rounded-md border border-gray-100 space-y-3">
             <div>
@@ -150,9 +148,9 @@ export const VenueForm = ({ initialData, onCancel, onSuccess }: VenueFormProps) 
                 onChange={handleChange}
                 className="w-full border border-gray-300 rounded-md px-3 py-2 bg-white"
               >
-                <option value="active">🟢 Activo</option>
-                <option value="inactive">🔴 Inactivo</option>
-                <option value="maintenance">🚧 En Mantenimiento</option>
+                <option value="active">Activo</option>
+                <option value="inactive">Inactivo</option>
+                <option value="maintenance">En Mantenimiento</option>
               </select>
             </div>
           </div>

@@ -15,7 +15,6 @@ export const LeagueTable = ({ leagueSlug }: LeagueTableProps) => {
     <div className="space-y-4">
       <div className="flex justify-between items-center mb-2">
         <h3 className="text-xl font-bold text-gray-800">Clasificación General</h3>
-        <span className="text-xs text-gray-400 uppercase tracking-wider">Actualizado en tiempo real</span>
       </div>
 
       <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
@@ -44,10 +43,8 @@ export const LeagueTable = ({ leagueSlug }: LeagueTableProps) => {
                   .sort((a, b) => b.points - a.points || b.points_diff - a.points_diff)
                   .map((team, index) => (
                     <tr key={team.id_team} className="hover:bg-gray-50 transition-colors">
-                      {/* Posición */}
                       <td className="py-4 px-4 text-center font-bold text-gray-400">{index + 1}</td>
 
-                      {/* Equipo (Imagen + Nombre) */}
                       <td className="py-4 px-4">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded bg-gray-100 flex-shrink-0 border border-gray-200 overflow-hidden">
@@ -61,23 +58,18 @@ export const LeagueTable = ({ leagueSlug }: LeagueTableProps) => {
                         </div>
                       </td>
 
-                      {/* Puntos (Resaltado) */}
                       <td className="py-4 px-4 text-center font-black bg-blue-50/50 text-blue-700">{team.points}</td>
 
-                      {/* Estadísticas de Partidos */}
                       <td className="py-4 px-4 text-center text-gray-600">{team.played}</td>
                       <td className="py-4 px-4 text-center text-green-600 font-medium">{team.won}</td>
                       <td className="py-4 px-4 text-center text-red-600 font-medium">{team.lost}</td>
 
-                      {/* Sets */}
                       <td className="py-4 px-4 text-center text-gray-500">{team.sets_won}</td>
                       <td className="py-4 px-4 text-center text-gray-500">{team.sets_lost}</td>
 
-                      {/* Puntos a favor y en contra */}
                       <td className="py-4 px-4 text-center text-gray-500">{team.points_favor}</td>
                       <td className="py-4 px-4 text-center text-gray-500">{team.points_against}</td>
 
-                      {/* Diferencia de puntos */}
                       <td className={`py-4 px-4 text-center font-bold ${team.points_diff >= 0 ? "text-gray-800" : "text-red-500"}`}>
                         {team.points_diff > 0 ? `+${team.points_diff}` : team.points_diff}
                       </td>
@@ -87,28 +79,6 @@ export const LeagueTable = ({ leagueSlug }: LeagueTableProps) => {
             </table>
           </div>
         )}
-      </div>
-
-      {/* Leyenda rápida */}
-      <div className="flex gap-4 text-[10px] text-gray-400 px-2 uppercase font-medium">
-        <span>
-          <b>PTS:</b> Puntos
-        </span>
-        <span>
-          <b>PJ:</b> Jugados
-        </span>
-        <span>
-          <b>PG:</b> Ganados
-        </span>
-        <span>
-          <b>PP:</b> Perdidos
-        </span>
-        <span>
-          <b>SG/SP:</b> Sets Ganados/Perdidos
-        </span>
-        <span>
-          <b>PF/PC:</b> Puntos Favor/Contra
-        </span>
       </div>
     </div>
   );

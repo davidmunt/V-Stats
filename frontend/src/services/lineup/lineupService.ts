@@ -1,12 +1,13 @@
 import apiClient from "@/services/apiClient";
 import type { MatchLineupsResponse, Lineup } from "@/interfaces/lineup.interface";
 import type { LineupPosition } from "@/interfaces/lineupPosition.interface";
-import type { Player } from "@/interfaces/player.interface";
 import type { SaveLineupParam, UpdateLineupPositionParam } from "./lineupService.param";
 
-export interface LineupPositionPopulated extends Omit<LineupPosition, "id_player"> {
+export interface LineupPositionPopulated extends LineupPosition {
   slug: string;
-  player: Player;
+  name: string;
+  role: string;
+  image: string;
 }
 
 export interface SingleLineupResponse {
