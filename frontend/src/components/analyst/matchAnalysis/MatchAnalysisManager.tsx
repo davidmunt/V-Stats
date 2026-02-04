@@ -9,6 +9,7 @@ import { ActionPanel } from "./ActionPanel";
 import { SubstitutionPanel } from "./SubstitutionPanel";
 import LoadingFallback from "@/components/LoadingFallback";
 import type { LineupPosition } from "@/interfaces/lineupPosition.interface";
+import { ButtonFinishMatch } from "./ButtonFinishMatch";
 
 export const MatchAnalysisManager = ({ analystSlug }: { analystSlug: string }) => {
   const [selectedPosition, setSelectedPosition] = useState<LineupPosition | null>(null);
@@ -21,6 +22,10 @@ export const MatchAnalysisManager = ({ analystSlug }: { analystSlug: string }) =
 
   if (match.status !== "live") {
     return <StartAnalysing match={match} analystSlug={analystSlug} />;
+  }
+
+  if (String(match.status) === "finished") {
+    return <ButtonFinishMatch />;
   }
 
   const formatLineup = (positions: LineupPosition[]) => {
