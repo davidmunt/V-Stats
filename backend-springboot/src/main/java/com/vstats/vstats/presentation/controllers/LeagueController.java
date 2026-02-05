@@ -4,6 +4,8 @@ import com.vstats.vstats.presentation.requests.league.*;
 import com.vstats.vstats.presentation.responses.LeagueResponse;
 import com.vstats.vstats.application.services.LeagueService;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,8 +26,19 @@ public class LeagueController {
     }
 
     @GetMapping
-    public ResponseEntity<Map<String, List<LeagueResponse>>> getAll() {
-        return ResponseEntity.ok(Map.of("leagues", leagueService.getAllLeagues()));
+    public ResponseEntity<Map<String, Object>> getAll(
+            @RequestParam(required = false) String q,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        
+        Page<LeagueResponse> result = leagueService.getAllLeagues(q, page, size);
+        
+        return ResponseEntity.ok(Map.of(
+            "leagues", result.getContent(),
+            "totalElements", result.getTotalElements(),
+            "totalPages", result.getTotalPages(),
+            "currentPage", result.getNumber()
+        ));
     }
 
     @GetMapping("/admin/{slugAdmin}")
