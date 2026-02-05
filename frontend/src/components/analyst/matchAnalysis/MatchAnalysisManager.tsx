@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNextMatchForAnalystQuery } from "@/queries/match/useNextMatchForAnalyst";
 import { useActualSetQuery } from "@/queries/set/useActualSet";
 import { useMatchLineupsQuery } from "@/queries/lineups/useMatchLineupsQuery";
@@ -9,23 +9,76 @@ import { ActionPanel } from "./ActionPanel";
 import { SubstitutionPanel } from "./SubstitutionPanel";
 import LoadingFallback from "@/components/LoadingFallback";
 import type { LineupPosition } from "@/interfaces/lineupPosition.interface";
-import { ButtonFinishMatch } from "./ButtonFinishMatch";
+import Swal from "sweetalert2";
+import { useFinishedSetsQuery } from "@/queries/set/useSetsFromMatch";
 
 export const MatchAnalysisManager = ({ analystSlug }: { analystSlug: string }) => {
   const [selectedPosition, setSelectedPosition] = useState<LineupPosition | null>(null);
   const { data: match, isLoading: isLoadingMatch } = useNextMatchForAnalystQuery(analystSlug);
   const { data: actualSet, isLoading: isLoadingSet } = useActualSetQuery(match?.slug || "");
   const { data: lineups, isLoading: isLoadingMatchLineups } = useMatchLineupsQuery(match?.slug || "");
+  const { data: finishedSetsData } = useFinishedSetsQuery(match?.slug || "");
+  const previousMatchId = useRef<string | null>(null);
+  const lastScore = useRef({ local: 0, visitor: 0 });
+
+  useEffect(() => {
+    if (previousMatchId.current && (!match || match.id_match !== previousMatchId.current)) {
+      const { local, visitor } = lastScore.current;
+
+      Swal.fire({
+        title: "¡Partido Finalizado!",
+        html: `
+        <div class="py-4">
+          <div class="flex justify-center items-center gap-6 mb-2">
+            <div class="text-center">
+              <span class="block text-[10px] font-black text-gray-400 uppercase">Local</span>
+              <span class="text-4xl font-black text-slate-800">${local}</span>
+            </div>
+            <div class="text-2xl font-black text-gray-300 mt-4">-</div>
+            <div class="text-center">
+              <span class="block text-[10px] font-black text-gray-400 uppercase">Visitante</span>
+              <span class="text-4xl font-black text-slate-800">${visitor}</span>
+            </div>
+          </div>
+          <p class="text-sm font-bold text-blue-600 uppercase tracking-widest mt-4">
+            ${local > visitor ? "Victoria Local" : "Victoria Visitante"}
+          </p>
+        </div>
+      `,
+        icon: "success",
+        confirmButtonText: "Entendido",
+        confirmButtonColor: "#1e293b",
+        allowOutsideClick: false,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.reload();
+        }
+      });
+    }
+    if (match) {
+      previousMatchId.current = match.id_match;
+      if (finishedSetsData && finishedSetsData.length > 0) {
+        const score = finishedSetsData.reduce(
+          (acc, set) => {
+            if (set.local_points > set.visitor_points) {
+              acc.local += 1;
+            } else if (set.visitor_points > set.local_points) {
+              acc.visitor += 1;
+            }
+            return acc;
+          },
+          { local: 0, visitor: 0 },
+        );
+        lastScore.current = score;
+      }
+    }
+  }, [match, finishedSetsData]);
 
   if (isLoadingMatch || isLoadingSet || isLoadingMatchLineups) return <LoadingFallback />;
   if (!match || !actualSet) return <div className="p-8 text-center text-gray-500">No se encontraron los datos del partido.</div>;
 
   if (match.status !== "live") {
     return <StartAnalysing match={match} analystSlug={analystSlug} />;
-  }
-
-  if (String(match.status) === "finished") {
-    return <ButtonFinishMatch />;
   }
 
   const formatLineup = (positions: LineupPosition[]) => {

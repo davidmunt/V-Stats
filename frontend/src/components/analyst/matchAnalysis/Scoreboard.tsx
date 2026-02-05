@@ -4,6 +4,7 @@ import { useAddPointMutation } from "@/mutations/actions/useAddPoint";
 import { useDeleteLastPointMutation } from "@/mutations/actions/useDeleteLastPoint";
 import LoadingFallback from "@/components/LoadingFallback";
 import Swal from "sweetalert2";
+import FinishedSets from "./FinishedSets";
 
 interface ScoreboardProps {
   matchSlug: string;
@@ -106,6 +107,7 @@ export const Scoreboard = ({ matchSlug }: ScoreboardProps) => {
           </div>
         </div>
       </div>
+      <FinishedSets matchSlug={matchSlug} />
     </div>
   );
 };
