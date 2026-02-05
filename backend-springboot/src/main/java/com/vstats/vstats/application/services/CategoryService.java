@@ -10,11 +10,7 @@ import com.vstats.vstats.presentation.responses.CategoryResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.text.Normalizer;
 import java.util.List;
-import java.util.Locale;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,7 +25,7 @@ public class CategoryService {
         LeagueAdminEntity admin = adminRepository.findBySlug(request.getSlugAdmin())
                 .orElseThrow(() -> new RuntimeException("Administrador no encontrado con el slug: " + request.getSlugAdmin()));
 
-        String slugCategory = generateSlug(request.getName());
+        String slugCategory = generateUniqueSlug(request.getName());
 
         CategoryEntity category = CategoryEntity.builder()
                 .idAdmin(admin.getIdAdmin().toString())
@@ -116,9 +112,20 @@ public class CategoryService {
                 .build();
     }
 
-    private String generateSlug(String input) {
-        String nowhitespace = input.replaceAll("\\s", "-");
-        String normalized = Normalizer.normalize(nowhitespace, Normalizer.Form.NFD);
-        return Pattern.compile("[^\\w-]").matcher(normalized).replaceAll("").toLowerCase(Locale.ENGLISH);
+    private String generateUniqueSlug(String name) {
+        String baseSlug = name.toLowerCase()
+                .trim()
+                .replace(" ", "-")
+                .replaceAll("[^a-z0-9-]", ""); 
+
+        String finalSlug = baseSlug;
+        int count = 1;
+
+        while (categoryRepository.findBySlug(finalSlug).isPresent()) {
+                finalSlug = baseSlug + "-" + count;
+                count++;
+        }
+
+        return finalSlug;
     }
 }

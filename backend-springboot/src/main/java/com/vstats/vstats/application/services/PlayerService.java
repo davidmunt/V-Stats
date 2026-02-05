@@ -7,11 +7,7 @@ import com.vstats.vstats.presentation.responses.PlayerResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.text.Normalizer;
 import java.util.List;
-import java.util.Locale;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,7 +32,7 @@ public class PlayerService {
         SeasonTeamEntity seasonTeam = seasonTeamRepository.findByTeam_SlugAndSeason_IsActiveTrue(request.getSlugTeam())
                 .orElseThrow(() -> new RuntimeException("El equipo no existe en la temporada actual"));
 
-        String slug = generateSlug(request.getName());
+        String slug = generateUniqueSlug(request.getName());
         
         // Identidad: Si el email ya existe en otro slug, mejor avisar (Control extra)
         playerRepository.findByEmail(request.getEmail()).ifPresent(p -> {
@@ -170,11 +166,6 @@ public class PlayerService {
             throw new RuntimeException("El rol del jugador no puede estar vacío");
     }
 
-    private String generateSlug(String input) {
-        String normalized = Normalizer.normalize(input.replaceAll("\\s", "-"), Normalizer.Form.NFD);
-        return Pattern.compile("[^\\w-]").matcher(normalized).replaceAll("").toLowerCase(Locale.ENGLISH);
-    }
-
     private PlayerResponse mapToResponse(SeasonPlayerEntity sp) {
         return PlayerResponse.builder()
                 .slug_player(sp.getPlayer().getSlug())
@@ -188,5 +179,22 @@ public class PlayerService {
                 .isActive(sp.getIsActive())
                 .createdAt(sp.getPlayer().getCreatedAt())
                 .build();
+    }
+
+    private String generateUniqueSlug(String name) {
+        String baseSlug = name.toLowerCase()
+                .trim()
+                .replace(" ", "-")
+                .replaceAll("[^a-z0-9-]", ""); 
+
+        String finalSlug = baseSlug;
+        int count = 1;
+
+        while (playerRepository.findBySlug(finalSlug).isPresent()) {
+                finalSlug = baseSlug + "-" + count;
+                count++;
+        }
+
+        return finalSlug;
     }
 }

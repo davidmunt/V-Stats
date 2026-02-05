@@ -2,17 +2,20 @@ package com.vstats.vstats.application.services;
 
 import com.vstats.vstats.domain.entities.*;
 import com.vstats.vstats.infrastructure.repositories.*;
+import com.vstats.vstats.infrastructure.specs.LeagueSpecification;
 import com.vstats.vstats.presentation.requests.league.CreateLeagueRequest;
 import com.vstats.vstats.presentation.requests.league.UpdateLeagueRequest;
 import com.vstats.vstats.presentation.responses.LeagueResponse;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
-import java.text.Normalizer;
 import java.util.List;
-import java.util.Locale;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,7 +29,8 @@ public class LeagueService {
     private final LeagueAdminRepository adminRepository;
 
     @Transactional
-    public LeagueResponse createLeague(CreateLeagueRequest request) {
+        public LeagueResponse createLeague(CreateLeagueRequest request) {
+        // 1. Buscamos todas las piezas necesarias
         LeagueAdminEntity admin = adminRepository.findBySlug(request.getSlugAdmin())
                 .orElseThrow(() -> new RuntimeException("Admin no encontrado"));
         
@@ -34,20 +38,26 @@ public class LeagueService {
                 .orElseThrow(() -> new RuntimeException("Categoría no encontrada"));
 
         SeasonEntity currentSeason = seasonRepository.findByIsActiveTrue()
-                .orElseThrow(() -> new RuntimeException("No hay una temporada activa configurada en el sistema"));
+                .orElseThrow(() -> new RuntimeException("No hay una temporada activa"));
 
-        String leagueSlug = generateSlug(request.getName());
+        String leagueSlug = generateUniqueSlug(request.getName());
+
+        // 2. Creamos o recuperamos la Liga (Añadimos la categoría aquí)
         LeagueEntity league = leagueRepository.findBySlug(leagueSlug)
                 .orElseGet(() -> leagueRepository.save(
-                    LeagueEntity.builder()
+                        LeagueEntity.builder()
                         .name(request.getName())
                         .slug(leagueSlug)
                         .country(request.getCountry())
                         .image(request.getImage())
                         .idAdmin(admin.getIdAdmin().toString())
+                        .category(category) // <--- ESTO FALTABA
+                        .isActive(true)
+                        .status("active")
                         .build()
                 ));
 
+        // 3. Creamos la relación de temporada
         SeasonLeagueEntity seasonLeague = SeasonLeagueEntity.builder()
                 .league(league)
                 .season(currentSeason)
@@ -56,14 +66,16 @@ public class LeagueService {
                 .build();
 
         return mapToResponse(seasonLeagueRepository.save(seasonLeague));
-    }
+        }
 
-    public List<LeagueResponse> getAllLeagues() {
-        return seasonLeagueRepository.findAllBySeason_IsActiveTrue().stream()
-                .filter(sl -> !"deleted".equals(sl.getStatus()))
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
-    }
+        public Page<LeagueResponse> getAllLeagues(String q, int page, int size) {
+                Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+                Page<SeasonLeagueEntity> entities = seasonLeagueRepository.findAll(
+                        LeagueSpecification.filterLeagues(q), 
+                        pageable
+                );
+                return entities.map(this::mapToResponse);
+        }
 
         public List<LeagueResponse> getLeaguesByAdminSlug(String slugAdmin) {
         String adminId = getAdminIdBySlug(slugAdmin);
@@ -129,9 +141,20 @@ public class LeagueService {
                 .build();
     }
 
-    private String generateSlug(String input) {
-        String nowhitespace = input.replaceAll("\\s", "-");
-        String normalized = Normalizer.normalize(nowhitespace, Normalizer.Form.NFD);
-        return Pattern.compile("[^\\w-]").matcher(normalized).replaceAll("").toLowerCase(Locale.ENGLISH);
+    private String generateUniqueSlug(String name) {
+        String baseSlug = name.toLowerCase()
+                .trim()
+                .replace(" ", "-")
+                .replaceAll("[^a-z0-9-]", ""); 
+
+        String finalSlug = baseSlug;
+        int count = 1;
+
+        while (leagueRepository.findBySlug(finalSlug).isPresent()) {
+                finalSlug = baseSlug + "-" + count;
+                count++;
+        }
+
+        return finalSlug;
     }
 }

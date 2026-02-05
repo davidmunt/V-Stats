@@ -7,12 +7,8 @@ import com.vstats.vstats.presentation.responses.MatchResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.text.Normalizer;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Locale;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,7 +46,7 @@ public class MatchService {
         }
 
         // 3. Crear el Partido
-        String slugMatch = generateMatchSlug(local.getName(), visitor.getName());
+        String slugMatch = generateUniqueSlug(local.getName() + "-vs-" + visitor.getName());
         MatchEntity match = MatchEntity.builder()
                 .slug(slugMatch)
                 .league(league)
@@ -234,8 +230,20 @@ public class MatchService {
         }
     }
 
-    private String generateMatchSlug(String local, String visitor) {
-        return (local + "-vs-" + visitor + "-" + System.currentTimeMillis())
-                .toLowerCase().replaceAll("\\s+", "-");
+    private String generateUniqueSlug(String name) {
+        String baseSlug = name.toLowerCase()
+                .trim()
+                .replace(" ", "-")
+                .replaceAll("[^a-z0-9-]", ""); 
+
+        String finalSlug = baseSlug;
+        int count = 1;
+
+        while (matchRepository.findBySlug(finalSlug).isPresent()) {
+                finalSlug = baseSlug + "-" + count;
+                count++;
+        }
+
+        return finalSlug;
     }
 }

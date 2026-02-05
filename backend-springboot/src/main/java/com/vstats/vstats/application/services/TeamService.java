@@ -7,11 +7,7 @@ import com.vstats.vstats.presentation.responses.TeamResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.text.Normalizer;
 import java.util.List;
-import java.util.Locale;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,7 +34,7 @@ public class TeamService {
         VenueEntity venue = venueRepository.findBySlug(request.getSlugVenue())
             .orElseThrow(() -> new RuntimeException("Sede no encontrada"));
 
-        String slug = generateSlug(request.getName());
+        String slug = generateUniqueSlug(request.getName());
         TeamEntity team = teamRepository.findBySlug(slug)
             .orElseGet(() -> teamRepository.save(
                 TeamEntity.builder().name(request.getName()).slug(slug).image(request.getImage()).build()
@@ -143,8 +139,20 @@ public class TeamService {
                 .getIdAdmin().toString();
     }
 
-    private String generateSlug(String input) {
-        String normalized = Normalizer.normalize(input.replaceAll("\\s", "-"), Normalizer.Form.NFD);
-        return Pattern.compile("[^\\w-]").matcher(normalized).replaceAll("").toLowerCase(Locale.ENGLISH);
+    private String generateUniqueSlug(String name) {
+        String baseSlug = name.toLowerCase()
+                .trim()
+                .replace(" ", "-")
+                .replaceAll("[^a-z0-9-]", ""); 
+
+        String finalSlug = baseSlug;
+        int count = 1;
+
+        while (teamRepository.findBySlug(finalSlug).isPresent()) {
+                finalSlug = baseSlug + "-" + count;
+                count++;
+        }
+
+        return finalSlug;
     }
 }

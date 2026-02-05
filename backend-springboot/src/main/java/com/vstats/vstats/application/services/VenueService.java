@@ -3,17 +3,18 @@ package com.vstats.vstats.application.services;
 import com.vstats.vstats.domain.entities.VenueEntity;
 import com.vstats.vstats.domain.entities.LeagueAdminEntity;
 import com.vstats.vstats.infrastructure.repositories.VenueRepository;
+import com.vstats.vstats.infrastructure.specs.VenueSpecification;
 import com.vstats.vstats.infrastructure.repositories.LeagueAdminRepository;
 import com.vstats.vstats.presentation.requests.venue.*;
 import com.vstats.vstats.presentation.responses.VenueResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.text.Normalizer;
 import java.util.List;
-import java.util.Locale;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,8 +28,12 @@ public class VenueService {
     public VenueResponse createVenue(CreateVenueRequest request) {
         LeagueAdminEntity admin = adminRepository.findBySlug(request.getSlugAdmin())
                 .orElseThrow(() -> new RuntimeException("Administrador no encontrado"));
+        String slug = generateUniqueSlug(request.getName());
 
-        String slug = generateSlug(request.getName());
+        Boolean exists = venueRepository.existsBySlug(slug);
+        if (exists) {
+            throw new RuntimeException("Ya existe una sede con ese nombre");
+        }
         
         VenueEntity venue = VenueEntity.builder()
                 .name(request.getName())
@@ -45,16 +50,15 @@ public class VenueService {
         return mapToResponse(venueRepository.save(venue), admin.getSlug());
     }
 
-    public List<VenueResponse> getAllVenues() {
-        return venueRepository.findAll().stream()
-                .filter(v -> !"deleted".equals(v.getStatus()))
-                .map(v -> {
-                    String adminSlug = adminRepository.findById(Long.parseLong(v.getIdAdmin()))
-                            .map(LeagueAdminEntity::getSlug)
-                            .orElse("unknown");
-                    return mapToResponse(v, adminSlug);
-                })
-                .collect(Collectors.toList()); 
+    public Page<VenueResponse> getAllVenues(String q, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("name").ascending());
+        Page<VenueEntity> venuePage = venueRepository.findAll(VenueSpecification.filterBy(q), pageable);
+        return venuePage.map(v -> {
+                String adminSlug = adminRepository.findById(Long.parseLong(v.getIdAdmin()))
+                        .map(LeagueAdminEntity::getSlug)
+                        .orElse("unknown");
+                return mapToResponse(v, adminSlug);
+        });
     }
 
     public List<VenueResponse> getVenuesByAdminSlug(String slugAdmin) {
@@ -125,9 +129,20 @@ public class VenueService {
                 .build();
     }
 
-    private String generateSlug(String input) {
-        String nowhitespace = input.replaceAll("\\s", "-");
-        String normalized = Normalizer.normalize(nowhitespace, Normalizer.Form.NFD);
-        return Pattern.compile("[^\\w-]").matcher(normalized).replaceAll("").toLowerCase(Locale.ENGLISH);
+    private String generateUniqueSlug(String name) {
+        String baseSlug = name.toLowerCase()
+                .trim()
+                .replace(" ", "-")
+                .replaceAll("[^a-z0-9-]", ""); 
+
+        String finalSlug = baseSlug;
+        int count = 1;
+
+        while (venueRepository.findBySlug(finalSlug).isPresent()) {
+                finalSlug = baseSlug + "-" + count;
+                count++;
+        }
+
+        return finalSlug;
     }
 }
