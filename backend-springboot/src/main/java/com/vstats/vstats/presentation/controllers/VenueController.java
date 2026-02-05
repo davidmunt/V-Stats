@@ -4,6 +4,7 @@ import com.vstats.vstats.presentation.requests.venue.*;
 import com.vstats.vstats.presentation.responses.VenueResponse;
 import com.vstats.vstats.application.services.VenueService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,8 +25,19 @@ public class VenueController {
     }
 
     @GetMapping
-    public ResponseEntity<Map<String, List<VenueResponse>>> getAll() {
-        return ResponseEntity.ok(Map.of("venues", venueService.getAllVenues()));
+    public ResponseEntity<Map<String, Object>> getAll(
+            @RequestParam(required = false) String q,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        
+        Page<VenueResponse> result = venueService.getAllVenues(q, page, size);
+        
+        return ResponseEntity.ok(Map.of(
+            "venues", result.getContent(),
+            "totalElements", result.getTotalElements(),
+            "totalPages", result.getTotalPages(),
+            "currentPage", result.getNumber()
+        ));
     }
 
     @GetMapping("/admin/{slugAdmin}")
