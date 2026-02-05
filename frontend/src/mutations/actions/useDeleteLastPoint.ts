@@ -19,6 +19,14 @@ export const useDeleteLastPointMutation = () => {
         queryKey: ["match", "lineups"],
         exact: false,
       });
+      await queryClient.invalidateQueries({
+        queryKey: ["sets", "match"],
+        exact: false,
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["matches", "next", "analyst"],
+        exact: false,
+      });
     },
   });
 };

@@ -1,9 +1,9 @@
 import apiClient from "@/services/apiClient";
 import type { Set } from "@/interfaces/set.interface";
 
-// interface SetsResponse {
-//   sets: Set[];
-// }
+interface SetsResponse {
+  sets: Set[];
+}
 
 interface SingleSetResponse {
   set: Set;
@@ -12,4 +12,9 @@ interface SingleSetResponse {
 export const getActualSetFromMath = async (slug: string): Promise<Set> => {
   const response = await apiClient.get<SingleSetResponse>(`/set-match/${slug}`);
   return response.data.set;
+};
+
+export const getFinishedSetsByMatch = async (slug: string): Promise<Set[]> => {
+  const response = await apiClient.get<SetsResponse>(`/sets/finished/${slug}`);
+  return response.data.sets;
 };
