@@ -2,11 +2,21 @@ package com.vstats.vstats.application.services;
 
 import com.vstats.vstats.domain.entities.*;
 import com.vstats.vstats.infrastructure.repositories.*;
+import com.vstats.vstats.infrastructure.specs.PlayerSpecification;
 import com.vstats.vstats.presentation.requests.player.*;
 import com.vstats.vstats.presentation.responses.PlayerResponse;
+
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,31 +33,39 @@ public class PlayerService {
 
     @Transactional
     public PlayerResponse createPlayer(CreatePlayerRequest request) {
-        // Controles de errores iniciales
-        validateRequest(request.getName(), request.getEmail(), request.getDorsal(), request.getRole());
+        if (request.getName() == null || request.getName().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El nombre del jugador es obligatorio");
+        }
+        if (request.getDorsal() != null && request.getDorsal() < 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El dorsal no puede ser negativo");
+        }
 
         SeasonEntity currentSeason = seasonRepository.findByIsActiveTrue()
-                .orElseThrow(() -> new RuntimeException("No hay temporada activa"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No hay temporada activa"));
 
         SeasonTeamEntity seasonTeam = seasonTeamRepository.findByTeam_SlugAndSeason_IsActiveTrue(request.getSlugTeam())
-                .orElseThrow(() -> new RuntimeException("El equipo no existe en la temporada actual"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "El equipo no existe en la temporada actual"));
+
+        if (request.getEmail() != null && !request.getEmail().isBlank()) {
+            playerRepository.findByEmail(request.getEmail()).ifPresent(p -> {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "El email " + request.getEmail() + " ya está registrado");
+            });
+        }
 
         String slug = generateUniqueSlug(request.getName());
-        
-        // Identidad: Si el email ya existe en otro slug, mejor avisar (Control extra)
-        playerRepository.findByEmail(request.getEmail()).ifPresent(p -> {
-            if(!p.getSlug().equals(slug)) throw new RuntimeException("El email ya está registrado");
-        });
 
         PlayerEntity player = playerRepository.findBySlug(slug)
                 .orElseGet(() -> playerRepository.save(
-                    PlayerEntity.builder()
-                        .name(request.getName())
-                        .slug(slug)
-                        .email(request.getEmail())
-                        .avatar(request.getAvatar())
-                        .build()
-                ));
+                        PlayerEntity.builder()
+                                .name(request.getName())
+                                .slug(slug)
+                                .email(request.getEmail())
+                                .avatar(request.getAvatar())
+                                .status("active")
+                                .isActive(true)
+                                .build()));
 
         SeasonPlayerEntity seasonPlayer = SeasonPlayerEntity.builder()
                 .player(player)
@@ -62,29 +80,39 @@ public class PlayerService {
         return mapToResponse(seasonPlayerRepository.save(seasonPlayer));
     }
 
-    // 1. Obtener jugador por su slug (Individual)
     public PlayerResponse getPlayerBySlug(String playerSlug) {
         return seasonPlayerRepository.findByPlayer_SlugAndSeason_IsActiveTrue(playerSlug)
                 .filter(sp -> !"deleted".equals(sp.getStatus()))
                 .map(this::mapToResponse)
-                .orElseThrow(() -> new RuntimeException("Error: Jugador no encontrado o no está activo en la temporada actual."));
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado a ese jugador"));
     }
 
-    // 2. Obtener todos los jugadores de un equipo (slugTeam)
-    public List<PlayerResponse> getPlayersByTeam(String slugTeam) {
-        List<SeasonPlayerEntity> players = seasonPlayerRepository.findAllBySeasonTeam_Team_SlugAndSeason_IsActiveTrue(slugTeam);
-        
-        return players.stream()
-                .filter(sp -> !"deleted".equals(sp.getStatus()))
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
+    public Page<PlayerResponse> getAllPlayersFromTeam(String slugTeam, String q, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("player.dorsal").ascending());
+        Page<SeasonPlayerEntity> resultPage = seasonPlayerRepository.findAll(
+                PlayerSpecification.filterPlayers(slugTeam, q),
+                pageable);
+
+        return resultPage.map(sp -> {
+            return PlayerResponse.builder()
+                    .slug_player(sp.getPlayer().getSlug())
+                    .name(sp.getPlayer().getName())
+                    .email(sp.getPlayer().getEmail())
+                    .avatar(sp.getPlayer().getAvatar())
+                    .dorsal(sp.getDorsal().toString())
+                    .role(sp.getRole())
+                    .slug_team(slugTeam)
+                    .status(sp.getStatus())
+                    .isActive(sp.getIsActive())
+                    .createdAt(sp.getPlayer().getCreatedAt())
+                    .build();
+        });
     }
 
-    // 3. Obtener jugadores del equipo vinculado a un Coach (slugCoach)
     public List<PlayerResponse> getPlayersByCoach(String slugCoach) {
-        // Primero verificamos si el coach existe (opcional, pero da mejores errores)
         if (!coachRepository.existsBySlug(slugCoach)) {
-            throw new RuntimeException("Error: El entrenador con slug '" + slugCoach + "' no existe.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Coach no encontrado");
         }
 
         return seasonPlayerRepository.findAllBySeasonTeam_Coach_SlugAndSeason_IsActiveTrue(slugCoach).stream()
@@ -93,11 +121,9 @@ public class PlayerService {
                 .collect(Collectors.toList());
     }
 
-    // 4. Obtener jugadores del equipo vinculado a un Analyst (slugAnalyst)
     public List<PlayerResponse> getPlayersByAnalyst(String slugAnalyst) {
-        // Verificamos si el analista existe
         if (!analystRepository.existsBySlug(slugAnalyst)) {
-            throw new RuntimeException("Error: El analista con slug '" + slugAnalyst + "' no existe.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Analista no encontrado");
         }
 
         return seasonPlayerRepository.findAllBySeasonTeam_Analyst_SlugAndSeason_IsActiveTrue(slugAnalyst).stream()
@@ -109,26 +135,43 @@ public class PlayerService {
     @Transactional
     public PlayerResponse updatePlayer(String slug, UpdatePlayerRequest request) {
         SeasonPlayerEntity sp = seasonPlayerRepository.findByPlayer_SlugAndSeason_IsActiveTrue(slug)
-                .orElseThrow(() -> new RuntimeException("Jugador no encontrado en esta temporada"));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Jugador no encontrado en la temporada actual"));
 
-        // Validaciones: que no vengan vacíos
-        validateRequest(request.getName(), request.getEmail(), request.getDorsal(), request.getRole());
+        if ("deleted".equals(sp.getStatus())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede editar un jugador eliminado");
+        }
 
-        // Actualizar Identidad (Humano)
+        if (request.getName() == null || request.getName().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El nombre es obligatorio");
+        }
+        if (request.getDorsal() != null && request.getDorsal() < 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El dorsal no puede ser negativo");
+        }
+
+        if (request.getEmail() != null && !request.getEmail().equals(sp.getPlayer().getEmail())) {
+            playerRepository.findByEmail(request.getEmail()).ifPresent(other -> {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "El email ya está registrado por otro jugador");
+            });
+        }
+
         PlayerEntity p = sp.getPlayer();
         p.setName(request.getName());
         p.setEmail(request.getEmail());
-        if (request.getAvatar() != null) p.setAvatar(request.getAvatar());
+        if (request.getAvatar() != null)
+            p.setAvatar(request.getAvatar());
 
-        // Actualizar Ficha de Temporada
         sp.setDorsal(request.getDorsal());
         sp.setRole(request.getRole());
-        
+
         if (request.getStatus() != null) {
-            String newStatus = request.getStatus().toLowerCase();
+            String newStatus = request.getStatus().toLowerCase().trim();
+            if ("deleted".equals(newStatus)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usa el método DELETE para eliminar");
+            }
             sp.setStatus(newStatus);
-            // Si el status es 'active' es true, si no (deleted, inactive, etc), es false
-            sp.setIsActive(newStatus.equals("active"));
+            sp.setIsActive("active".equals(newStatus));
         }
 
         return mapToResponse(seasonPlayerRepository.save(sp));
@@ -137,33 +180,19 @@ public class PlayerService {
     @Transactional
     public void deletePlayer(String slug) {
         SeasonPlayerEntity sp = seasonPlayerRepository.findByPlayer_SlugAndSeason_IsActiveTrue(slug)
-                .orElseThrow(() -> new RuntimeException("Jugador no encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Jugador no encontrado"));
 
-        // Soft delete en temporada
+        if ("deleted".equals(sp.getStatus())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El jugador ya ha sido eliminado previamente");
+        }
+
         sp.setStatus("deleted");
         sp.setIsActive(false);
-        
-        // Soft delete en identidad global
+
         sp.getPlayer().setStatus("deleted");
         sp.getPlayer().setIsActive(false);
 
         seasonPlayerRepository.save(sp);
-    }
-
-    // --- Auxiliares de Validación ---
-
-    private void validateRequest(String name, String email, Integer dorsal, String role) {
-        if (name == null || name.trim().length() < 3) 
-            throw new RuntimeException("El nombre debe tener al menos 3 caracteres");
-        
-        if (email == null || !email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) 
-            throw new RuntimeException("El formato del email no es válido");
-            
-        if (dorsal == null || dorsal < 0 || dorsal > 99) 
-            throw new RuntimeException("El dorsal debe ser un número entre 0 y 99");
-            
-        if (role == null || role.trim().isEmpty()) 
-            throw new RuntimeException("El rol del jugador no puede estar vacío");
     }
 
     private PlayerResponse mapToResponse(SeasonPlayerEntity sp) {
@@ -185,14 +214,14 @@ public class PlayerService {
         String baseSlug = name.toLowerCase()
                 .trim()
                 .replace(" ", "-")
-                .replaceAll("[^a-z0-9-]", ""); 
+                .replaceAll("[^a-z0-9-]", "");
 
         String finalSlug = baseSlug;
         int count = 1;
 
         while (playerRepository.findBySlug(finalSlug).isPresent()) {
-                finalSlug = baseSlug + "-" + count;
-                count++;
+            finalSlug = baseSlug + "-" + count;
+            count++;
         }
 
         return finalSlug;

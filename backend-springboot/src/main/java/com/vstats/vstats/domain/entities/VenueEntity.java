@@ -38,7 +38,7 @@ public class VenueEntity {
     private Boolean isActive = true;
 
     @Builder.Default
-    private String status = "active";
+    public String status = "active";
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

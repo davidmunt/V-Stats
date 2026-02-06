@@ -5,8 +5,11 @@ import com.vstats.vstats.infrastructure.repositories.*;
 import com.vstats.vstats.presentation.requests.team.*;
 import com.vstats.vstats.presentation.responses.TeamResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,42 +29,52 @@ public class TeamService {
     @Transactional
     public TeamResponse createTeam(CreateTeamRequest request) {
         SeasonEntity currentSeason = seasonRepository.findByIsActiveTrue()
-            .orElseThrow(() -> new RuntimeException("No hay temporada activa"));
-        
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No hay temporada activa"));
+
         LeagueEntity league = leagueRepository.findBySlug(request.getSlugLeague())
-            .orElseThrow(() -> new RuntimeException("Liga no encontrada"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Liga no encontrada"));
 
         VenueEntity venue = venueRepository.findBySlug(request.getSlugVenue())
-            .orElseThrow(() -> new RuntimeException("Sede no encontrada"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sede no encontrada"));
+
+        if (request.getName() == null || request.getName().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El nombre del equipo es obligatorio");
+        }
+        if (request.getImage() == null || request.getImage().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La imagen del equipo es obligatoria");
+        }
 
         String slug = generateUniqueSlug(request.getName());
         TeamEntity team = teamRepository.findBySlug(slug)
-            .orElseGet(() -> teamRepository.save(
-                TeamEntity.builder().name(request.getName()).slug(slug).image(request.getImage()).build()
-            ));
+                .orElseGet(() -> teamRepository.save(
+                        TeamEntity.builder()
+                                .name(request.getName())
+                                .slug(slug)
+                                .image(request.getImage())
+                                .build()));
 
         SeasonTeamEntity teamSeason = SeasonTeamEntity.builder()
-            .team(team)
-            .season(currentSeason)
-            .league(league)
-            .venue(venue)
-            .status("active")
-            .isActive(true)
-            .build();
+                .team(team)
+                .season(currentSeason)
+                .league(league)
+                .venue(venue)
+                .status("active")
+                .isActive(true)
+                .build();
 
         return mapToResponse(seasonTeamRepository.save(teamSeason));
     }
 
     public List<TeamResponse> getAllTeams() {
         return seasonTeamRepository.findAllBySeason_IsActiveTrue().stream()
-            .filter(ts -> !"deleted".equals(ts.getStatus()))
-            .map(this::mapToResponse)
-            .collect(Collectors.toList());
+                .filter(ts -> !"deleted".equals(ts.getStatus()))
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
     }
 
     public List<TeamResponse> getTeamsByAdminSlug(String slugAdmin) {
         String adminId = getAdminIdBySlug(slugAdmin);
-        
+
         return seasonTeamRepository.findAllByLeague_IdAdminAndSeason_IsActiveTrue(adminId).stream()
                 .filter(ts -> !"deleted".equals(ts.getStatus()))
                 .map(this::mapToResponse)
@@ -70,34 +83,54 @@ public class TeamService {
 
     public TeamResponse getTeamBySlug(String slug) {
         SeasonTeamEntity ts = seasonTeamRepository.findByTeam_SlugAndSeason_IsActiveTrue(slug)
-            .orElseThrow(() -> new RuntimeException("Equipo no encontrado en la temporada actual"));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Equipo no encontrado en la temporada actual"));
         return mapToResponse(ts);
     }
 
     @Transactional
     public TeamResponse updateTeam(String slug, UpdateTeamRequest request) {
         SeasonTeamEntity ts = seasonTeamRepository.findByTeam_SlugAndSeason_IsActiveTrue(slug)
-            .orElseThrow(() -> new RuntimeException("Equipo no encontrado para la temporada actual"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Equipo no encontrado"));
 
-        if (request.getName() != null) ts.getTeam().setName(request.getName());
-        if (request.getImage() != null) ts.getTeam().setImage(request.getImage());
-
-        if (request.getSlugVenue() != null) {
-            VenueEntity venue = venueRepository.findBySlug(request.getSlugVenue())
-                .orElseThrow(() -> new RuntimeException("Sede no encontrada"));
-            ts.setVenue(venue);
+        if ("deleted".equals(ts.getStatus())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede editar un equipo eliminado");
         }
 
+        if (request.getName() != null && request.getName().isBlank())
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El nombre no puede estar vacío");
+        if (request.getImage() != null && request.getImage().isBlank())
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La imagen es obligatoria");
+
+        if (request.getName() != null)
+            ts.getTeam().setName(request.getName());
+        if (request.getImage() != null)
+            ts.getTeam().setImage(request.getImage());
+
         if (request.getSlugCoach() != null) {
-            CoachEntity coach = coachRepository.findBySlug(request.getSlugCoach())
-                .orElseThrow(() -> new RuntimeException("Entrenador no encontrado"));
-            ts.setCoach(coach);
+            if (request.getSlugCoach().isBlank()) {
+                ts.setCoach(null);
+            } else {
+                CoachEntity coach = coachRepository.findBySlug(request.getSlugCoach())
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Coach no encontrado"));
+                ts.setCoach(coach);
+            }
         }
 
         if (request.getSlugAnalyst() != null) {
-            AnalystEntity analyst = analystRepository.findBySlug(request.getSlugAnalyst())
-                .orElseThrow(() -> new RuntimeException("Analista no encontrado"));
-            ts.setAnalyst(analyst);
+            if (request.getSlugAnalyst().isBlank()) {
+                ts.setAnalyst(null);
+            } else {
+                AnalystEntity analyst = analystRepository.findBySlug(request.getSlugAnalyst())
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Analista no encontrado"));
+                ts.setAnalyst(analyst);
+            }
+        }
+
+        if (request.getSlugVenue() != null) {
+            VenueEntity venue = venueRepository.findBySlug(request.getSlugVenue())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sede no encontrada"));
+            ts.setVenue(venue);
         }
 
         if (request.getStatus() != null) {
@@ -111,9 +144,15 @@ public class TeamService {
     @Transactional
     public void deleteTeam(String slug) {
         SeasonTeamEntity ts = seasonTeamRepository.findByTeam_SlugAndSeason_IsActiveTrue(slug)
-                .orElseThrow(() -> new RuntimeException("Equipo no encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Equipo no encontrado"));
+
+        if ("deleted".equals(ts.getStatus())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El equipo ya ha sido eliminado");
+        }
+
         ts.setStatus("deleted");
         ts.setIsActive(false);
+
         seasonTeamRepository.save(ts);
     }
 
@@ -143,14 +182,14 @@ public class TeamService {
         String baseSlug = name.toLowerCase()
                 .trim()
                 .replace(" ", "-")
-                .replaceAll("[^a-z0-9-]", ""); 
+                .replaceAll("[^a-z0-9-]", "");
 
         String finalSlug = baseSlug;
         int count = 1;
 
         while (teamRepository.findBySlug(finalSlug).isPresent()) {
-                finalSlug = baseSlug + "-" + count;
-                count++;
+            finalSlug = baseSlug + "-" + count;
+            count++;
         }
 
         return finalSlug;

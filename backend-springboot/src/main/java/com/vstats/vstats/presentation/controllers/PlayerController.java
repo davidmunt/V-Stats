@@ -3,8 +3,11 @@ package com.vstats.vstats.presentation.controllers;
 import com.vstats.vstats.application.services.PlayerService;
 import com.vstats.vstats.presentation.requests.player.CreatePlayerRequest;
 import com.vstats.vstats.presentation.requests.player.UpdatePlayerRequest;
+import com.vstats.vstats.presentation.responses.LeagueResponse;
 import com.vstats.vstats.presentation.responses.PlayerResponse;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,8 +36,21 @@ public class PlayerController {
     }
 
     @GetMapping("/team/{slugTeam}")
-    public ResponseEntity<Map<String, List<PlayerResponse>>> getByTeam(@PathVariable String slugTeam) {
-        return ResponseEntity.ok(Map.of("players", playerService.getPlayersByTeam(slugTeam)));
+    public ResponseEntity<Map<String, Object>> getByTeam(
+            @PathVariable String slugTeam, 
+            @RequestParam(required = false) String q,       
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+            
+            Page<PlayerResponse> result = playerService.getAllPlayersFromTeam(slugTeam, q, page, size);
+            Map<String, Object> response = Map.of(
+                "players", result.getContent(),
+                "totalElements", result.getTotalElements(),
+                "totalPages", result.getTotalPages(),
+                "currentPage", result.getNumber()
+            );
+
+            return ResponseEntity.ok(response);
     }
 
     @GetMapping("/coach/{slugCoach}")

@@ -17,6 +17,7 @@ public class PlayerResponse {
     private String dorsal;
     private String role;
     private String avatar;
+    private String status;
     private Boolean isActive;
     private LocalDateTime createdAt;
 }

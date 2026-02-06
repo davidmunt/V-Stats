@@ -2,13 +2,14 @@ package com.vstats.vstats.infrastructure.repositories;
 
 import com.vstats.vstats.domain.entities.SeasonPlayerEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface SeasonPlayerRepository extends JpaRepository<SeasonPlayerEntity, Long> {
+public interface SeasonPlayerRepository extends JpaRepository<SeasonPlayerEntity, Long>, JpaSpecificationExecutor<SeasonPlayerEntity> {
 
     // Buscar por el slug del jugador en la temporada activa
     Optional<SeasonPlayerEntity> findByPlayer_SlugAndSeason_IsActiveTrue(String playerSlug);

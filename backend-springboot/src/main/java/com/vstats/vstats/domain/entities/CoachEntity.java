@@ -8,7 +8,11 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "coaches")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class CoachEntity {
 
     @Id
@@ -28,8 +32,9 @@ public class CoachEntity {
     private String password;
     private String avatar;
 
-    @Column(name = "id_team")
-    private String idTeam;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_team")
+    private TeamEntity team;
 
     @Column(name = "refresh_token")
     private String refreshToken;

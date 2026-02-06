@@ -18,6 +18,5 @@ public interface SeasonTeamRepository extends JpaRepository<SeasonTeamEntity, Lo
     
     List<SeasonTeamEntity> findAllByLeague_IdAdminAndSeason_IsActiveTrue(String idAdmin);
 
-    // ESTE ES EL MÉTODO QUE TENÍAS EN EL OTRO REPO, MUÉVELO AQUÍ:
     List<SeasonTeamEntity> findAllByLeague_SlugAndSeason_IsActiveTrue(String leagueSlug);
 }
