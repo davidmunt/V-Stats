@@ -10,8 +10,8 @@ import java.util.Optional;
 @Repository
 public interface PlayerRepository extends JpaRepository<PlayerEntity, Long> {
     Optional<PlayerEntity> findBySlug(String slug);
-    
+
     // List<PlayerEntity> findAllByIdTeam(String idTeam);
-    
+
     Optional<PlayerEntity> findByEmail(String email);
 }

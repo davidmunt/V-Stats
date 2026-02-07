@@ -1,5 +1,6 @@
 package com.vstats.vstats.infrastructure.repositories;
 
+import com.vstats.vstats.domain.entities.PlayerEntity;
 import com.vstats.vstats.domain.entities.SeasonPlayerEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -9,7 +10,8 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface SeasonPlayerRepository extends JpaRepository<SeasonPlayerEntity, Long>, JpaSpecificationExecutor<SeasonPlayerEntity> {
+public interface SeasonPlayerRepository
+        extends JpaRepository<SeasonPlayerEntity, Long>, JpaSpecificationExecutor<SeasonPlayerEntity> {
 
     // Buscar por el slug del jugador en la temporada activa
     Optional<SeasonPlayerEntity> findByPlayer_SlugAndSeason_IsActiveTrue(String playerSlug);
@@ -22,4 +24,6 @@ public interface SeasonPlayerRepository extends JpaRepository<SeasonPlayerEntity
 
     // Buscar jugadores por el equipo donde está un Analyst específico
     List<SeasonPlayerEntity> findAllBySeasonTeam_Analyst_SlugAndSeason_IsActiveTrue(String analystSlug);
+
+    Optional<SeasonPlayerEntity> findByPlayer_IdPlayerAndSeason_IsActiveTrue(Long idPlayer);
 }

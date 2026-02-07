@@ -24,11 +24,10 @@ public class MatchController {
             @PathVariable String slugLeague,
             @RequestBody CreateMatchRequest request) {
         // El adminId lo podrías sacar del token JWT más adelante, ahora simulamos uno
-        String adminId = "SYSTEM_ADMIN"; 
+        String adminId = "SYSTEM_ADMIN";
         return new ResponseEntity<>(
-            Map.of("match", matchService.createMatch(request, slugLeague, adminId)), 
-            HttpStatus.CREATED
-        );
+                Map.of("match", matchService.createMatch(request, slugLeague, adminId)),
+                HttpStatus.CREATED);
     }
 
     @PostMapping("/{slug}/start")
@@ -62,7 +61,7 @@ public class MatchController {
 
     @PutMapping("/{slug}")
     public ResponseEntity<Map<String, MatchResponse>> update(
-            @PathVariable String slug, 
+            @PathVariable String slug,
             @RequestBody UpdateMatchRequest request) {
         return ResponseEntity.ok(Map.of("match", matchService.updateMatch(slug, request)));
     }
