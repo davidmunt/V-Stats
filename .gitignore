@@ -38,6 +38,4 @@ Thumbs.db
 # Logs (global)
 *.log
 
-/backend_mongoose/node_modules
-/backend_mongoose/package-lock.json
-/backend_mongoose/.env
+/backend_mongoose
