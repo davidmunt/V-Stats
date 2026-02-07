@@ -37,6 +37,34 @@ const getActualSetFromMatch = asyncHandler(async (req, res) => {
   });
 });
 
+const getFinishedSetsByMatch = asyncHandler(async (req, res) => {
+  const { matchSlug } = req.params;
+
+  // 1. Buscamos el partido para obtener su _id
+  const match = await Match.findOne({ slug: matchSlug });
+  if (!match) {
+    return res.status(404).json({ message: "Partido no encontrado" });
+  }
+
+  // 2. Buscamos los sets que NO están "in_progress"
+  // Usamos $ne para traer "finished", "canceled", etc.
+  const sets = await SetModel.find({
+    match_id: match._id,
+    status: { $ne: "in_progress" },
+    is_active: true,
+  }).sort({ set_number: 1 }); // Ordenados del primero al último
+
+  // 3. Formateamos la respuesta usando tu método toSetResponse
+  const formattedSets = sets.map((s) => s.toSetResponse());
+
+  res.status(200).json({
+    id_match: match._id,
+    total_finished: formattedSets.length,
+    sets: formattedSets,
+  });
+});
+
 module.exports = {
   getActualSetFromMatch,
+  getFinishedSetsByMatch,
 };
