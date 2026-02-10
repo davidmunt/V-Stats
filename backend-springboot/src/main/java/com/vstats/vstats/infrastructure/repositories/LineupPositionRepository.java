@@ -9,7 +9,7 @@ import java.util.List;
 @Repository
 public interface LineupPositionRepository extends JpaRepository<LineupPositionEntity, Long> {
 
-    List<LineupPositionEntity> findByLineupId(Long id);
+    List<LineupPositionEntity> findByLineup_IdLineup(Long idLineup);
 
-    void deleteByLineupId(Long id);
+    void deleteByLineup_IdLineup(Long idLineup);
 }

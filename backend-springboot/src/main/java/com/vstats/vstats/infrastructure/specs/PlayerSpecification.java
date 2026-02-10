@@ -1,27 +1,49 @@
 package com.vstats.vstats.infrastructure.specs;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.springframework.data.jpa.domain.Specification;
 import com.vstats.vstats.domain.entities.SeasonPlayerEntity;
 
-import jakarta.persistence.criteria.Predicate;
-
 public class PlayerSpecification {
-    public static Specification<SeasonPlayerEntity> filterPlayers(String slugTeam, String q) {
+
+    public static Specification<SeasonPlayerEntity> build(String q, Long idTeam, String status) {
+        return Specification
+                .where(isAvailable())
+                .and(isCurrentSeason())
+                .and(searchByQ(q))
+                .and(filterByTeam(idTeam))
+                .and(filterByStatus(status));
+    }
+
+    private static Specification<SeasonPlayerEntity> isCurrentSeason() {
+        return (root, query, cb) -> cb.equal(root.get("season").get("isActive"), true);
+    }
+
+    private static Specification<SeasonPlayerEntity> isAvailable() {
+        return (root, query, cb) -> cb.notEqual(root.get("status"), "deleted");
+    }
+
+    private static Specification<SeasonPlayerEntity> searchByQ(String q) {
         return (root, query, cb) -> {
-            List<Predicate> predicates = new ArrayList<>();
-
-            predicates.add(cb.equal(root.get("seasonTeam").get("team").get("slug"), slugTeam));
-            predicates.add(cb.equal(root.get("season").get("isActive"), true));
-            predicates.add(cb.notEqual(root.get("status"), "deleted"));
-            
-            if (q != null && !q.isBlank()) {
-                String pattern = "%" + q.toLowerCase() + "%";
-                predicates.add(cb.like(cb.lower(root.get("player").get("name")), pattern));
-            }
-
-            return cb.and(predicates.toArray(new Predicate[0]));
+            if (q == null || q.isBlank())
+                return null;
+            String pattern = "%" + q.toLowerCase() + "%";
+            return cb.or(
+                    cb.like(cb.lower(root.get("player").get("name")), pattern),
+                    cb.like(cb.lower(root.get("player").get("slug")), pattern));
         };
+    }
+
+    private static Specification<SeasonPlayerEntity> filterByTeam(Long idTeam) {
+        return (root, query, cb) -> {
+            if (idTeam == null)
+                return null;
+            return cb.equal(root.get("seasonTeam").get("team").get("idTeam"), idTeam);
+        };
+    }
+
+    private static Specification<SeasonPlayerEntity> filterByStatus(String status) {
+        return (root, query, cb) -> (status == null || status.isBlank())
+                ? null
+                : cb.equal(root.get("status"), status.toLowerCase());
     }
 }

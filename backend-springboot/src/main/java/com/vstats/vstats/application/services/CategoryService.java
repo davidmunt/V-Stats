@@ -4,15 +4,24 @@ import com.vstats.vstats.domain.entities.CategoryEntity;
 import com.vstats.vstats.domain.entities.LeagueAdminEntity;
 import com.vstats.vstats.infrastructure.repositories.CategoryRepository;
 import com.vstats.vstats.infrastructure.repositories.LeagueAdminRepository;
+import com.vstats.vstats.infrastructure.specs.CategorySpecification;
 import com.vstats.vstats.presentation.requests.category.CreateCategoryRequest;
 import com.vstats.vstats.presentation.requests.category.UpdateCategoryRequest;
 import com.vstats.vstats.presentation.responses.CategoryResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,7 +56,7 @@ public class CategoryService {
                 String slugCategory = generateUniqueSlug(request.getName());
 
                 CategoryEntity category = CategoryEntity.builder()
-                                .idAdmin(admin.getIdAdmin().toString())
+                                .admin(admin)
                                 .slug(slugCategory)
                                 .name(request.getName())
                                 .description(request.getDescription())
@@ -56,14 +65,39 @@ public class CategoryService {
                                 .status("active")
                                 .build();
 
-                return mapToResponse(categoryRepository.save(category), admin.getSlug());
+                return mapToResponse(categoryRepository.save(category));
         }
 
-        public List<CategoryResponse> getAllCategories() {
-                return categoryRepository.findAll().stream()
-                                .filter(c -> !"deleted".equals(c.getStatus()))
-                                .map(this::enrichWithAdminSlug)
-                                .collect(Collectors.toList());
+        // añade lo de id admin despes
+        public Map<String, Object> getAllCategories(String q, String status, String sort, int page, int size) {
+
+                Sort sortOrder = switch (sort != null ? sort : "recent") {
+                        case "name_asc" -> Sort.by("name").ascending();
+                        case "name_desc" -> Sort.by("name").descending();
+                        case "oldest" -> Sort.by("createdAt").ascending();
+                        default -> Sort.by("createdAt").descending();
+                };
+
+                Pageable pageable = PageRequest.of(page, size, sortOrder);
+                Specification<CategoryEntity> spec = CategorySpecification.build(q, status);
+
+                Page<CategoryEntity> entitiesPage = categoryRepository.findAll(spec, pageable);
+
+                List<CategoryResponse> categories = entitiesPage.getContent().stream()
+                                .map(this::mapToResponse)
+                                .toList();
+
+                Map<String, Object> response = new LinkedHashMap<>();
+                response.put("categories", categories);
+                response.put("total", entitiesPage.getTotalElements());
+                response.put("page", entitiesPage.getNumber());
+                response.put("total_pages", entitiesPage.getTotalPages());
+                response.put("sort", sort != null ? sort : "recent");
+                response.put("filters_applied", Map.of(
+                                "q", q != null ? q : "",
+                                "status", status != null ? status : ""));
+
+                return response;
         }
 
         public List<CategoryResponse> getCategoriesByAdminSlug(String slugAdmin) {
@@ -71,9 +105,9 @@ public class CategoryService {
                                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                                                 "Administrador no encontrado con este slug"));
 
-                return categoryRepository.findAllByIdAdmin(admin.getIdAdmin().toString()).stream()
+                return categoryRepository.findAllByAdmin_IdAdmin(admin.getIdAdmin()).stream()
                                 .filter(c -> !"deleted".equals(c.getStatus()))
-                                .map(c -> mapToResponse(c, slugAdmin))
+                                .map(c -> mapToResponse(c))
                                 .collect(Collectors.toList());
         }
 
@@ -82,7 +116,7 @@ public class CategoryService {
                                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                                                 "Categoria no encontrada con este slug"));
 
-                return enrichWithAdminSlug(category);
+                return mapToResponse(category);
         }
 
         @Transactional
@@ -123,7 +157,8 @@ public class CategoryService {
                         category.setIsActive("active".equals(newStatus));
                 }
 
-                return enrichWithAdminSlug(categoryRepository.save(category));
+                CategoryEntity savedCategory = categoryRepository.save(category);
+                return mapToResponse(savedCategory);
         }
 
         @Transactional
@@ -144,17 +179,9 @@ public class CategoryService {
                 categoryRepository.save(category);
         }
 
-        private CategoryResponse enrichWithAdminSlug(CategoryEntity entity) {
-                String adminSlug = adminRepository.findById(Long.parseLong(entity.getIdAdmin()))
-                                .map(LeagueAdminEntity::getSlug)
-                                .orElse("unknown-admin");
-                return mapToResponse(entity, adminSlug);
-        }
-
-        private CategoryResponse mapToResponse(CategoryEntity entity, String adminSlug) {
+        private CategoryResponse mapToResponse(CategoryEntity entity) {
                 return CategoryResponse.builder()
                                 .slug_category(entity.getSlug())
-                                .slug_admin(adminSlug)
                                 .name(entity.getName())
                                 .description(entity.getDescription())
                                 .image(entity.getImage())

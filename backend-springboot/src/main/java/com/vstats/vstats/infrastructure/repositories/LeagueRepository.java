@@ -10,5 +10,6 @@ import java.util.Optional;
 @Repository
 public interface LeagueRepository extends JpaRepository<LeagueEntity, Long> {
     Optional<LeagueEntity> findBySlug(String slug);
-    List<LeagueEntity> findAllByIdAdmin(String idAdmin);
+
+    List<LeagueEntity> findByAdmin_IdAdmin(Long idAdmin);
 }

@@ -5,19 +5,19 @@ import com.vstats.vstats.infrastructure.repositories.*;
 import com.vstats.vstats.infrastructure.specs.PlayerSpecification;
 import com.vstats.vstats.presentation.requests.player.*;
 import com.vstats.vstats.presentation.responses.PlayerResponse;
-
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,32 +30,38 @@ public class PlayerService {
     private final AnalystRepository analystRepository;
     private final SeasonRepository seasonRepository;
     private final SeasonTeamRepository seasonTeamRepository;
+    private final TeamRepository teamRepository;
 
     @Transactional
     public PlayerResponse createPlayer(CreatePlayerRequest request) {
+
         if (request.getName() == null || request.getName().isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El nombre del jugador es obligatorio");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El nombre es obligatorio");
         }
         if (request.getDorsal() != null && request.getDorsal() < 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El dorsal no puede ser negativo");
+        }
+
+        if (request.getEmail() != null && !request.getEmail().isBlank()) {
+            playerRepository.findByEmail(request.getEmail()).ifPresent(other -> {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "El email ya está registrado por otro jugador");
+            });
         }
 
         SeasonEntity currentSeason = seasonRepository.findByIsActiveTrue()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No hay temporada activa"));
 
         SeasonTeamEntity seasonTeam = seasonTeamRepository.findByTeam_SlugAndSeason_IsActiveTrue(request.getSlugTeam())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "El equipo no existe en la temporada actual"));
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "El equipo no compite esta temporada"));
 
-        if (request.getEmail() != null && !request.getEmail().isBlank()) {
-            playerRepository.findByEmail(request.getEmail()).ifPresent(p -> {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "El email " + request.getEmail() + " ya está registrado");
-            });
+        if (seasonPlayerRepository.existsByPlayer_SlugAndSeason_IdSeason(generateUniqueSlug(request.getName()),
+                currentSeason.getIdSeason())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El jugador ya está inscrito en esta temporada");
         }
 
         String slug = generateUniqueSlug(request.getName());
-
         PlayerEntity player = playerRepository.findBySlug(slug)
                 .orElseGet(() -> playerRepository.save(
                         PlayerEntity.builder()
@@ -72,7 +78,7 @@ public class PlayerService {
                 .seasonTeam(seasonTeam)
                 .season(currentSeason)
                 .dorsal(request.getDorsal())
-                .role(request.getRole())
+                .role(request.getRole() != null ? request.getRole() : "PLAYER")
                 .status("active")
                 .isActive(true)
                 .build();
@@ -88,26 +94,35 @@ public class PlayerService {
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado a ese jugador"));
     }
 
-    public Page<PlayerResponse> getAllPlayersFromTeam(String slugTeam, String q, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("player.dorsal").ascending());
-        Page<SeasonPlayerEntity> resultPage = seasonPlayerRepository.findAll(
-                PlayerSpecification.filterPlayers(slugTeam, q),
-                pageable);
+    public Map<String, Object> getAllPlayers(String q, String status, String slug_team, String sort, int page,
+            int size) {
 
-        return resultPage.map(sp -> {
-            return PlayerResponse.builder()
-                    .slug_player(sp.getPlayer().getSlug())
-                    .name(sp.getPlayer().getName())
-                    .email(sp.getPlayer().getEmail())
-                    .avatar(sp.getPlayer().getAvatar())
-                    .dorsal(sp.getDorsal().toString())
-                    .role(sp.getRole())
-                    .slug_team(slugTeam)
-                    .status(sp.getStatus())
-                    .isActive(sp.getIsActive())
-                    .createdAt(sp.getPlayer().getCreatedAt())
-                    .build();
-        });
+        TeamEntity team = teamRepository.findBySlug(slug_team)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Equipo no encontrado"));
+
+        Sort sortOrder = switch (sort != null ? sort : "recent") {
+            case "name_asc" -> Sort.by("player.name").ascending(); // Ordena por el nombre del chaval
+            case "dorsal" -> Sort.by("dorsal").ascending(); // Ordena por número
+            default -> Sort.by("createdAt").descending();
+        };
+
+        Pageable pageable = PageRequest.of(page, size, sortOrder);
+        Specification<SeasonPlayerEntity> spec = PlayerSpecification.build(q, team.getIdTeam(), status);
+
+        Page<SeasonPlayerEntity> entitiesPage = seasonPlayerRepository.findAll(spec, pageable);
+
+        List<PlayerResponse> players = entitiesPage.getContent().stream()
+                .map(this::mapToResponse)
+                .toList();
+
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("players", players);
+        response.put("total", entitiesPage.getTotalElements());
+        response.put("page", entitiesPage.getNumber());
+        response.put("total_pages", entitiesPage.getTotalPages());
+        response.put("filters_applied", Map.of("q", q != null ? q : "", "team", slug_team));
+
+        return response;
     }
 
     public List<PlayerResponse> getPlayersByCoach(String slugCoach) {

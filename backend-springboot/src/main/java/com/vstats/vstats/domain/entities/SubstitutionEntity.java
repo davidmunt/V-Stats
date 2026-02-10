@@ -8,7 +8,8 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "substitutions")
-@Getter @Setter
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -30,14 +31,17 @@ public class SubstitutionEntity {
     @JoinColumn(name = "id_set", nullable = false)
     private SetEntity set;
 
-    @Column(name = "id_team", nullable = false)
-    private String idTeam; // Formato String
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_team", nullable = false)
+    private TeamEntity team;
 
-    @Column(name = "id_other_player")
-    private String idOtherPlayer; // Jugador normal (sustituido o sustituto)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_other_player", nullable = false)
+    private PlayerEntity otherPlayer;
 
-    @Column(name = "id_libero_player")
-    private String idLiberoPlayer; // ID del líbero involucrado
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_libero_player")
+    private PlayerEntity liberoPlayer;
 
     @Column(name = "libero_is_replacing")
     private Boolean liberoIsReplacing; // true si el líbero entra, false si sale

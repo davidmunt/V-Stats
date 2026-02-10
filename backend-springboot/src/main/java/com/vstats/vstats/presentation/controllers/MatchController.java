@@ -24,7 +24,8 @@ public class MatchController {
             @PathVariable String slugLeague,
             @RequestBody CreateMatchRequest request) {
         // El adminId lo podrías sacar del token JWT más adelante, ahora simulamos uno
-        String adminId = "SYSTEM_ADMIN";
+        Long adminId = 1L;
+        // Simulamos un adminId como Long
         return new ResponseEntity<>(
                 Map.of("match", matchService.createMatch(request, slugLeague, adminId)),
                 HttpStatus.CREATED);

@@ -13,6 +13,8 @@ import java.util.Optional;
 public interface SeasonPlayerRepository
         extends JpaRepository<SeasonPlayerEntity, Long>, JpaSpecificationExecutor<SeasonPlayerEntity> {
 
+    boolean existsByPlayer_SlugAndSeason_IdSeason(String slug, Long idSeason);
+
     // Buscar por el slug del jugador en la temporada activa
     Optional<SeasonPlayerEntity> findByPlayer_SlugAndSeason_IsActiveTrue(String playerSlug);
 

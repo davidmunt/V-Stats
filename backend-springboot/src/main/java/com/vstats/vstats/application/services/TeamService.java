@@ -2,15 +2,25 @@ package com.vstats.vstats.application.services;
 
 import com.vstats.vstats.domain.entities.*;
 import com.vstats.vstats.infrastructure.repositories.*;
+import com.vstats.vstats.infrastructure.specs.TeamSpecification;
 import com.vstats.vstats.presentation.requests.team.*;
 import com.vstats.vstats.presentation.responses.TeamResponse;
+
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,6 +31,7 @@ public class TeamService {
     private final SeasonTeamRepository seasonTeamRepository;
     private final SeasonRepository seasonRepository;
     private final LeagueRepository leagueRepository;
+    private final SeasonLeagueRepository seasonLeagueRepository;
     private final VenueRepository venueRepository;
     private final CoachRepository coachRepository;
     private final AnalystRepository analystRepository;
@@ -33,6 +44,10 @@ public class TeamService {
 
         LeagueEntity league = leagueRepository.findBySlug(request.getSlugLeague())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Liga no encontrada"));
+
+        seasonLeagueRepository.findByLeagueAndSeason(league, currentSeason)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Esa liga no está disponible esta temporada"));
 
         VenueEntity venue = venueRepository.findBySlug(request.getSlugVenue())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sede no encontrada"));
@@ -65,17 +80,40 @@ public class TeamService {
         return mapToResponse(seasonTeamRepository.save(teamSeason));
     }
 
-    public List<TeamResponse> getAllTeams() {
-        return seasonTeamRepository.findAllBySeason_IsActiveTrue().stream()
-                .filter(ts -> !"deleted".equals(ts.getStatus()))
+    public Map<String, Object> getAllTeams(String q, String status, String slug_league, String sort, int page,
+            int size) {
+
+        LeagueEntity league = leagueRepository.findBySlug(slug_league)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Liga no encontrada"));
+
+        Sort sortOrder = switch (sort != null ? sort : "recent") {
+            case "name_asc" -> Sort.by("team.name").ascending();
+            default -> Sort.by("createdAt").descending();
+        };
+
+        Pageable pageable = PageRequest.of(page, size, sortOrder);
+        Specification<SeasonTeamEntity> spec = TeamSpecification.build(q, league.getIdLeague(), status);
+
+        Page<SeasonTeamEntity> entitiesPage = seasonTeamRepository.findAll(spec, pageable);
+
+        List<TeamResponse> teams = entitiesPage.getContent().stream()
                 .map(this::mapToResponse)
-                .collect(Collectors.toList());
+                .toList();
+
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("teams", teams);
+        response.put("total", entitiesPage.getTotalElements());
+        response.put("page", entitiesPage.getNumber());
+        response.put("total_pages", entitiesPage.getTotalPages());
+        response.put("filters_applied", Map.of("q", q != null ? q : "", "league", slug_league));
+
+        return response;
     }
 
     public List<TeamResponse> getTeamsByAdminSlug(String slugAdmin) {
-        String adminId = getAdminIdBySlug(slugAdmin);
+        Long adminId = getAdminIdBySlug(slugAdmin);
 
-        return seasonTeamRepository.findAllByLeague_IdAdminAndSeason_IsActiveTrue(adminId).stream()
+        return seasonTeamRepository.findAllByLeague_Admin_IdAdminAndSeason_IsActiveTrue(adminId).stream()
                 .filter(ts -> !"deleted".equals(ts.getStatus()))
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
@@ -172,10 +210,10 @@ public class TeamService {
                 .build();
     }
 
-    private String getAdminIdBySlug(String slug) {
+    private Long getAdminIdBySlug(String slug) {
         return adminRepository.findBySlug(slug)
                 .orElseThrow(() -> new RuntimeException("Admin no encontrado"))
-                .getIdAdmin().toString();
+                .getIdAdmin();
     }
 
     private String generateUniqueSlug(String name) {

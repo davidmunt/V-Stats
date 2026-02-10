@@ -8,7 +8,8 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "lineups")
-@Getter @Setter
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -26,8 +27,9 @@ public class LineupEntity {
     @JoinColumn(name = "id_match", nullable = false)
     private MatchEntity match;
 
-    @Column(name = "id_team", nullable = false)
-    private String idTeam; // Formato String
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_team", nullable = false)
+    private TeamEntity team;
 
     @Builder.Default
     @Column(name = "is_active")

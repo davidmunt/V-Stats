@@ -25,8 +25,13 @@ public class CategoryController {
     }
 
     @GetMapping
-    public ResponseEntity<Map<String, List<CategoryResponse>>> getAll() {
-        return ResponseEntity.ok(Map.of("categories", categoryService.getAllCategories()));
+    public ResponseEntity<Map<String, Object>> getAllCategories(
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) String status,
+            @RequestParam(defaultValue = "recent") String sort,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(categoryService.getAllCategories(q, status, sort, page, size));
     }
 
     @GetMapping("/{slug}")
@@ -40,7 +45,8 @@ public class CategoryController {
     }
 
     @PutMapping("/{slug}")
-    public ResponseEntity<Map<String, CategoryResponse>> update(@PathVariable String slug, @RequestBody UpdateCategoryRequest request) {
+    public ResponseEntity<Map<String, CategoryResponse>> update(@PathVariable String slug,
+            @RequestBody UpdateCategoryRequest request) {
         return ResponseEntity.ok(Map.of("category", categoryService.updateCategory(slug, request)));
     }
 

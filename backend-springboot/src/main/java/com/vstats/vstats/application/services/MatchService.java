@@ -26,9 +26,10 @@ public class MatchService {
     private final SetRepository setRepository;
     private final CoachRepository coachRepository;
     private final AnalystRepository analystRepository;
+    private final LeagueAdminRepository leagueAdminRepository;
 
     @Transactional
-    public MatchResponse createMatch(CreateMatchRequest request, String slugLeague, String adminId) {
+    public MatchResponse createMatch(CreateMatchRequest request, String slugLeague, Long adminId) {
         if (request.getSlugTeamLocal().equals(request.getSlugTeamVisitor())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Un equipo no puede jugar contra sí mismo");
         }
@@ -59,13 +60,15 @@ public class MatchService {
         }
 
         String slugMatch = generateUniqueSlug(local.getName() + "-vs-" + visitor.getName());
+        LeagueAdminEntity admin = leagueAdminRepository.findById(adminId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Admin no encontrado"));
         MatchEntity match = MatchEntity.builder()
                 .slug(slugMatch)
                 .league(league)
                 .localTeam(local)
                 .visitorTeam(visitor)
-                .idVenue(localSeasonData.getVenue().getIdVenue().toString())
-                .idAdminCreator(adminId)
+                .venue(localSeasonData.getVenue())
+                .adminCreator(admin)
                 .date(matchDate)
                 .status("scheduled")
                 .isActive(false)
@@ -131,7 +134,7 @@ public class MatchService {
         // 5. Aplicar cambios
         match.setLocalTeam(local);
         match.setVisitorTeam(visitor);
-        match.setIdVenue(localSeasonData.getVenue().getIdVenue().toString());
+        match.setVenue(localSeasonData.getVenue());
         match.setDate(matchDate);
 
         // 6. Lógica de Status

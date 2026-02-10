@@ -8,7 +8,8 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "categories")
-@Getter @Setter
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -19,8 +20,9 @@ public class CategoryEntity {
     @Column(name = "id_category")
     private Long idCategory;
 
-    @Column(name = "id_admin", nullable = false)
-    private String idAdmin;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_admin", nullable = false)
+    private LeagueAdminEntity admin;
 
     @Column(nullable = false, unique = true)
     private String slug;

@@ -8,7 +8,11 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "venues")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class VenueEntity {
 
     @Id
@@ -19,8 +23,9 @@ public class VenueEntity {
     @Column(nullable = false, unique = true)
     private String slug;
 
-    @Column(name = "id_admin", nullable = false)
-    private String idAdmin;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_admin", nullable = false)
+    private LeagueAdminEntity admin;
 
     @Column(nullable = false)
     private String name;

@@ -24,8 +24,14 @@ public class TeamController {
     }
 
     @GetMapping
-    public ResponseEntity<Map<String, List<TeamResponse>>> getAll() {
-        return ResponseEntity.ok(Map.of("teams", teamService.getAllTeams()));
+    public ResponseEntity<Map<String, Object>> getAllTeams(
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = true) String slug_league,
+            @RequestParam(defaultValue = "recent") String sort,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(teamService.getAllTeams(q, status, slug_league, sort, page, size));
     }
 
     @GetMapping("/admin/{slugAdmin}")
@@ -40,7 +46,8 @@ public class TeamController {
     }
 
     @PutMapping("/{slug}")
-    public ResponseEntity<Map<String, TeamResponse>> update(@PathVariable String slug, @RequestBody UpdateTeamRequest request) {
+    public ResponseEntity<Map<String, TeamResponse>> update(@PathVariable String slug,
+            @RequestBody UpdateTeamRequest request) {
         return ResponseEntity.ok(Map.of("team", teamService.updateTeam(slug, request)));
     }
 

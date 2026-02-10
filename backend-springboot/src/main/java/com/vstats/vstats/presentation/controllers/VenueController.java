@@ -25,25 +25,13 @@ public class VenueController {
     }
 
     @GetMapping
-    public ResponseEntity<Map<String, Object>> getAll(
+    public ResponseEntity<Map<String, Object>> getAllVenues(
             @RequestParam(required = false) String q,
+            @RequestParam(required = false) String status,
+            @RequestParam(defaultValue = "recent") String sort,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        
-        Page<VenueResponse> result = venueService.getAllVenues(q, page, size);
-        
-        return ResponseEntity.ok(Map.of(
-            "venues", result.getContent(),
-            "totalElements", result.getTotalElements(),
-            "totalPages", result.getTotalPages(),
-            "currentPage", result.getNumber()
-        ));
-    }
-
-    @GetMapping("/admin/{slugAdmin}")
-    public ResponseEntity<Map<String, List<VenueResponse>>> getByAdmin(@PathVariable String slugAdmin) {
-        List<VenueResponse> venues = venueService.getVenuesByAdminSlug(slugAdmin);
-        return ResponseEntity.ok(Map.of("venues", venues));
+        return ResponseEntity.ok(venueService.getAllVenues(q, status, sort, page, size));
     }
 
     @GetMapping("/{slug}")
@@ -52,7 +40,8 @@ public class VenueController {
     }
 
     @PutMapping("/{slug}")
-    public ResponseEntity<Map<String, VenueResponse>> update(@PathVariable String slug, @RequestBody UpdateVenueRequest request) {
+    public ResponseEntity<Map<String, VenueResponse>> update(@PathVariable String slug,
+            @RequestBody UpdateVenueRequest request) {
         return ResponseEntity.ok(Map.of("venue", venueService.updateVenue(slug, request)));
     }
 

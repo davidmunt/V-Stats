@@ -6,15 +6,20 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "refresh_token_blacklist")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class RefreshTokenBlacklistEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_blacklist")
     private Long idBlacklist;
 
-    @Column(name = "id_user", nullable = false)
-    private String idUser;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_user", nullable = false)
+    private LeagueAdminEntity user;
 
     @Column(nullable = false, unique = true)
     private String token;

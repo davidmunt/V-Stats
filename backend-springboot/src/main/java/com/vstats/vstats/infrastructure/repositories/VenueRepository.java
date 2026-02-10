@@ -13,7 +13,7 @@ public interface VenueRepository extends JpaRepository<VenueEntity, Long>, JpaSp
 
     Optional<VenueEntity> findBySlug(String slug);
 
-    List<VenueEntity> findAllByIdAdmin(String idAdmin);
+    List<VenueEntity> findAllByAdmin_IdAdmin(Long idAdmin);
 
     List<VenueEntity> findAllByIsActiveTrue();
 

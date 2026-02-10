@@ -25,9 +25,8 @@ public class PlayerController {
     @PostMapping
     public ResponseEntity<Map<String, PlayerResponse>> create(@RequestBody CreatePlayerRequest request) {
         return new ResponseEntity<>(
-            Map.of("player", playerService.createPlayer(request)), 
-            HttpStatus.CREATED
-        );
+                Map.of("player", playerService.createPlayer(request)),
+                HttpStatus.CREATED);
     }
 
     @GetMapping("/{slug}")
@@ -35,22 +34,15 @@ public class PlayerController {
         return ResponseEntity.ok(Map.of("player", playerService.getPlayerBySlug(slug)));
     }
 
-    @GetMapping("/team/{slugTeam}")
-    public ResponseEntity<Map<String, Object>> getByTeam(
-            @PathVariable String slugTeam, 
-            @RequestParam(required = false) String q,       
+    @GetMapping
+    public ResponseEntity<Map<String, Object>> getAllPlayers(
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = true) String slug_team,
+            @RequestParam(defaultValue = "recent") String sort,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-            
-            Page<PlayerResponse> result = playerService.getAllPlayersFromTeam(slugTeam, q, page, size);
-            Map<String, Object> response = Map.of(
-                "players", result.getContent(),
-                "totalElements", result.getTotalElements(),
-                "totalPages", result.getTotalPages(),
-                "currentPage", result.getNumber()
-            );
-
-            return ResponseEntity.ok(response);
+        return ResponseEntity.ok(playerService.getAllPlayers(q, status, slug_team, sort, page, size));
     }
 
     @GetMapping("/coach/{slugCoach}")
@@ -65,7 +57,7 @@ public class PlayerController {
 
     @PutMapping("/{slug}")
     public ResponseEntity<Map<String, PlayerResponse>> update(
-            @PathVariable String slug, 
+            @PathVariable String slug,
             @RequestBody UpdatePlayerRequest request) {
         return ResponseEntity.ok(Map.of("player", playerService.updatePlayer(slug, request)));
     }

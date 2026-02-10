@@ -8,7 +8,8 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "actions")
-@Getter @Setter
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -30,11 +31,17 @@ public class ActionEntity {
     @JoinColumn(name = "id_set", nullable = false)
     private SetEntity set;
 
-    @Column(name = "id_team", nullable = false)
-    private String idTeam; // String format
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_team", nullable = false)
+    private TeamEntity team;
 
-    @Column(name = "id_player", nullable = false)
-    private String idPlayer; // String format
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_player", nullable = false)
+    private PlayerEntity player;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_point_for_team")
+    private TeamEntity pointForTeam;
 
     @Column(name = "player_position")
     private Integer playerPosition; // 1-6
@@ -44,9 +51,6 @@ public class ActionEntity {
 
     @Column(nullable = false)
     private String result;
-
-    @Column(name = "id_point_for_team")
-    private String idPointForTeam; // String format
 
     @Column(name = "start_x")
     private Integer startX;

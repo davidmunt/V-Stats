@@ -12,13 +12,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -64,35 +65,44 @@ public class VenueService {
                                 .city(request.getCity())
                                 .capacity(request.getCapacity())
                                 .indoor(request.getIndoor())
-                                .idAdmin(admin.getIdAdmin().toString())
+                                .admin(admin)
                                 .isActive(true)
                                 .status("active")
                                 .build();
 
-                return mapToResponse(venueRepository.save(venue), admin.getSlug());
+                return mapToResponse(venueRepository.save(venue));
         }
 
         // añadirle aqui lo del id de admin
-        public Page<VenueResponse> getAllVenues(String q, int page, int size) {
-                Pageable pageable = PageRequest.of(page, size, Sort.by("name").ascending());
-                Page<VenueEntity> venuePage = venueRepository.findAll(VenueSpecification.filterBy(q), pageable);
-                return venuePage.map(v -> {
-                        String adminSlug = adminRepository.findById(Long.parseLong(v.getIdAdmin()))
-                                        .map(LeagueAdminEntity::getSlug)
-                                        .orElse("unknown");
-                        return mapToResponse(v, adminSlug);
-                });
-        }
+        public Map<String, Object> getAllVenues(String q, String status, String sort, int page, int size) {
 
-        public List<VenueResponse> getVenuesByAdminSlug(String slugAdmin) {
-                LeagueAdminEntity admin = adminRepository.findBySlug(slugAdmin)
-                                .orElseThrow(() -> new ResponseStatusException(
-                                                HttpStatus.NOT_FOUND, "Administrador no encontrado"));
+                Sort sortOrder = switch (sort != null ? sort : "recent") {
+                        case "name_asc" -> Sort.by("name").ascending();
+                        case "name_desc" -> Sort.by("name").descending();
+                        case "oldest" -> Sort.by("createdAt").ascending();
+                        default -> Sort.by("createdAt").descending();
+                };
 
-                return venueRepository.findAllByIdAdmin(admin.getIdAdmin().toString()).stream()
-                                .filter(v -> !"deleted".equals(v.getStatus()))
-                                .map(v -> mapToResponse(v, slugAdmin))
-                                .collect(Collectors.toList());
+                Pageable pageable = PageRequest.of(page, size, sortOrder);
+                Specification<VenueEntity> spec = VenueSpecification.build(q, status);
+
+                Page<VenueEntity> entitiesPage = venueRepository.findAll(spec, pageable);
+
+                List<VenueResponse> venues = entitiesPage.getContent().stream()
+                                .map(this::mapToResponse)
+                                .toList();
+
+                Map<String, Object> response = new LinkedHashMap<>();
+                response.put("venues", venues);
+                response.put("total", entitiesPage.getTotalElements());
+                response.put("page", entitiesPage.getNumber());
+                response.put("total_pages", entitiesPage.getTotalPages());
+                response.put("sort", sort != null ? sort : "recent");
+                response.put("filters_applied", Map.of(
+                                "q", q != null ? q : "",
+                                "status", status != null ? status : ""));
+
+                return response;
         }
 
         public VenueResponse getVenueBySlug(String slug) {
@@ -100,12 +110,7 @@ public class VenueService {
                                 .orElseThrow(() -> new ResponseStatusException(
                                                 HttpStatus.NOT_FOUND, "Sede no encontrada"));
 
-                String adminSlug = adminRepository.findById(Long.parseLong(venue.getIdAdmin()))
-                                .map(LeagueAdminEntity::getSlug)
-                                .orElseThrow(() -> new ResponseStatusException(
-                                                HttpStatus.NOT_FOUND, "Administrador no encontrado"));
-
-                return mapToResponse(venue, adminSlug);
+                return mapToResponse(venue);
         }
 
         @Transactional
@@ -151,12 +156,7 @@ public class VenueService {
                 venue.setCapacity(request.getCapacity());
                 venue.setIndoor(request.getIndoor());
 
-                String adminSlug = adminRepository.findById(Long.parseLong(venue.getIdAdmin()))
-                                .map(LeagueAdminEntity::getSlug)
-                                .orElseThrow(() -> new ResponseStatusException(
-                                                HttpStatus.NOT_FOUND, "Admin vinculado a la sede no encontrado"));
-
-                return mapToResponse(venueRepository.save(venue), adminSlug);
+                return mapToResponse(venueRepository.save(venue));
         }
 
         @Transactional
@@ -175,16 +175,14 @@ public class VenueService {
                 venueRepository.save(venue);
         }
 
-        private VenueResponse mapToResponse(VenueEntity entity, String adminSlug) {
+        private VenueResponse mapToResponse(VenueEntity entity) {
                 return VenueResponse.builder()
-                                .slug_venue(entity.getSlug())
-                                .slug_admin(adminSlug)
                                 .name(entity.getName())
-                                .address(entity.getAddress())
+                                .slug_venue(entity.getSlug())
                                 .city(entity.getCity())
+                                .address(entity.getAddress())
                                 .capacity(entity.getCapacity())
                                 .indoor(entity.getIndoor())
-                                .isActive(entity.getIsActive())
                                 .status(entity.getStatus())
                                 .createdAt(entity.getCreatedAt())
                                 .build();

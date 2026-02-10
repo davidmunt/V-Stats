@@ -8,7 +8,8 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "matches")
-@Getter @Setter
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -34,11 +35,13 @@ public class MatchEntity {
     @JoinColumn(name = "id_visitor_team", nullable = false)
     private TeamEntity visitorTeam;
 
-    @Column(name = "id_venue")
-    private String idVenue; 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_venue", nullable = false)
+    private VenueEntity venue;
 
-    @Column(name = "id_admin_creator", nullable = false)
-    private String idAdminCreator;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_admin_creator", nullable = false)
+    private LeagueAdminEntity adminCreator;
 
     @Column(nullable = false)
     private LocalDateTime date;

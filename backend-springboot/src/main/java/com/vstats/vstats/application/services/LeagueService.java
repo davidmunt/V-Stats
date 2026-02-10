@@ -7,7 +7,6 @@ import com.vstats.vstats.presentation.requests.league.CreateLeagueRequest;
 import com.vstats.vstats.presentation.requests.league.UpdateLeagueRequest;
 import com.vstats.vstats.presentation.responses.LeagueResponse;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,10 +14,11 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
-
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -64,7 +64,7 @@ public class LeagueService {
                                 .slug(leagueSlug)
                                 .country(request.getCountry())
                                 .image(request.getImage())
-                                .idAdmin(admin.getIdAdmin().toString())
+                                .admin(admin)
                                 .category(category)
                                 .isActive(true)
                                 .status("active")
@@ -82,21 +82,37 @@ public class LeagueService {
                 return mapToResponse(seasonLeagueRepository.save(seasonLeague));
         }
 
-        // añadir lo del id de admin despues de crear el apartado del login
-        public Page<LeagueResponse> getAllLeagues(String q, int page, int size) {
-                Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-                Page<SeasonLeagueEntity> entities = seasonLeagueRepository.findAll(
-                                LeagueSpecification.filterLeagues(q),
-                                pageable);
-                return entities.map(this::mapToResponse);
-        }
+        public Map<String, Object> getAllLeagues(String q, String category, String status, String sort, int page,
+                        int size) {
 
-        public List<LeagueResponse> getLeaguesByAdminSlug(String slugAdmin) {
-                String adminId = getAdminIdBySlug(slugAdmin);
-                return seasonLeagueRepository.findAllByLeague_IdAdminAndSeason_IsActiveTrue(adminId).stream()
-                                .filter(sl -> !"deleted".equals(sl.getStatus()))
+                Sort sortOrder = switch (sort != null ? sort : "recent") {
+                        case "name_asc" -> Sort.by("league.name").ascending();
+                        case "name_desc" -> Sort.by("league.name").descending();
+                        case "oldest" -> Sort.by("createdAt").ascending();
+                        default -> Sort.by("createdAt").descending();
+                };
+
+                Pageable pageable = PageRequest.of(page, size, sortOrder);
+                Specification<SeasonLeagueEntity> spec = LeagueSpecification.build(q, category, status);
+
+                Page<SeasonLeagueEntity> entitiesPage = seasonLeagueRepository.findAll(spec, pageable);
+
+                List<LeagueResponse> leagues = entitiesPage.getContent().stream()
                                 .map(this::mapToResponse)
-                                .collect(Collectors.toList());
+                                .toList();
+
+                Map<String, Object> response = new LinkedHashMap<>();
+                response.put("leagues", leagues);
+                response.put("total", entitiesPage.getTotalElements());
+                response.put("page", entitiesPage.getNumber());
+                response.put("total_pages", entitiesPage.getTotalPages());
+                response.put("sort", sort != null ? sort : "recent");
+                response.put("filters_applied", Map.of(
+                                "q", q != null ? q : "",
+                                "category", category != null ? category : "",
+                                "status", status != null ? status : ""));
+
+                return response;
         }
 
         public LeagueResponse getLeagueBySlug(String slug) {
@@ -180,12 +196,6 @@ public class LeagueService {
         }
 
         // --- Mapeo y Auxiliares ---
-
-        private String getAdminIdBySlug(String slug) {
-                return adminRepository.findBySlug(slug)
-                                .orElseThrow(() -> new RuntimeException("Admin no encontrado"))
-                                .getIdAdmin().toString();
-        }
 
         private LeagueResponse mapToResponse(SeasonLeagueEntity sl) {
                 return LeagueResponse.builder()

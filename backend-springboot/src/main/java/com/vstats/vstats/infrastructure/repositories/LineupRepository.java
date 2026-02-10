@@ -8,9 +8,9 @@ import java.util.Optional;
 
 @Repository
 public interface LineupRepository extends JpaRepository<LineupEntity, Long> {
-    Optional<LineupEntity> findByMatchId(String slug);
+    Optional<LineupEntity> findByMatch_IdMatch(Long idMatch);
 
-    Optional<LineupEntity> findByMatch_IdAndIdTeam(Long idMatch, Long idTeam);
+    Optional<LineupEntity> findByMatch_IdMatchAndTeam_IdTeam(Long matchId, Long idTeam);
 
-    Optional<LineupEntity> findByMatch_SlugAndIdTeam(String slugMatch, String idTeam);
+    Optional<LineupEntity> findByMatch_SlugAndTeam_IdTeam(String matchSlug, Long idTeam);
 }

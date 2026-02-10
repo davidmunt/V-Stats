@@ -1,11 +1,20 @@
 package com.vstats.vstats.domain.entities;
 
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
 @Table(name = "season_players")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class SeasonPlayerEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,14 +26,14 @@ public class SeasonPlayerEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_season_team", nullable = false)
-    private SeasonTeamEntity seasonTeam; 
+    private SeasonTeamEntity seasonTeam;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_season", nullable = false)
     private SeasonEntity season;
 
     private Integer dorsal;
-    private String role; 
+    private String role;
 
     @Builder.Default
     private String status = "active";
@@ -32,4 +41,15 @@ public class SeasonPlayerEntity {
     @Builder.Default
     @Column(name = "is_active")
     private Boolean isActive = true;
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @Column(name = "boxed_at")
+    private LocalDateTime boxedAt;
 }
