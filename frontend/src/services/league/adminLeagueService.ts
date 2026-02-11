@@ -1,6 +1,7 @@
 import apiClient from "@/services/apiClient";
-import type { CreateLeagueParam, UpdateLeagueParam, DeleteLeagueParam } from "./adminLeagueService.param";
+import type { CreateLeagueParam, UpdateLeagueParam, DeleteLeagueParam, GetFilteredLeagueParam } from "./adminLeagueService.param";
 import type { League } from "@/interfaces/league.interface";
+import { buildQuery } from "@/utils/buildQuery";
 
 interface LeaguesResponse {
   leagues: League[];
@@ -8,6 +9,19 @@ interface LeaguesResponse {
 
 interface SingleLeagueResponse {
   league: League;
+}
+
+export interface LeaguesFilteredResponse {
+  leagues: League[];
+  total: number;
+  page: number;
+  total_pages: number;
+  sort: string;
+  filters_applied: {
+    status: string;
+    category: string;
+    q: string;
+  };
 }
 
 export const createLeague = async ({ name, country, category, season, image }: CreateLeagueParam): Promise<League> => {
@@ -45,6 +59,21 @@ export const updateLeague = async ({
 
 export const deleteLeague = async ({ slug }: DeleteLeagueParam): Promise<void> => {
   await apiClient.delete<void>(`/league/${slug}`);
+};
+
+export const getFilteredLeagues = async (params: GetFilteredLeagueParam): Promise<LeaguesFilteredResponse> => {
+  const queryData = {
+    q: params.name,
+    category: params.slug_category,
+    status: params.status,
+    sort: params.sort,
+    page: params.page,
+    size: params.size,
+  };
+
+  const queryString = buildQuery(queryData);
+  const response = await apiClient.get<LeaguesFilteredResponse>(`/api/leagues${queryString}`);
+  return response.data;
 };
 
 export const getMyLeagues = async (): Promise<League[]> => {

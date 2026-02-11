@@ -17,6 +17,15 @@ export interface UpdateLeagueParam {
   is_active: boolean;
 }
 
+export interface GetFilteredLeagueParam {
+  slug_category?: string;
+  name?: string;
+  status?: string;
+  sort?: string;
+  page?: number;
+  size?: number;
+}
+
 export interface DeleteLeagueParam {
   slug: string;
 }
