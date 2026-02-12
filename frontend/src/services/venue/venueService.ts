@@ -11,7 +11,7 @@ interface SingleVenueResponse {
 }
 
 export const createVenue = async ({ name, address, city, capacity, indoor }: CreateVenueParam): Promise<Venue> => {
-  const response = await apiClient.post<SingleVenueResponse>("/venue", {
+  const response = await apiClient.post<SingleVenueResponse>("express", "/venue", {
     name,
     address,
     city,
@@ -22,7 +22,7 @@ export const createVenue = async ({ name, address, city, capacity, indoor }: Cre
 };
 
 export const updateVenue = async ({ slug, name, address, city, capacity, indoor, status, is_active }: UpdateVenueParam): Promise<Venue> => {
-  const response = await apiClient.put<SingleVenueResponse>(`/venue/${slug}`, {
+  const response = await apiClient.put<SingleVenueResponse>("express", `/venue/${slug}`, {
     name,
     address,
     city,
@@ -35,15 +35,15 @@ export const updateVenue = async ({ slug, name, address, city, capacity, indoor,
 };
 
 export const deleteVenue = async ({ slug }: { slug: string }): Promise<void> => {
-  await apiClient.delete<void>(`/venue/${slug}`);
+  await apiClient.delete<void>("express", `/venue/${slug}`);
 };
 
 export const getMyVenues = async (): Promise<Venue[]> => {
-  const response = await apiClient.get<VenuesResponse>(`/venues/my-venues`);
+  const response = await apiClient.get<VenuesResponse>("express", `/venues/my-venues`);
   return response.data.venues;
 };
 
 export const getVenueBySlug = async (slug: string): Promise<Venue> => {
-  const response = await apiClient.get<SingleVenueResponse>(`/venue/${slug}`);
+  const response = await apiClient.get<SingleVenueResponse>("express", `/venue/${slug}`);
   return response.data.venue;
 };

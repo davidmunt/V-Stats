@@ -10,11 +10,11 @@ interface SingleSetResponse {
 }
 
 export const getActualSetFromMath = async (slug: string): Promise<Set> => {
-  const response = await apiClient.get<SingleSetResponse>(`/set-match/${slug}`);
+  const response = await apiClient.get<SingleSetResponse>("express", `/set-match/${slug}`);
   return response.data.set;
 };
 
 export const getFinishedSetsByMatch = async (slug: string): Promise<Set[]> => {
-  const response = await apiClient.get<SetsResponse>(`/sets/finished/${slug}`);
+  const response = await apiClient.get<SetsResponse>("express", `/sets/finished/${slug}`);
   return response.data.sets;
 };

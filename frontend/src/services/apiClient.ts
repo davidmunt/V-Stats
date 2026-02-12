@@ -1,33 +1,51 @@
-import axios, { AxiosError } from "axios";
+import axios, { AxiosError, type AxiosRequestConfig } from "axios";
 import token from "@/lib/token";
 import { ACCESS_TOKEN_KEY } from "@/constants/token.constant";
 
-const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
-});
+const API_URLS: Record<string, string> = {
+  express: import.meta.env.VITE_API_URL,
+  spring: import.meta.env.VITE_SPRING_API_URL,
+  fastapi: import.meta.env.VITE_FASTAPI_API_URL,
+};
 
-apiClient.interceptors.request.use((request) => {
+const axiosInstance = axios.create();
+
+axiosInstance.interceptors.request.use((config) => {
   const jwtToken = token.getToken(ACCESS_TOKEN_KEY);
   if (jwtToken) {
-    request.headers.Authorization = `Token ${jwtToken}`;
+    config.headers.Authorization = `Token ${jwtToken}`;
   }
-  return request;
+  return config;
 });
 
-apiClient.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+axiosInstance.interceptors.response.use(
+  (response) => response,
   (error: AxiosError) => {
-    if (!error.response) {
-      return Promise.reject(error);
-    }
-    const { status } = error.response;
-    if (status === 401 || status === 403) {
-      token.removeToken(ACCESS_TOKEN_KEY);
+    if (error.response) {
+      const { status } = error.response;
+      if (status === 401 || status === 403) {
+        token.removeToken(ACCESS_TOKEN_KEY);
+      }
     }
     return Promise.reject(error);
   },
 );
+
+const apiClient = {
+  get: <T>(provider: string, url: string, config?: AxiosRequestConfig) =>
+    axiosInstance.get<T>(url, { ...config, baseURL: API_URLS[provider] }),
+
+  post: <T>(provider: string, url: string, data?: unknown, config?: AxiosRequestConfig) =>
+    axiosInstance.post<T>(url, data, { ...config, baseURL: API_URLS[provider] }),
+
+  put: <T>(provider: string, url: string, data?: unknown, config?: AxiosRequestConfig) =>
+    axiosInstance.put<T>(url, data, { ...config, baseURL: API_URLS[provider] }),
+
+  patch: <T>(provider: string, url: string, data?: unknown, config?: AxiosRequestConfig) =>
+    axiosInstance.patch<T>(url, data, { ...config, baseURL: API_URLS[provider] }),
+
+  delete: <T>(provider: string, url: string, config?: AxiosRequestConfig) =>
+    axiosInstance.delete<T>(url, { ...config, baseURL: API_URLS[provider] }),
+};
 
 export default apiClient;

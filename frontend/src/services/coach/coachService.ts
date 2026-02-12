@@ -10,16 +10,16 @@ interface SingleCoachResponse {
 }
 
 export const getFreeCoaches = async (): Promise<Coach[]> => {
-  const response = await apiClient.get<CoachesResponse>(`/coaches/free`);
+  const response = await apiClient.get<CoachesResponse>("express", `/coaches/free`);
   return response.data.coaches;
 };
 
 export const getAssignedCoaches = async (): Promise<Coach[]> => {
-  const response = await apiClient.get<CoachesResponse>(`/coaches/assigned`);
+  const response = await apiClient.get<CoachesResponse>("express", `/coaches/assigned`);
   return response.data.coaches;
 };
 
 export const getCoachById = async (id: string): Promise<Coach> => {
-  const response = await apiClient.get<SingleCoachResponse>(`/coach/${id}`);
+  const response = await apiClient.get<SingleCoachResponse>("express", `/coach/${id}`);
   return response.data.coach;
 };

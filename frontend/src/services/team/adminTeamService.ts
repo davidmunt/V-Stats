@@ -12,7 +12,7 @@ interface SingleTeamResponse {
 }
 
 export const createTeam = async ({ id_league, id_venue, name, image }: CreateTeamParam): Promise<Team> => {
-  const response = await apiClient.post<SingleTeamResponse>("/team", {
+  const response = await apiClient.post<SingleTeamResponse>("express", "/team", {
     id_league,
     id_venue,
     name,
@@ -31,7 +31,7 @@ export const updateTeam = async ({
   status,
   is_active,
 }: UpdateTeamParam): Promise<Team> => {
-  const response = await apiClient.put<SingleTeamResponse>(`/team/${slug}`, {
+  const response = await apiClient.put<SingleTeamResponse>("express", `/team/${slug}`, {
     id_venue,
     id_coach,
     id_analyst,
@@ -44,25 +44,25 @@ export const updateTeam = async ({
 };
 
 export const deleteTeam = async ({ slug }: DeleteTeamParam): Promise<void> => {
-  await apiClient.delete<void>(`/team/${slug}`);
+  await apiClient.delete<void>("express", `/team/${slug}`);
 };
 
 export const getTeamsFromLeague = async (slug: string): Promise<Team[]> => {
-  const response = await apiClient.get<TeamsResponse>(`/league/${slug}/teams`);
+  const response = await apiClient.get<TeamsResponse>("express", `/league/${slug}/teams`);
   return response.data.teams;
 };
 
 export const getTeamsFromMatch = async (slug: string): Promise<Team[]> => {
-  const response = await apiClient.get<TeamsResponse>(`/match/${slug}/teams`);
+  const response = await apiClient.get<TeamsResponse>("express", `/match/${slug}/teams`);
   return response.data.teams;
 };
 
 export const getTeamsStandingsFromLeague = async (slug: string): Promise<TeamStanding[]> => {
-  const response = await apiClient.get<TeamStanding[]>(`/league/${slug}/standings`);
+  const response = await apiClient.get<TeamStanding[]>("express", `/league/${slug}/standings`);
   return response.data;
 };
 
 export const getTeamBySlug = async (slug: string): Promise<Team> => {
-  const response = await apiClient.get<SingleTeamResponse>(`/team/${slug}`);
+  const response = await apiClient.get<SingleTeamResponse>("express", `/team/${slug}`);
   return response.data.team;
 };

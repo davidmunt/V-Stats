@@ -18,6 +18,7 @@ const RegisterForm = ({ onSwitch }: RegisterFormProps) => {
     { id: "admin", label: "Admin" },
     { id: "coach", label: "Coach" },
     { id: "analyst", label: "Analyst" },
+    { id: "user", label: "User" },
   ];
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {

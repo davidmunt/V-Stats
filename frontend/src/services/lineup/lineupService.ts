@@ -24,23 +24,23 @@ export interface AllLineupsResponse {
 }
 
 export const saveLineup = async ({ matchSlug, teamSlug, positions }: SaveLineupParam): Promise<void> => {
-  await apiClient.post(`/lineup/${matchSlug}/${teamSlug}`, {
+  await apiClient.post("express", `/lineup/${matchSlug}/${teamSlug}`, {
     positions,
   });
 };
 
 export const updateLineupPosition = async ({ positionSlug, player_id }: UpdateLineupPositionParam): Promise<void> => {
-  await apiClient.put(`/lineup/position/${positionSlug}`, {
+  await apiClient.put("express", `/lineup/position/${positionSlug}`, {
     player_id,
   });
 };
 
 export const getLineupByTeam = async (matchSlug: string, teamSlug: string): Promise<SingleLineupResponse> => {
-  const response = await apiClient.get<SingleLineupResponse>(`/lineup/${matchSlug}/${teamSlug}`);
+  const response = await apiClient.get<SingleLineupResponse>("express", `/lineup/${matchSlug}/${teamSlug}`);
   return response.data;
 };
 
 export const getMatchLineups = async (matchSlug: string): Promise<MatchLineupsResponse> => {
-  const response = await apiClient.get<{ lineups: MatchLineupsResponse }>(`/lineups/${matchSlug}`);
+  const response = await apiClient.get<{ lineups: MatchLineupsResponse }>("express", `/lineups/${matchSlug}`);
   return response.data.lineups;
 };

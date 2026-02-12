@@ -23,7 +23,7 @@ export const createAction = async ({
   start_x,
   start_y,
 }: CreateActionParam): Promise<Action> => {
-  const response = await apiClient.post<SingleActionResponse>(`/set/${slug}/action`, {
+  const response = await apiClient.post<SingleActionResponse>("express", `/set/${slug}/action`, {
     id_point_for_team,
     action_type,
     id_player,
@@ -39,5 +39,5 @@ export const createAction = async ({
 };
 
 export const cancelLastAction = async (slug: string, teamSlug: string): Promise<void> => {
-  await apiClient.delete<void>(`/set/${slug}/${teamSlug}/action`);
+  await apiClient.delete<void>("express", `/set/${slug}/${teamSlug}/action`);
 };

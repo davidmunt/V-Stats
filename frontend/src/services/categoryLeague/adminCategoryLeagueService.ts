@@ -11,7 +11,7 @@ interface SingleCategoryResponse {
 }
 
 export const createCategoryLeague = async ({ name, description, image }: CreateCategoryLeagueParam): Promise<CategoryLeague> => {
-  const response = await apiClient.post<SingleCategoryResponse>("/categories", {
+  const response = await apiClient.post<SingleCategoryResponse>("express", "/categories", {
     name,
     description,
     image,
@@ -27,7 +27,7 @@ export const updateCategoryLeague = async ({
   status,
   is_active,
 }: UpdateCategoryLeagueParam): Promise<CategoryLeague> => {
-  const response = await apiClient.put<SingleCategoryResponse>(`/categories/${slug}`, {
+  const response = await apiClient.put<SingleCategoryResponse>("express", `/categories/${slug}`, {
     name,
     description,
     image,
@@ -38,15 +38,15 @@ export const updateCategoryLeague = async ({
 };
 
 export const deleteCategoryLeague = async ({ slug }: DeleteCategoryLeagueParam): Promise<void> => {
-  await apiClient.delete<void>(`/categories/${slug}`);
+  await apiClient.delete<void>("express", `/categories/${slug}`);
 };
 
 export const getMyCategoryLeagues = async (): Promise<CategoryLeague[]> => {
-  const response = await apiClient.get<CategoriesResponse>("/categories/my-categories");
+  const response = await apiClient.get<CategoriesResponse>("express", "/categories/my-categories");
   return response.data.categories;
 };
 
 export const getCategoryLeagueBySlug = async (slug: string): Promise<CategoryLeague> => {
-  const response = await apiClient.get<SingleCategoryResponse>(`/categories/${slug}`);
+  const response = await apiClient.get<SingleCategoryResponse>("express", `/categories/${slug}`);
   return response.data.category;
 };

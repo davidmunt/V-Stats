@@ -4,12 +4,12 @@ import type { Auth } from "@/interfaces/auth.interface";
 import type { User } from "@/interfaces/user.interface";
 
 export const login = async ({ email, password }: LoginParam): Promise<Auth> => {
-  const response = await apiClient.post<Auth>("/auth/login", { email, password });
+  const response = await apiClient.post<Auth>("express", "/auth/login", { email, password });
   return response.data;
 };
 
 export const register = async ({ name, email, password, user_type }: RegisterParam): Promise<Auth> => {
-  const response = await apiClient.post<Auth>("/auth/register", {
+  const response = await apiClient.post<Auth>("express", "/auth/register", {
     name,
     email,
     password,
@@ -19,11 +19,11 @@ export const register = async ({ name, email, password, user_type }: RegisterPar
 };
 
 export const getCurrentUser = async (): Promise<User> => {
-  const response = await apiClient.get<User>("/auth/me");
+  const response = await apiClient.get<User>("express", "/auth/me");
   return response.data;
 };
 
 export const updateUser = async (data: UpdateUserParam): Promise<User> => {
-  const response = await apiClient.put<User>("/auth/me", data);
+  const response = await apiClient.put<User>("express", "/auth/me", data);
   return response.data;
 };

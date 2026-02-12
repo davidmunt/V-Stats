@@ -8,6 +8,6 @@ interface StatsResponse {
 }
 
 export const getStatsFromTeam = async () => {
-  const response = await apiClient.get<StatsResponse>(`/stats/team`);
+  const response = await apiClient.get<StatsResponse>("express", `/stats/team`);
   return response.data;
 };
