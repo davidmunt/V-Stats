@@ -1,0 +1,141 @@
+package com.vstats.vstats.application.services;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import com.vstats.vstats.domain.entities.AnalystEntity;
+import com.vstats.vstats.domain.entities.CoachEntity;
+import com.vstats.vstats.domain.entities.LeagueAdminEntity;
+import com.vstats.vstats.domain.entities.UserEntity;
+import com.vstats.vstats.infrastructure.repositories.AnalystRepository;
+import com.vstats.vstats.infrastructure.repositories.CoachRepository;
+import com.vstats.vstats.infrastructure.repositories.LeagueAdminRepository;
+import com.vstats.vstats.infrastructure.repositories.UserRepository;
+import com.vstats.vstats.presentation.requests.auth.UpdateUserRequest;
+import com.vstats.vstats.presentation.responses.UserResponse;
+import com.vstats.vstats.security.AuthUtils;
+
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class UserService {
+
+    private final AuthUtils authUtils;
+    private final PasswordEncoder passwordEncoder;
+
+    private final LeagueAdminRepository adminRepo;
+    private final CoachRepository coachRepo;
+    private final AnalystRepository analystRepo;
+    private final UserRepository userRepo;
+
+    public UserResponse getCurrentUser() {
+        Long id = authUtils.getCurrentUserId();
+        String role = authUtils.getCurrentUserRole();
+        String token = authUtils.getCurrentToken();
+
+        Object entity = switch (role) {
+            case "admin" -> adminRepo.findById(id).orElseThrow();
+            case "coach" -> coachRepo.findById(id).orElseThrow();
+            case "analyst" -> analystRepo.findById(id).orElseThrow();
+            default -> userRepo.findById(id).orElseThrow();
+        };
+
+        return mapToResponse(entity, role, token);
+    }
+
+    @Transactional
+    public UserResponse updateUser(UpdateUserRequest request) {
+        Long id = authUtils.getCurrentUserId();
+        String role = authUtils.getCurrentUserRole();
+        String token = authUtils.getCurrentToken();
+
+        Object updatedEntity = switch (role) {
+            case "admin" -> {
+                var e = adminRepo.findById(id).orElseThrow();
+                applyUpdates(e, request);
+                yield adminRepo.save(e);
+            }
+            case "coach" -> {
+                var e = coachRepo.findById(id).orElseThrow();
+                applyUpdates(e, request);
+                yield coachRepo.save(e);
+            }
+            case "analyst" -> {
+                var e = analystRepo.findById(id).orElseThrow();
+                applyUpdates(e, request);
+                yield analystRepo.save(e);
+            }
+            default -> {
+                var e = userRepo.findById(id).orElseThrow();
+                applyUpdates(e, request);
+                yield userRepo.save(e);
+            }
+        };
+
+        return mapToResponse(updatedEntity, role, token);
+    }
+
+    private void applyUpdates(Object entity, UpdateUserRequest request) {
+        if (request.getName() != null) {
+            if (entity instanceof LeagueAdminEntity e)
+                e.setName(request.getName());
+            if (entity instanceof CoachEntity e)
+                e.setName(request.getName());
+            if (entity instanceof AnalystEntity e)
+                e.setName(request.getName());
+            if (entity instanceof UserEntity e)
+                e.setName(request.getName());
+        }
+        if (request.getEmail() != null) {
+            if (entity instanceof LeagueAdminEntity e)
+                e.setEmail(request.getEmail());
+            if (entity instanceof CoachEntity e)
+                e.setEmail(request.getEmail());
+            if (entity instanceof AnalystEntity e)
+                e.setEmail(request.getEmail());
+            if (entity instanceof UserEntity e)
+                e.setEmail(request.getEmail());
+        }
+        if (request.getAvatar() != null) {
+            if (entity instanceof LeagueAdminEntity e)
+                e.setAvatar(request.getAvatar());
+            if (entity instanceof CoachEntity e)
+                e.setAvatar(request.getAvatar());
+            if (entity instanceof AnalystEntity e)
+                e.setAvatar(request.getAvatar());
+            if (entity instanceof UserEntity e)
+                e.setAvatar(request.getAvatar());
+        }
+        if (request.getPassword() != null && !request.getPassword().isBlank()) {
+            String encoded = passwordEncoder.encode(request.getPassword());
+            if (entity instanceof LeagueAdminEntity e)
+                e.setPassword(encoded);
+            if (entity instanceof CoachEntity e)
+                e.setPassword(encoded);
+            if (entity instanceof AnalystEntity e)
+                e.setPassword(encoded);
+            if (entity instanceof UserEntity e)
+                e.setPassword(encoded);
+        }
+    }
+
+    private UserResponse mapToResponse(Object entity, String role, String token) {
+        var builder = UserResponse.builder().user_type(role).token(token);
+
+        if (entity instanceof LeagueAdminEntity e) {
+            builder.name(e.getName()).email(e.getEmail()).avatar(e.getAvatar()).slug_user(e.getSlug());
+        } else if (entity instanceof CoachEntity e) {
+            builder.name(e.getName()).email(e.getEmail()).avatar(e.getAvatar()).slug_user(e.getSlug())
+                    .slug_team(e.getTeam() != null ? e.getTeam().getSlug() : null);
+        } else if (entity instanceof AnalystEntity e) {
+            builder.name(e.getName()).email(e.getEmail()).avatar(e.getAvatar()).slug_user(e.getSlug())
+                    .slug_team(e.getTeam() != null ? e.getTeam().getSlug() : null);
+        } else if (entity instanceof UserEntity e) {
+            builder.name(e.getName()).email(e.getEmail()).avatar(e.getAvatar()).slug_user(e.getSlug());
+        }
+
+        return builder.build();
+    }
+}

@@ -14,5 +14,5 @@ public class UserResponse {
     private String email;
     private String user_type;
     private String avatar;
-    private String accessToken;
+    private String token;
 }

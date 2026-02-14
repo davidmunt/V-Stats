@@ -102,7 +102,7 @@ public class AuthService {
                 .slug_user(slug)
                 .user_type(type)
                 .avatar(avatar)
-                .accessToken(token)
+                .token(token)
                 .build();
     }
 
