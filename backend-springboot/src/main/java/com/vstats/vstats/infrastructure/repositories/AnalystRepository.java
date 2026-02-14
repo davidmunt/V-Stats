@@ -9,5 +9,8 @@ import java.util.Optional;
 @Repository
 public interface AnalystRepository extends JpaRepository<AnalystEntity, Long> {
     Optional<AnalystEntity> findBySlug(String slug);
+
     boolean existsBySlug(String slug);
+
+    Optional<AnalystEntity> findByEmail(String email);
 }

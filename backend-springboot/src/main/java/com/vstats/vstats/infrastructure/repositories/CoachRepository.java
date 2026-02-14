@@ -9,5 +9,8 @@ import java.util.Optional;
 @Repository
 public interface CoachRepository extends JpaRepository<CoachEntity, Long> {
     Optional<CoachEntity> findBySlug(String slug);
+
     boolean existsBySlug(String slug);
+
+    Optional<CoachEntity> findByEmail(String email);
 }
