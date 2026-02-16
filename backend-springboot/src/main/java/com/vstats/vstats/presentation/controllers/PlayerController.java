@@ -3,11 +3,8 @@ package com.vstats.vstats.presentation.controllers;
 import com.vstats.vstats.application.services.PlayerService;
 import com.vstats.vstats.presentation.requests.player.CreatePlayerRequest;
 import com.vstats.vstats.presentation.requests.player.UpdatePlayerRequest;
-import com.vstats.vstats.presentation.responses.LeagueResponse;
 import com.vstats.vstats.presentation.responses.PlayerResponse;
 import lombok.RequiredArgsConstructor;
-
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

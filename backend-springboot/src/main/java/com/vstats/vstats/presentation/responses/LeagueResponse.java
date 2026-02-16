@@ -9,10 +9,10 @@ import java.time.LocalDateTime;
 public class LeagueResponse {
     private String slug_league;
     private String slug_season;
+    private String slug_category;
     private String name;
     private String country;
     private String image;
-    private String categoryName;
     private String status;
     private Boolean isActive;
     private LocalDateTime createdAt;

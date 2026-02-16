@@ -7,11 +7,11 @@ export const useDeleteVenueMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: { slug: string }) => deleteVenue(data),
+    mutationFn: (data: { slug_venue: string }) => deleteVenue(data),
     onSuccess: (_, variables) => {
       queryClient.setQueryData<Venue[]>(VENUES_QUERY_KEY, (oldVenues) => {
         if (!oldVenues) return [];
-        return oldVenues.filter((venue) => venue.slug !== variables.slug);
+        return oldVenues.filter((venue) => venue.slug_venue !== variables.slug_venue);
       });
     },
   });

@@ -12,7 +12,7 @@ export const useUpdateVenueMutation = () => {
     onSuccess: (updatedVenue) => {
       queryClient.setQueryData<Venue[]>(VENUES_QUERY_KEY, (oldVenues) => {
         if (!oldVenues) return [updatedVenue];
-        return oldVenues.map((venue) => (venue.slug === updatedVenue.slug ? updatedVenue : venue));
+        return oldVenues.map((venue) => (venue.slug_venue === updatedVenue.slug_venue ? updatedVenue : venue));
       });
     },
   });

@@ -7,6 +7,8 @@ import com.vstats.vstats.infrastructure.specs.VenueSpecification;
 import com.vstats.vstats.infrastructure.repositories.LeagueAdminRepository;
 import com.vstats.vstats.presentation.requests.venue.*;
 import com.vstats.vstats.presentation.responses.VenueResponse;
+import com.vstats.vstats.security.AuthUtils;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,10 +29,12 @@ public class VenueService {
 
         private final VenueRepository venueRepository;
         private final LeagueAdminRepository adminRepository;
+        private final AuthUtils authUtils;
 
         @Transactional
         public VenueResponse createVenue(CreateVenueRequest request) {
-                LeagueAdminEntity admin = adminRepository.findBySlug(request.getSlugAdmin())
+                Long currentAdminId = authUtils.getCurrentUserId();
+                LeagueAdminEntity admin = adminRepository.findById(currentAdminId)
                                 .orElseThrow(() -> new ResponseStatusException(
                                                 HttpStatus.NOT_FOUND, "Administrador no encontrado"));
                 String slug = generateUniqueSlug(request.getName());

@@ -13,8 +13,8 @@ export const VenuesList = ({ onCreate, onEdit }: VenuesListProps) => {
   const { data: venues, isLoading, isError } = useVenuesQuery();
   const deleteMutation = useDeleteVenueMutation();
 
-  const handleDelete = (slug: string) => {
-    deleteMutation.mutate({ slug });
+  const handleDelete = (slug_venue: string) => {
+    deleteMutation.mutate({ slug_venue });
   };
 
   if (isLoading) return <LoadingFallback />;
@@ -51,7 +51,7 @@ export const VenuesList = ({ onCreate, onEdit }: VenuesListProps) => {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {venues.map((venue) => (
-                  <tr key={venue.id_venue} className="hover:bg-gray-50 transition-colors">
+                  <tr key={venue.slug_venue} className="hover:bg-gray-50 transition-colors">
                     <td className="py-4 px-4">
                       <div className="font-bold text-gray-800">{venue.name}</div>
                     </td>
@@ -86,7 +86,7 @@ export const VenuesList = ({ onCreate, onEdit }: VenuesListProps) => {
                           Editar
                         </button>
                         <button
-                          onClick={() => handleDelete(venue.slug)}
+                          onClick={() => handleDelete(venue.slug_venue)}
                           disabled={deleteMutation.isPending}
                           className="text-red-600 hover:text-red-800 text-sm font-medium px-2 py-1 rounded hover:bg-red-50 disabled:opacity-50 transition-colors"
                         >

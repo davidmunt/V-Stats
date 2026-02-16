@@ -31,7 +31,7 @@ public class TokenService {
 
     public String generateToken(String subject, String role) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("role", role);
+        claims.put("role", role.toLowerCase()); // Lo forzamos a minúsculas
         return buildToken(claims, subject);
     }
 

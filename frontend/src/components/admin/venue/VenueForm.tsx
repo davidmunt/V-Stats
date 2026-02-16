@@ -45,7 +45,7 @@ export const VenueForm = ({ initialData, onCancel, onSuccess }: VenueFormProps) 
     try {
       if (isEditing && initialData) {
         await updateMutation.mutateAsync({
-          slug: initialData.slug,
+          slug: initialData.slug_venue,
           ...formData,
         });
       } else {

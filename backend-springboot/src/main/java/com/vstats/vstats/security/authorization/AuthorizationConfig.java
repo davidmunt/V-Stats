@@ -31,7 +31,7 @@ public class AuthorizationConfig {
 
         return venueRepository.findBySlug(slug)
                 .map(venue -> {
-                    return authUtils.getCurrentUserRole().equals("admin");
+                    return venue.getAdmin().getIdAdmin().equals(authUtils.getCurrentUserId());
                 })
                 .orElse(false);
     }
