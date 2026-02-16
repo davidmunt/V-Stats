@@ -39,7 +39,8 @@ public class SecurityConfig {
     // 2. Declaramos los endpoints de escritura pública (POST para Auth)
     private static final String[] PUBLIC_WRITE_ENDPOINTS = {
             "/api/auth/register",
-            "/api/auth/login"
+            "/api/auth/login",
+            "/error"
     };
 
     @Bean

@@ -8,6 +8,8 @@ import com.vstats.vstats.infrastructure.specs.CategorySpecification;
 import com.vstats.vstats.presentation.requests.category.CreateCategoryRequest;
 import com.vstats.vstats.presentation.requests.category.UpdateCategoryRequest;
 import com.vstats.vstats.presentation.responses.CategoryResponse;
+import com.vstats.vstats.security.AuthUtils;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,13 +32,14 @@ public class CategoryService {
 
         private final CategoryRepository categoryRepository;
         private final LeagueAdminRepository adminRepository;
+        private final AuthUtils authUtils;
 
         @Transactional
         public CategoryResponse createCategory(CreateCategoryRequest request) {
-                LeagueAdminEntity admin = adminRepository.findBySlug(request.getSlugAdmin())
+                Long currentAdminId = authUtils.getCurrentUserId();
+                LeagueAdminEntity admin = adminRepository.findById(currentAdminId)
                                 .orElseThrow(() -> new ResponseStatusException(
-                                                HttpStatus.NOT_FOUND,
-                                                "Administrador no encontrado con el slug: " + request.getSlugAdmin()));
+                                                HttpStatus.NOT_FOUND, "Administrador no encontrado"));
 
                 if (request.getName() == null || request.getName().isBlank()) {
                         throw new ResponseStatusException(HttpStatus.BAD_REQUEST,

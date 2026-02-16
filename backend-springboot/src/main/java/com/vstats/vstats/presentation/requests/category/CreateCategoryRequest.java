@@ -4,7 +4,6 @@ import lombok.Data;
 
 @Data
 public class CreateCategoryRequest {
-private String slugAdmin; 
     private String name;
     private String description;
     private String image;

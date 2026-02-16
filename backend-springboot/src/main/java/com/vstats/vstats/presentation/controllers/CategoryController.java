@@ -4,9 +4,12 @@ import com.vstats.vstats.application.services.CategoryService;
 import com.vstats.vstats.presentation.requests.category.CreateCategoryRequest;
 import com.vstats.vstats.presentation.requests.category.UpdateCategoryRequest;
 import com.vstats.vstats.presentation.responses.CategoryResponse;
+import com.vstats.vstats.security.authorization.CheckSecurity;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +23,7 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @PostMapping
+    @PreAuthorize("hasRole('admin')")
     public ResponseEntity<Map<String, CategoryResponse>> create(@RequestBody CreateCategoryRequest request) {
         return new ResponseEntity<>(Map.of("category", categoryService.createCategory(request)), HttpStatus.CREATED);
     }
@@ -45,12 +49,14 @@ public class CategoryController {
     }
 
     @PutMapping("/{slug}")
+    @CheckSecurity.Categories.CanManage
     public ResponseEntity<Map<String, CategoryResponse>> update(@PathVariable String slug,
             @RequestBody UpdateCategoryRequest request) {
         return ResponseEntity.ok(Map.of("category", categoryService.updateCategory(slug, request)));
     }
 
     @DeleteMapping("/{slug}")
+    @CheckSecurity.Categories.CanManage
     public ResponseEntity<Void> delete(@PathVariable String slug) {
         categoryService.deleteCategory(slug);
         return ResponseEntity.noContent().build();

@@ -60,4 +60,13 @@ public @interface CheckSecurity {
         public @interface CanManage {
         }
     }
+
+    // Reglas para categorias
+    public @interface Categories {
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target(ElementType.METHOD)
+        @PreAuthorize("@authZ.isCategoryAdmin(#slug)")
+        public @interface CanManage {
+        }
+    }
 }
