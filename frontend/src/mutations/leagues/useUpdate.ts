@@ -13,9 +13,9 @@ export const useUpdateLeagueMutation = () => {
     onSuccess: (updatedLeague) => {
       queryClient.setQueryData<League[]>(LEAGUES_QUERY_KEY, (oldLeagues) => {
         if (!oldLeagues) return [updatedLeague];
-        return oldLeagues.map((league) => (league.slug === updatedLeague.slug ? updatedLeague : league));
+        return oldLeagues.map((league) => (league.slug_league === updatedLeague.slug_league ? updatedLeague : league));
       });
-      queryClient.setQueryData(LEAGUE_DETAIL_QUERY_KEY(updatedLeague.slug), updatedLeague);
+      queryClient.setQueryData(LEAGUE_DETAIL_QUERY_KEY(updatedLeague.slug_league), updatedLeague);
     },
   });
 };

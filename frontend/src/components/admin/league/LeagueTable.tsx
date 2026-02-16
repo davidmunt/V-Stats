@@ -42,7 +42,7 @@ export const LeagueTable = ({ leagueSlug }: LeagueTableProps) => {
                 {standings
                   .sort((a, b) => b.points - a.points || b.points_diff - a.points_diff)
                   .map((team, index) => (
-                    <tr key={team.id_team} className="hover:bg-gray-50 transition-colors">
+                    <tr key={team.slug_team} className="hover:bg-gray-50 transition-colors">
                       <td className="py-4 px-4 text-center font-bold text-gray-400">{index + 1}</td>
 
                       <td className="py-4 px-4">

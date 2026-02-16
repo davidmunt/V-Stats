@@ -6,6 +6,8 @@ import com.vstats.vstats.infrastructure.specs.LeagueSpecification;
 import com.vstats.vstats.presentation.requests.league.CreateLeagueRequest;
 import com.vstats.vstats.presentation.requests.league.UpdateLeagueRequest;
 import com.vstats.vstats.presentation.responses.LeagueResponse;
+import com.vstats.vstats.security.AuthUtils;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -29,14 +31,16 @@ public class LeagueService {
         private final CategoryRepository categoryRepository;
         private final SeasonLeagueRepository seasonLeagueRepository;
         private final LeagueAdminRepository adminRepository;
+        private final AuthUtils authUtils;
 
         @Transactional
         public LeagueResponse createLeague(CreateLeagueRequest request) {
-                LeagueAdminEntity admin = adminRepository.findBySlug(request.getSlugAdmin())
+                Long currentAdminId = authUtils.getCurrentUserId();
+                LeagueAdminEntity admin = adminRepository.findById(currentAdminId)
                                 .orElseThrow(() -> new ResponseStatusException(
                                                 HttpStatus.NOT_FOUND, "Administrador no encontrado"));
 
-                CategoryEntity category = categoryRepository.findBySlug(request.getSlugCategory())
+                CategoryEntity category = categoryRepository.findBySlug(request.getSlug_category())
                                 .orElseThrow(() -> new ResponseStatusException(
                                                 HttpStatus.NOT_FOUND, "Categoría no encontrada"));
 
@@ -144,7 +148,7 @@ public class LeagueService {
                         throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                                         "La imagen de la liga es obligatoria");
                 }
-                if (request.getSlugCategory() == null || request.getSlugCategory().isBlank()) {
+                if (request.getSlug_category() == null || request.getSlug_category().isBlank()) {
                         throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                                         "El slug de la categoría es obligatorio");
                 }
@@ -153,10 +157,10 @@ public class LeagueService {
                 sl.getLeague().setCountry(request.getCountry());
                 sl.getLeague().setImage(request.getImage());
 
-                CategoryEntity newCat = categoryRepository.findBySlug(request.getSlugCategory())
+                CategoryEntity newCat = categoryRepository.findBySlug(request.getSlug_category())
                                 .orElseThrow(() -> new ResponseStatusException(
                                                 HttpStatus.NOT_FOUND,
-                                                "Nueva categoría no encontrada: " + request.getSlugCategory()));
+                                                "Nueva categoría no encontrada: " + request.getSlug_category()));
 
                 sl.setCategory(newCat);
                 sl.getLeague().setCategory(newCat);

@@ -18,11 +18,9 @@ public @interface CheckSecurity {
         }
     }
 
-    // Reglas específicas para Ligas
     public @interface Leagues {
         @Retention(RetentionPolicy.RUNTIME)
         @Target(ElementType.METHOD)
-        // Solo el Admin de la liga puede gestionar
         @PreAuthorize("@authZ.isLeagueAdmin(#slug)")
         public @interface CanManage {
         }
@@ -34,25 +32,6 @@ public @interface CheckSecurity {
         }
     }
 
-    // Reglas para Equipos (Basado en si eres Coach)
-    public @interface Teams {
-        @Retention(RetentionPolicy.RUNTIME)
-        @Target(ElementType.METHOD)
-        @PreAuthorize("hasRole('coach')")
-        public @interface CanManage {
-        }
-    }
-
-    // Reglas para Acciones (Basado en si eres Analista)
-    public @interface Actions {
-        @Retention(RetentionPolicy.RUNTIME)
-        @Target(ElementType.METHOD)
-        @PreAuthorize("hasRole('analyst')")
-        public @interface CanManage {
-        }
-    }
-
-    // Reglas para Sedes
     public @interface Venues {
         @Retention(RetentionPolicy.RUNTIME)
         @Target(ElementType.METHOD)
@@ -61,7 +40,6 @@ public @interface CheckSecurity {
         }
     }
 
-    // Reglas para categorias
     public @interface Categories {
         @Retention(RetentionPolicy.RUNTIME)
         @Target(ElementType.METHOD)

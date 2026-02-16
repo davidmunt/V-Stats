@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { League } from "@/interfaces/league.interface";
 import { useCreateLeagueMutation } from "@/mutations/leagues/useCreate";
 import { useUpdateLeagueMutation } from "@/mutations/leagues/useUpdate";
-import { useCategoryLeaguesQuery } from "@/queries/categoryLeagues/useCategoryLeagues";
+import { useCategoryLeaguesQuery } from "@/queries/category/useCategories";
 
 interface LeagueFormProps {
   initialData: League | null;
@@ -20,9 +20,8 @@ export const LeagueForm = ({ initialData, onCancel, onSuccess }: LeagueFormProps
 
   const [formData, setFormData] = useState({
     name: initialData?.name || "",
-    id_category_league: initialData?.id_category_league || "",
+    slug_category: initialData?.slug_category || "",
     country: initialData?.country || "",
-    season: initialData?.season || "",
     image: initialData?.image || "",
     is_active: initialData?.is_active ?? true,
     status: initialData?.status || "active",
@@ -39,15 +38,14 @@ export const LeagueForm = ({ initialData, onCancel, onSuccess }: LeagueFormProps
     try {
       const commonData = {
         name: formData.name,
-        category: formData.id_category_league,
+        slug_category: formData.slug_category,
         country: formData.country,
-        season: formData.season,
         image: formData.image,
       };
 
       if (isEditing && initialData) {
         await updateMutation.mutateAsync({
-          slug: initialData.slug,
+          slug_league: initialData.slug_league,
           ...commonData,
           status: formData.status,
           is_active: formData.is_active,
@@ -70,7 +68,7 @@ export const LeagueForm = ({ initialData, onCancel, onSuccess }: LeagueFormProps
       <h2 className="text-xl font-bold text-gray-800 mb-6">{isEditing ? `Editar Liga: ${initialData.name}` : "Crear Nueva Liga"}</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4">
           <div className="col-span-2 md:col-span-1">
             <label className="block text-sm font-medium text-gray-700 mb-1">Nombre de la Liga</label>
             <input
@@ -87,15 +85,15 @@ export const LeagueForm = ({ initialData, onCancel, onSuccess }: LeagueFormProps
           <div className="col-span-2 md:col-span-1">
             <label className="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
             <select
-              name="id_category_league"
-              value={formData.id_category_league}
+              name="slug_category"
+              value={formData.slug_category}
               onChange={handleChange}
               required
               className="w-full border border-gray-300 rounded-md px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500 bg-white"
             >
               <option value="">Selecciona una categoría</option>
               {categories?.map((cat) => (
-                <option key={cat.id_category_league} value={cat.id_category_league}>
+                <option key={cat.slug_category} value={cat.slug_category}>
                   {cat.name}
                 </option>
               ))}
@@ -112,20 +110,6 @@ export const LeagueForm = ({ initialData, onCancel, onSuccess }: LeagueFormProps
               required
               className="w-full border border-gray-300 rounded-md px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Ej: Inglaterra"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Temporada</label>
-            <input
-              type="text"
-              name="season"
-              value={formData.season}
-              onChange={handleChange}
-              required
-              className="w-full border border-gray-300 rounded-md px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Ej: 2024/2025"
-              pattern="\d{4}/\d{4}"
             />
           </div>
         </div>

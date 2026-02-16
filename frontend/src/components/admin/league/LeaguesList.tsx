@@ -2,7 +2,7 @@ import { useLeaguesQuery } from "@/queries/leagues/useLeagues";
 import { useDeleteLeagueMutation } from "@/mutations/leagues/useDelete";
 import type { League } from "@/interfaces/league.interface";
 import LoadingFallback from "@/components/LoadingFallback";
-import { useCategoryLeaguesQuery } from "@/queries/categoryLeagues/useCategoryLeagues";
+import { useCategoryLeaguesQuery } from "@/queries/category/useCategories";
 
 interface LeaguesListProps {
   onCreate: () => void;
@@ -16,14 +16,14 @@ export const LeaguesList = ({ onCreate, onEdit, onViewDetail }: LeaguesListProps
   const { data: categories } = useCategoryLeaguesQuery();
   const deleteMutation = useDeleteLeagueMutation();
 
-  const getCategoryName = (categoryId: string) => {
+  const getCategoryName = (categorySlug: string) => {
     if (!categories) return "Cargando...";
-    const category = categories.find((cat) => cat.id_category_league === categoryId);
+    const category = categories.find((cat) => cat.slug_category === categorySlug);
     return category ? category.name : "Sin categoría";
   };
 
-  const handleDelete = (slug: string) => {
-    deleteMutation.mutate({ slug });
+  const handleDelete = (slug_league: string) => {
+    deleteMutation.mutate({ slug_league });
   };
 
   if (isLoading) return <LoadingFallback />;
@@ -53,7 +53,6 @@ export const LeaguesList = ({ onCreate, onEdit, onViewDetail }: LeaguesListProps
                 <tr>
                   <th className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Logo</th>
                   <th className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Nombre</th>
-                  <th className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Temporada</th>
                   <th className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Categoria</th>
                   <th className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">País</th>
                   <th className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Estado</th>
@@ -62,7 +61,7 @@ export const LeaguesList = ({ onCreate, onEdit, onViewDetail }: LeaguesListProps
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {leagues.map((league) => (
-                  <tr key={league.id_league} className="hover:bg-gray-50 transition-colors">
+                  <tr key={league.slug_league} className="hover:bg-gray-50 transition-colors">
                     <td className="py-3 px-4">
                       <div className="w-10 h-10 rounded bg-gray-100 border border-gray-200 overflow-hidden">
                         {league.image ? (
@@ -78,11 +77,7 @@ export const LeaguesList = ({ onCreate, onEdit, onViewDetail }: LeaguesListProps
                     </td>
 
                     <td className="py-3 px-4">
-                      <div className="font-medium text-gray-800">{league.season}</div>
-                    </td>
-
-                    <td className="py-3 px-4">
-                      <div className="font-medium text-gray-800">{getCategoryName(league.id_category_league)}</div>
+                      <div className="font-medium text-gray-800">{getCategoryName(league.slug_category)}</div>
                     </td>
 
                     <td className="py-3 px-4">
@@ -114,7 +109,7 @@ export const LeaguesList = ({ onCreate, onEdit, onViewDetail }: LeaguesListProps
                           Editar
                         </button>
                         <button
-                          onClick={() => handleDelete(league.slug)}
+                          onClick={() => handleDelete(league.slug_league)}
                           disabled={deleteMutation.isPending}
                           className="text-red-600 hover:text-red-800 text-sm font-medium px-2 py-1 rounded hover:bg-red-50 disabled:opacity-50"
                         >

@@ -4,9 +4,8 @@ import lombok.Data;
 
 @Data
 public class CreateLeagueRequest {
-    private String slugAdmin; 
-    private String slugCategory;
-    private String name; 
+    private String slug_category;
+    private String name;
     private String country;
     private String image;
 }

@@ -13,10 +13,10 @@ export const useDeleteLeagueMutation = () => {
     onSuccess: (_, variables) => {
       queryClient.setQueryData<League[]>(LEAGUES_QUERY_KEY, (oldLeagues) => {
         if (!oldLeagues) return [];
-        return oldLeagues.filter((league) => league.slug !== variables.slug);
+        return oldLeagues.filter((league) => league.slug_league !== variables.slug_league);
       });
       queryClient.removeQueries({
-        queryKey: LEAGUE_DETAIL_QUERY_KEY(variables.slug),
+        queryKey: LEAGUE_DETAIL_QUERY_KEY(variables.slug_league),
       });
     },
   });

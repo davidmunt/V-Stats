@@ -5,9 +5,9 @@ import lombok.Data;
 @Data
 
 public class UpdateLeagueRequest {
-    private String slugCategory;
+    private String slug_category;
     private String country;
-    private String name; 
+    private String name;
     private String image;
     private String status;
 }

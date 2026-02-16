@@ -34,7 +34,7 @@ export const LeaguesManager = () => {
 
       {view === "form" && <LeagueForm initialData={selectedLeague} onCancel={handleBackToList} onSuccess={handleBackToList} />}
 
-      {view === "detail" && selectedLeague && <LeagueDetail slug={selectedLeague.slug} onBack={handleBackToList} />}
+      {view === "detail" && selectedLeague && <LeagueDetail slug={selectedLeague.slug_league} onBack={handleBackToList} />}
     </div>
   );
 };

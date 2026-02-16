@@ -2,11 +2,13 @@ package com.vstats.vstats.presentation.controllers;
 
 import com.vstats.vstats.presentation.requests.league.*;
 import com.vstats.vstats.presentation.responses.LeagueResponse;
+import com.vstats.vstats.security.authorization.CheckSecurity;
 import com.vstats.vstats.application.services.LeagueService;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -19,6 +21,7 @@ public class LeagueController {
     private final LeagueService leagueService;
 
     @PostMapping
+    @PreAuthorize("hasRole('admin')")
     public ResponseEntity<Map<String, LeagueResponse>> create(@RequestBody CreateLeagueRequest request) {
         return new ResponseEntity<>(Map.of("league", leagueService.createLeague(request)), HttpStatus.CREATED);
     }
@@ -40,12 +43,14 @@ public class LeagueController {
     }
 
     @PutMapping("/{slug}")
+    @CheckSecurity.Leagues.CanManage
     public ResponseEntity<Map<String, LeagueResponse>> update(@PathVariable String slug,
             @RequestBody UpdateLeagueRequest request) {
         return ResponseEntity.ok(Map.of("league", leagueService.updateLeague(slug, request)));
     }
 
     @DeleteMapping("/{slug}")
+    @CheckSecurity.Leagues.CanManage
     public ResponseEntity<Void> delete(@PathVariable String slug) {
         leagueService.deleteLeague(slug);
         return ResponseEntity.noContent().build();
