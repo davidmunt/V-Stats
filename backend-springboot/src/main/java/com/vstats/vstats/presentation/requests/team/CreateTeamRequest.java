@@ -4,8 +4,8 @@ import lombok.Data;
 
 @Data
 public class CreateTeamRequest {
-    private String slugLeague; 
-    private String slugVenue;
-    private String name; 
+    private String slug_league;
+    private String slug_venue;
+    private String name;
     private String image;
 }

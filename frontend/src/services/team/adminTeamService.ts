@@ -11,10 +11,10 @@ interface SingleTeamResponse {
   team: Team;
 }
 
-export const createTeam = async ({ id_league, id_venue, name, image }: CreateTeamParam): Promise<Team> => {
-  const response = await apiClient.post<SingleTeamResponse>("express", "/team", {
-    id_league,
-    id_venue,
+export const createTeam = async ({ slug_league, slug_venue, name, image }: CreateTeamParam): Promise<Team> => {
+  const response = await apiClient.post<SingleTeamResponse>("spring", "/api/teams", {
+    slug_league,
+    slug_venue,
     name,
     image,
   });
@@ -22,19 +22,19 @@ export const createTeam = async ({ id_league, id_venue, name, image }: CreateTea
 };
 
 export const updateTeam = async ({
-  slug,
-  id_venue,
-  id_coach,
-  id_analyst,
+  slug_team,
+  slug_venue,
+  slug_coach,
+  slug_analyst,
   name,
   image,
   status,
   is_active,
 }: UpdateTeamParam): Promise<Team> => {
-  const response = await apiClient.put<SingleTeamResponse>("express", `/team/${slug}`, {
-    id_venue,
-    id_coach,
-    id_analyst,
+  const response = await apiClient.put<SingleTeamResponse>("spring", `/api/teams/${slug_team}`, {
+    slug_venue,
+    slug_coach,
+    slug_analyst,
     name,
     image,
     status,
@@ -43,26 +43,26 @@ export const updateTeam = async ({
   return response.data.team;
 };
 
-export const deleteTeam = async ({ slug }: DeleteTeamParam): Promise<void> => {
-  await apiClient.delete<void>("express", `/team/${slug}`);
+export const deleteTeam = async ({ slug_team }: DeleteTeamParam): Promise<void> => {
+  await apiClient.delete<void>("spring", `/api/teams/${slug_team}`);
 };
 
-export const getTeamsFromLeague = async (slug: string): Promise<Team[]> => {
-  const response = await apiClient.get<TeamsResponse>("express", `/league/${slug}/teams`);
+export const getTeamsFromLeague = async (slug_team: string): Promise<Team[]> => {
+  const response = await apiClient.get<TeamsResponse>("spring", `/api/teams/league/${slug_team}`);
   return response.data.teams;
 };
 
-export const getTeamsFromMatch = async (slug: string): Promise<Team[]> => {
-  const response = await apiClient.get<TeamsResponse>("express", `/match/${slug}/teams`);
+export const getTeamsFromMatch = async (slug_team: string): Promise<Team[]> => {
+  const response = await apiClient.get<TeamsResponse>("express", `/match/${slug_team}/teams`);
   return response.data.teams;
 };
 
-export const getTeamsStandingsFromLeague = async (slug: string): Promise<TeamStanding[]> => {
-  const response = await apiClient.get<TeamStanding[]>("express", `/league/${slug}/standings`);
+export const getTeamsStandingsFromLeague = async (slug_team: string): Promise<TeamStanding[]> => {
+  const response = await apiClient.get<TeamStanding[]>("express", `/league/${slug_team}/standings`);
   return response.data;
 };
 
-export const getTeamBySlug = async (slug: string): Promise<Team> => {
-  const response = await apiClient.get<SingleTeamResponse>("express", `/team/${slug}`);
+export const getTeamBySlug = async (slug_team: string): Promise<Team> => {
+  const response = await apiClient.get<SingleTeamResponse>("express", `/team/${slug_team}`);
   return response.data.team;
 };

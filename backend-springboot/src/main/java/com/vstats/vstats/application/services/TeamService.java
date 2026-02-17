@@ -42,14 +42,14 @@ public class TeamService {
         SeasonEntity currentSeason = seasonRepository.findByIsActiveTrue()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No hay temporada activa"));
 
-        LeagueEntity league = leagueRepository.findBySlug(request.getSlugLeague())
+        LeagueEntity league = leagueRepository.findBySlug(request.getSlug_league())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Liga no encontrada"));
 
         seasonLeagueRepository.findByLeagueAndSeason(league, currentSeason)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
                         "Esa liga no está disponible esta temporada"));
 
-        VenueEntity venue = venueRepository.findBySlug(request.getSlugVenue())
+        VenueEntity venue = venueRepository.findBySlug(request.getSlug_venue())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sede no encontrada"));
 
         if (request.getName() == null || request.getName().isBlank()) {
@@ -110,10 +110,12 @@ public class TeamService {
         return response;
     }
 
-    public List<TeamResponse> getTeamsByAdminSlug(String slugAdmin) {
-        Long adminId = getAdminIdBySlug(slugAdmin);
+    public List<TeamResponse> getTeamsByLeagueSlug(String slugLeague) {
+        Long leagueId = leagueRepository.findBySlug(slugLeague)
+                .map(LeagueEntity::getIdLeague)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Liga no encontrada"));
 
-        return seasonTeamRepository.findAllByLeague_Admin_IdAdminAndSeason_IsActiveTrue(adminId).stream()
+        return seasonTeamRepository.findAllByLeague_IdLeagueAndSeason_IsActiveTrue(leagueId).stream()
                 .filter(ts -> !"deleted".equals(ts.getStatus()))
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
@@ -145,28 +147,28 @@ public class TeamService {
         if (request.getImage() != null)
             ts.getTeam().setImage(request.getImage());
 
-        if (request.getSlugCoach() != null) {
-            if (request.getSlugCoach().isBlank()) {
+        if (request.getSlug_coach() != null) {
+            if (request.getSlug_coach().isBlank()) {
                 ts.setCoach(null);
             } else {
-                CoachEntity coach = coachRepository.findBySlug(request.getSlugCoach())
+                CoachEntity coach = coachRepository.findBySlug(request.getSlug_coach())
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Coach no encontrado"));
                 ts.setCoach(coach);
             }
         }
 
-        if (request.getSlugAnalyst() != null) {
-            if (request.getSlugAnalyst().isBlank()) {
+        if (request.getSlug_analyst() != null) {
+            if (request.getSlug_analyst().isBlank()) {
                 ts.setAnalyst(null);
             } else {
-                AnalystEntity analyst = analystRepository.findBySlug(request.getSlugAnalyst())
+                AnalystEntity analyst = analystRepository.findBySlug(request.getSlug_analyst())
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Analista no encontrado"));
                 ts.setAnalyst(analyst);
             }
         }
 
-        if (request.getSlugVenue() != null) {
-            VenueEntity venue = venueRepository.findBySlug(request.getSlugVenue())
+        if (request.getSlug_venue() != null) {
+            VenueEntity venue = venueRepository.findBySlug(request.getSlug_venue())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sede no encontrada"));
             ts.setVenue(venue);
         }

@@ -1,7 +1,6 @@
 package com.vstats.vstats.infrastructure.repositories;
 
 import com.vstats.vstats.domain.entities.LeagueEntity;
-import com.vstats.vstats.domain.entities.PlayerEntity;
 import com.vstats.vstats.domain.entities.SeasonEntity;
 import com.vstats.vstats.domain.entities.SeasonLeagueEntity;
 

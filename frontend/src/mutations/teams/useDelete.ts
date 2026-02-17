@@ -7,14 +7,14 @@ export const useDeleteTeamMutation = (leagueSlug: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ slug }: { slug: string }) => deleteTeam({ slug }),
+    mutationFn: ({ slug_team }: { slug_team: string }) => deleteTeam({ slug_team }),
 
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: TEAMS_LIST_QUERY_KEY(leagueSlug),
       });
       queryClient.removeQueries({
-        queryKey: TEAMS_DETAIL_QUERY_KEY(variables.slug),
+        queryKey: TEAMS_DETAIL_QUERY_KEY(variables.slug_team),
       });
     },
   });

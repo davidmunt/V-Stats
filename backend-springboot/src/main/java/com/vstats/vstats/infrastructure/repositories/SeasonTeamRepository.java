@@ -18,7 +18,11 @@ public interface SeasonTeamRepository
 
     Optional<SeasonTeamEntity> findByTeam_IdTeamAndSeason_IdSeason(Long idTeam, Long idSeason);
 
+    List<SeasonTeamEntity> findAllByLeague_IdLeagueAndSeason_IsActiveTrue(Long idLeague);
+
     List<SeasonTeamEntity> findAllByLeague_Admin_IdAdminAndSeason_IsActiveTrue(Long idAdmin);
 
     List<SeasonTeamEntity> findAllByLeague_SlugAndSeason_IsActiveTrue(String leagueSlug);
+
+    Optional<SeasonTeamEntity> findByTeam_Slug(String slug);
 }

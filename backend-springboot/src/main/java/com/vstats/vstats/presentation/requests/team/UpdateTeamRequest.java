@@ -5,10 +5,10 @@ import lombok.Data;
 @Data
 
 public class UpdateTeamRequest {
-    private String slugCoach;
-    private String slugAnalyst;
-    private String slugVenue;
-    private String name; 
+    private String slug_coach;
+    private String slug_analyst;
+    private String slug_venue;
+    private String name;
     private String image;
     private String status;
 }

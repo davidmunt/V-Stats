@@ -32,6 +32,14 @@ public @interface CheckSecurity {
         }
     }
 
+    public @interface Teams {
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target(ElementType.METHOD)
+        @PreAuthorize("@authZ.isTeamAdmin(#slug)")
+        public @interface CanManage {
+        }
+    }
+
     public @interface Venues {
         @Retention(RetentionPolicy.RUNTIME)
         @Target(ElementType.METHOD)

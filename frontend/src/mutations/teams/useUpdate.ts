@@ -12,9 +12,9 @@ export const useUpdateTeamMutation = (leagueSlug: string) => {
     mutationFn: (data: UpdateTeamParam) => updateTeam(data),
     onSuccess: (updatedTeam) => {
       queryClient.setQueryData<Team[]>(TEAMS_LIST_QUERY_KEY(leagueSlug), (oldTeams) => {
-        return oldTeams?.map((t) => (t.slug === updatedTeam.slug ? updatedTeam : t));
+        return oldTeams?.map((t) => (t.slug_team === updatedTeam.slug_team ? updatedTeam : t));
       });
-      queryClient.setQueryData(TEAMS_DETAIL_QUERY_KEY(updatedTeam.slug), updatedTeam);
+      queryClient.setQueryData(TEAMS_DETAIL_QUERY_KEY(updatedTeam.slug_team), updatedTeam);
     },
   });
 };

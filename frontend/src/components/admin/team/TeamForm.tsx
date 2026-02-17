@@ -21,17 +21,17 @@ export const TeamForm = ({ leagueSlug, initialData, onCancel, onSuccess }: TeamF
   const updateMutation = useUpdateTeamMutation(leagueSlug);
 
   const { data: freeCoaches } = useFreeCoachesQuery();
-  const { data: currentCoach } = useCoachByIdQuery(initialData?.id_coach || null);
+  const { data: currentCoach } = useCoachByIdQuery(initialData?.slug_coach || null);
   const { data: freeAnalysts } = useFreeAnalystsQuery();
-  const { data: currentAnalyst } = useAnalystDetailQuery(initialData?.id_analyst || null);
+  const { data: currentAnalyst } = useAnalystDetailQuery(initialData?.slug_analyst || null);
 
   const allCoaches = freeCoaches || [];
-  if (currentCoach && !allCoaches.some((c) => c.id_coach === currentCoach.id_coach)) {
+  if (currentCoach && !allCoaches.some((c) => c.slug_coach === currentCoach.slug_coach)) {
     allCoaches.push(currentCoach);
   }
 
   const allAnalysts = freeAnalysts || [];
-  if (currentAnalyst && !allAnalysts.some((a) => a.id_analyst === currentAnalyst.id_analyst)) {
+  if (currentAnalyst && !allAnalysts.some((a) => a.slug_analyst === currentAnalyst.slug_analyst)) {
     allAnalysts.push(currentAnalyst);
   }
 
@@ -40,9 +40,9 @@ export const TeamForm = ({ leagueSlug, initialData, onCancel, onSuccess }: TeamF
   const [formData, setFormData] = useState({
     name: initialData?.name || "",
     image: initialData?.image || "",
-    id_venue: initialData?.id_venue || "",
-    id_coach: initialData?.id_coach || "",
-    id_analyst: initialData?.id_analyst || "",
+    slug_venue: initialData?.slug_venue || "",
+    slug_coach: initialData?.slug_coach || "",
+    slug_analyst: initialData?.slug_analyst || "",
     status: initialData?.status || "active",
     is_active: initialData?.is_active ?? true,
   });
@@ -58,15 +58,15 @@ export const TeamForm = ({ leagueSlug, initialData, onCancel, onSuccess }: TeamF
     try {
       if (isEditing && initialData) {
         await updateMutation.mutateAsync({
-          slug: initialData.slug,
+          slug_team: initialData.slug_team,
           ...formData,
         });
       } else {
         await createMutation.mutateAsync({
           name: formData.name,
           image: formData.image,
-          id_venue: formData.id_venue,
-          id_league: leagueSlug,
+          slug_venue: formData.slug_venue,
+          slug_league: leagueSlug,
         });
       }
       onSuccess();
@@ -99,15 +99,15 @@ export const TeamForm = ({ leagueSlug, initialData, onCancel, onSuccess }: TeamF
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">Sede</label>
             <select
-              name="id_venue"
-              value={formData.id_venue}
+              name="slug_venue"
+              value={formData.slug_venue}
               onChange={handleChange}
               required
               className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Selecciona una sede</option>
               {(venues || []).map((v) => (
-                <option key={v.id_venue} value={v.id_venue}>
+                <option key={v.slug_venue} value={v.slug_venue}>
                   {v.name}
                 </option>
               ))}
@@ -132,15 +132,15 @@ export const TeamForm = ({ leagueSlug, initialData, onCancel, onSuccess }: TeamF
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">Entrenador</label>
                 <select
-                  name="id_coach"
-                  value={formData.id_coach || ""}
+                  name="slug_coach"
+                  value={formData.slug_coach || ""}
                   onChange={handleChange}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white"
                 >
                   <option value="">Sin entrenador asignado</option>
                   {allCoaches.map((c) => (
-                    <option key={c.id_coach} value={c.id_coach}>
-                      {c.name} {initialData?.id_coach === c.id_coach ? "(Actual)" : ""}
+                    <option key={c.slug_coach} value={c.slug_coach}>
+                      {c.name} {initialData?.slug_coach === c.slug_coach ? "(Actual)" : ""}
                     </option>
                   ))}
                 </select>
@@ -149,15 +149,15 @@ export const TeamForm = ({ leagueSlug, initialData, onCancel, onSuccess }: TeamF
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">Analista</label>
                 <select
-                  name="id_analyst"
-                  value={formData.id_analyst || ""}
+                  name="slug_analyst"
+                  value={formData.slug_analyst || ""}
                   onChange={handleChange}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white"
                 >
                   <option value="">Sin analista asignado</option>
                   {allAnalysts.map((a) => (
-                    <option key={a.id_analyst} value={a.id_analyst}>
-                      {a.name} {initialData?.id_analyst === a.id_analyst ? "(Actual)" : ""}
+                    <option key={a.slug_analyst} value={a.slug_analyst}>
+                      {a.name} {initialData?.slug_analyst === a.slug_analyst ? "(Actual)" : ""}
                     </option>
                   ))}
                 </select>

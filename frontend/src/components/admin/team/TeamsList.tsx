@@ -21,24 +21,24 @@ export const TeamsList = ({ leagueSlug, onCreate, onEdit }: TeamsListProps) => {
   const { data: allAssignedAnalysts } = useAssignedAnalystsQuery();
   const { data: allVenues } = useVenuesQuery();
 
-  const handleDelete = (slug: string) => {
-    deleteMutation.mutate({ slug });
+  const handleDelete = (slug_team: string) => {
+    deleteMutation.mutate({ slug_team });
   };
 
   const getCoachName = (id: string | null) => {
     if (!id) return "Sin asignar";
-    const coach = allAssignedCoaches?.find((c) => c.id_coach === id);
+    const coach = allAssignedCoaches?.find((c) => c.slug_coach === id);
     return coach ? coach.name : "No encontrado";
   };
 
   const getAnalystName = (id: string | null) => {
     if (!id) return "Sin analista";
-    const analyst = allAssignedAnalysts?.find((a) => a.id_analyst === id);
+    const analyst = allAssignedAnalysts?.find((a) => a.slug_analyst === id);
     return analyst ? analyst.name : "No encontrado";
   };
 
   const getVenueName = (id: string) => {
-    const venue = allVenues?.find((v) => v.id_venue === id);
+    const venue = allVenues?.find((v) => v.slug_venue === id);
     return venue ? venue.name : "Sede no encontrada";
   };
 
@@ -72,14 +72,13 @@ export const TeamsList = ({ leagueSlug, onCreate, onEdit }: TeamsListProps) => {
                   <th className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Info</th>
                   <th className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Entrenador / Analista</th>
                   <th className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Sede</th>
-                  <th className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Registro</th>
                   <th className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Estado</th>
                   <th className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Acciones</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {teams.map((team) => (
-                  <tr key={team.id_team} className="hover:bg-gray-50 transition-colors">
+                  <tr key={team.slug_team} className="hover:bg-gray-50 transition-colors">
                     <td className="py-4 px-4">
                       <div className="flex items-center gap-3">
                         <div className="w-12 h-12 rounded-lg bg-gray-100 border border-gray-200 overflow-hidden flex-shrink-0">
@@ -91,19 +90,17 @@ export const TeamsList = ({ leagueSlug, onCreate, onEdit }: TeamsListProps) => {
                         </div>
                         <div>
                           <div className="font-bold text-gray-900">{team.name}</div>
-                          <div className="text-[10px] text-gray-400 font-mono uppercase">{team.slug}</div>
+                          <div className="text-[10px] text-gray-400 font-mono uppercase">{team.slug_team}</div>
                         </div>
                       </div>
                     </td>
 
                     <td className="py-4 px-4 text-sm">
-                      <div className="text-gray-700">{getCoachName(team.id_coach)}</div>
-                      <div className="text-gray-500 text-xs mt-1">{getAnalystName(team.id_analyst)}</div>
+                      <div className="text-gray-700">{getCoachName(team.slug_coach)}</div>
+                      <div className="text-gray-500 text-xs mt-1">{getAnalystName(team.slug_analyst)}</div>
                     </td>
 
-                    <td className="py-4 px-4 text-sm text-gray-600">{getVenueName(team.id_venue)}</td>
-
-                    <td className="py-4 px-4 text-xs text-gray-500">{new Date(team.created_at).toLocaleDateString()}</td>
+                    <td className="py-4 px-4 text-sm text-gray-600">{getVenueName(team.slug_venue)}</td>
 
                     <td className="py-4 px-4">
                       <span
@@ -121,7 +118,7 @@ export const TeamsList = ({ leagueSlug, onCreate, onEdit }: TeamsListProps) => {
                           Editar
                         </button>
                         <button
-                          onClick={() => handleDelete(team.slug)}
+                          onClick={() => handleDelete(team.slug_team)}
                           disabled={deleteMutation.isPending}
                           className="text-red-500 hover:text-red-700 text-sm font-semibold disabled:opacity-50"
                         >

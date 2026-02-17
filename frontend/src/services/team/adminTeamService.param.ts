@@ -1,15 +1,15 @@
 export interface CreateTeamParam {
-  id_venue: string;
-  id_league: string;
+  slug_venue: string;
+  slug_league: string;
   name: string;
   image: string;
 }
 
 export interface UpdateTeamParam {
-  slug: string;
-  id_venue: string;
-  id_coach: string | null;
-  id_analyst: string | null;
+  slug_team: string;
+  slug_venue: string;
+  slug_coach: string | null;
+  slug_analyst: string | null;
   name: string;
   image: string;
   status: string;
@@ -17,5 +17,5 @@ export interface UpdateTeamParam {
 }
 
 export interface DeleteTeamParam {
-  slug: string;
+  slug_team: string;
 }
