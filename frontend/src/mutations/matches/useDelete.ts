@@ -6,7 +6,7 @@ export const useDeleteMatchMutation = (leagueSlug: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ slug, matchSlug }: { slug: string; matchSlug: string }) => deleteMatch({ slug, matchSlug }),
+    mutationFn: ({ matchSlug }: { matchSlug: string }) => deleteMatch({ matchSlug }),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: MATCHES_LIST_QUERY_KEY(leagueSlug),

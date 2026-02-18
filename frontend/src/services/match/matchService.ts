@@ -15,34 +15,41 @@ interface TeamsResponse {
   teams: Team[];
 }
 
-export const createMatch = async ({ slug, name, image, id_team_local, id_team_visitor, date }: CreateMatchParam): Promise<Match> => {
-  const response = await apiClient.post<SingleMatchResponse>("express", `/match/${slug}`, {
+export const createMatch = async ({
+  slug_league,
+  name,
+  image,
+  slug_team_local,
+  slug_team_visitor,
+  date,
+}: CreateMatchParam): Promise<Match> => {
+  const response = await apiClient.post<SingleMatchResponse>("spring", `/api/matches/${slug_league}`, {
     name,
     image,
-    id_team_local,
-    id_team_visitor,
+    slug_team_local,
+    slug_team_visitor,
     date,
   });
   return response.data.match;
 };
 
 export const updateMatch = async ({
-  slug,
+  slug_league,
   name,
   image,
-  matchSlug,
-  id_team_local,
-  id_team_visitor,
+  slug_match,
+  slug_team_local,
+  slug_team_visitor,
   date,
   status,
   is_active,
 }: UpdateMatchParam): Promise<Match> => {
-  const response = await apiClient.put<SingleMatchResponse>("express", `${slug}/match/${matchSlug}`, {
-    slug,
+  const response = await apiClient.put<SingleMatchResponse>("spring", `/api/matches/${slug_match}`, {
+    slug_league,
     name,
     image,
-    id_team_local,
-    id_team_visitor,
+    slug_team_local,
+    slug_team_visitor,
     date,
     status,
     is_active,
@@ -50,12 +57,12 @@ export const updateMatch = async ({
   return response.data.match;
 };
 
-export const deleteMatch = async ({ slug, matchSlug }: { slug: string; matchSlug: string }): Promise<void> => {
-  await apiClient.delete<void>("express", `${slug}/match/${matchSlug}`);
+export const deleteMatch = async ({ matchSlug }: { matchSlug: string }): Promise<void> => {
+  await apiClient.delete<void>("spring", `/api/matches/${matchSlug}`);
 };
 
 export const getMatchesFromLeague = async (slug: string): Promise<Match[]> => {
-  const response = await apiClient.get<MatchesResponse>("express", `/matches/${slug}`);
+  const response = await apiClient.get<MatchesResponse>("spring", `api/matches/league/${slug}`);
   return response.data.matches;
 };
 

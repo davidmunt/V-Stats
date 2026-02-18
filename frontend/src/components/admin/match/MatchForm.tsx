@@ -24,8 +24,8 @@ export const MatchForm = ({ leagueSlug, initialData, onCancel, onSuccess }: Matc
   const [formData, setFormData] = useState({
     name: initialData?.name || "",
     image: initialData?.image || "",
-    id_team_local: initialData?.id_team_local || "",
-    id_team_visitor: initialData?.id_team_visitor || "",
+    slug_team_local: initialData?.slug_team_local || "",
+    slug_team_visitor: initialData?.slug_team_visitor || "",
     date: initialData?.date ? new Date(initialData.date).toISOString().slice(0, 16) : "",
     status: initialData?.status?.toLowerCase() || "scheduled",
     is_active: initialData?.is_active ?? true,
@@ -38,13 +38,13 @@ export const MatchForm = ({ leagueSlug, initialData, onCancel, onSuccess }: Matc
   };
 
   const handleDelete = async () => {
-    await deleteMutation.mutateAsync({ slug: leagueSlug, matchSlug: initialData!.slug });
+    await deleteMutation.mutateAsync({ matchSlug: initialData!.slug_match });
     onSuccess();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.id_team_local === formData.id_team_visitor) {
+    if (formData.slug_team_local === formData.slug_team_visitor) {
       Swal.fire({
         title: "Error",
         text: "El equipo local y el visitante no pueden ser el mismo.",
@@ -57,14 +57,14 @@ export const MatchForm = ({ leagueSlug, initialData, onCancel, onSuccess }: Matc
     try {
       if (isEditing && initialData) {
         await updateMutation.mutateAsync({
-          slug: leagueSlug,
-          matchSlug: initialData.slug,
+          slug_league: leagueSlug,
+          slug_match: initialData.slug_match,
           ...formData,
           date: new Date(formData.date),
         });
       } else {
         await createMutation.mutateAsync({
-          slug: leagueSlug,
+          slug_league: leagueSlug,
           ...formData,
           date: new Date(formData.date),
         });
@@ -105,15 +105,15 @@ export const MatchForm = ({ leagueSlug, initialData, onCancel, onSuccess }: Matc
           <div>
             <label className="block text-sm font-semibold text-gray-700">Equipo Local</label>
             <select
-              name="id_team_local"
-              value={formData.id_team_local}
+              name="slug_team_local"
+              value={formData.slug_team_local}
               onChange={handleChange}
               required
               className="w-full border p-2 rounded mt-1 bg-white"
             >
               <option value="">Seleccionar...</option>
               {teams?.map((t) => (
-                <option key={t.id_team} value={t.id_team}>
+                <option key={t.slug_team} value={t.slug_team}>
                   {t.name}
                 </option>
               ))}
@@ -123,15 +123,15 @@ export const MatchForm = ({ leagueSlug, initialData, onCancel, onSuccess }: Matc
           <div>
             <label className="block text-sm font-semibold text-gray-700">Equipo Visitante</label>
             <select
-              name="id_team_visitor"
-              value={formData.id_team_visitor}
+              name="slug_team_visitor"
+              value={formData.slug_team_visitor}
               onChange={handleChange}
               required
               className="w-full border p-2 rounded mt-1 bg-white"
             >
               <option value="">Seleccionar...</option>
               {teams?.map((t) => (
-                <option key={t.id_team} value={t.id_team}>
+                <option key={t.slug_team} value={t.slug_team}>
                   {t.name}
                 </option>
               ))}

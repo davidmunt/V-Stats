@@ -1,14 +1,16 @@
 package com.vstats.vstats.presentation.controllers;
 
-import com.vstats.vstats.presentation.requests.match.*;
+import com.vstats.vstats.presentation.requests.match.CreateMatchRequest;
+import com.vstats.vstats.presentation.requests.match.UpdateMatchRequest;
 import com.vstats.vstats.presentation.responses.MatchResponse;
+import com.vstats.vstats.security.authorization.CheckSecurity;
 import com.vstats.vstats.application.services.MatchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -20,14 +22,12 @@ public class MatchController {
     private final MatchService matchService;
 
     @PostMapping("/{slugLeague}")
+    @PreAuthorize("hasRole('admin')")
     public ResponseEntity<Map<String, MatchResponse>> create(
             @PathVariable String slugLeague,
             @RequestBody CreateMatchRequest request) {
-        // El adminId lo podrías sacar del token JWT más adelante, ahora simulamos uno
-        Long adminId = 1L;
-        // Simulamos un adminId como Long
         return new ResponseEntity<>(
-                Map.of("match", matchService.createMatch(request, slugLeague, adminId)),
+                Map.of("match", matchService.createMatch(request, slugLeague)),
                 HttpStatus.CREATED);
     }
 
@@ -61,6 +61,7 @@ public class MatchController {
     }
 
     @PutMapping("/{slug}")
+    @CheckSecurity.Matches.CanManage
     public ResponseEntity<Map<String, MatchResponse>> update(
             @PathVariable String slug,
             @RequestBody UpdateMatchRequest request) {
@@ -68,6 +69,7 @@ public class MatchController {
     }
 
     @DeleteMapping("/{slug}")
+    @CheckSecurity.Matches.CanManage
     public ResponseEntity<Void> delete(@PathVariable String slug) {
         matchService.deleteMatch(slug);
         return ResponseEntity.noContent().build();

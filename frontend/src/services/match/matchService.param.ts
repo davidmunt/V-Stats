@@ -1,19 +1,19 @@
 export interface CreateMatchParam {
-  slug: string;
+  slug_league: string;
   name: string;
   image: string;
-  id_team_local: string;
-  id_team_visitor: string;
+  slug_team_local: string;
+  slug_team_visitor: string;
   date: Date;
 }
 
 export interface UpdateMatchParam {
-  slug: string;
-  matchSlug: string;
+  slug_match: string;
+  slug_league: string;
   name: string;
   image: string;
-  id_team_local: string;
-  id_team_visitor: string;
+  slug_team_local: string;
+  slug_team_visitor: string;
   date: Date;
   status: string;
   is_active: boolean;

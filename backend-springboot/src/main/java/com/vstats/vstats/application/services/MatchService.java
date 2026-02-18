@@ -2,15 +2,15 @@ package com.vstats.vstats.application.services;
 
 import com.vstats.vstats.domain.entities.*;
 import com.vstats.vstats.infrastructure.repositories.*;
-import com.vstats.vstats.presentation.requests.match.*;
+import com.vstats.vstats.presentation.requests.match.CreateMatchRequest;
+import com.vstats.vstats.presentation.requests.match.UpdateMatchRequest;
 import com.vstats.vstats.presentation.responses.MatchResponse;
+import com.vstats.vstats.security.AuthUtils;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,17 +26,25 @@ public class MatchService {
     private final SetRepository setRepository;
     private final CoachRepository coachRepository;
     private final AnalystRepository analystRepository;
-    private final LeagueAdminRepository leagueAdminRepository;
+    private final AuthUtils authUtils;
+    private final LeagueAdminRepository adminRepository;
 
     @Transactional
-    public MatchResponse createMatch(CreateMatchRequest request, String slugLeague, Long adminId) {
-        if (request.getSlugTeamLocal().equals(request.getSlugTeamVisitor())) {
+    public MatchResponse createMatch(CreateMatchRequest request, String slugLeague) {
+        Long currentAdminId = authUtils.getCurrentUserId();
+        LeagueAdminEntity admin = adminRepository.findById(currentAdminId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Administrador no encontrado"));
+
+        if (request.getSlug_team_local().equals(request.getSlug_team_visitor())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Un equipo no puede jugar contra sí mismo");
         }
 
         LocalDateTime matchDate;
         try {
-            matchDate = LocalDateTime.parse(request.getDate());
+            matchDate = java.time.Instant.parse(request.getDate())
+                    .atZone(java.time.ZoneId.systemDefault())
+                    .toLocalDateTime();
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Formato de fecha inválido");
         }
@@ -44,10 +52,10 @@ public class MatchService {
         LeagueEntity league = leagueRepository.findBySlug(slugLeague)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Liga no encontrada"));
 
-        TeamEntity local = teamRepository.findBySlug(request.getSlugTeamLocal())
+        TeamEntity local = teamRepository.findBySlug(request.getSlug_team_local())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Equipo local no encontrado"));
 
-        TeamEntity visitor = teamRepository.findBySlug(request.getSlugTeamVisitor())
+        TeamEntity visitor = teamRepository.findBySlug(request.getSlug_team_visitor())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Equipo visitante no encontrado"));
 
         SeasonTeamEntity localSeasonData = seasonTeamRepository.findByTeam_SlugAndSeason_IsActiveTrue(local.getSlug())
@@ -60,8 +68,6 @@ public class MatchService {
         }
 
         String slugMatch = generateUniqueSlug(local.getName() + "-vs-" + visitor.getName());
-        LeagueAdminEntity admin = leagueAdminRepository.findById(adminId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Admin no encontrado"));
         MatchEntity match = MatchEntity.builder()
                 .slug(slugMatch)
                 .league(league)
@@ -71,7 +77,7 @@ public class MatchService {
                 .adminCreator(admin)
                 .date(matchDate)
                 .status("scheduled")
-                .isActive(false)
+                .isActive(true)
                 .currentSet(1)
                 .build();
 
@@ -84,7 +90,7 @@ public class MatchService {
                 .localPoints(0)
                 .visitorPoints(0)
                 .status("active")
-                .isActive(false)
+                .isActive(true)
                 .build();
 
         setRepository.save(firstSet);
@@ -103,22 +109,23 @@ public class MatchService {
         }
 
         // 2. Validaciones de Negocio (400)
-        if (request.getSlugTeamLocal().equals(request.getSlugTeamVisitor())) {
+        if (request.getSlug_team_local().equals(request.getSlug_team_visitor())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Un equipo no puede jugar contra sí mismo");
         }
 
         LocalDateTime matchDate;
         try {
-            matchDate = LocalDateTime.parse(request.getDate());
+            // OffsetDateTime sí entiende la 'Z', luego lo pasamos a LocalDateTime
+            matchDate = java.time.OffsetDateTime.parse(request.getDate()).toLocalDateTime();
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Formato de fecha inválido");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Formato de fecha inválido: " + e.getMessage());
         }
 
         // 3. Cargar nuevas entidades
-        TeamEntity local = teamRepository.findBySlug(request.getSlugTeamLocal())
+        TeamEntity local = teamRepository.findBySlug(request.getSlug_team_local())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Equipo local no encontrado"));
 
-        TeamEntity visitor = teamRepository.findBySlug(request.getSlugTeamVisitor())
+        TeamEntity visitor = teamRepository.findBySlug(request.getSlug_team_visitor())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Equipo visitante no encontrado"));
 
         // 4. Validar Sede del nuevo local
@@ -146,7 +153,7 @@ public class MatchService {
             }
 
             match.setStatus(status);
-            match.setIsActive("live".equals(status));
+            match.setIsActive("live".equals(status) || "scheduled".equals(status));
         }
 
         return mapToResponse(matchRepository.save(match));

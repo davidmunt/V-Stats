@@ -11,7 +11,7 @@ export const useUpdateMatchMutation = (leagueSlug: string) => {
     mutationFn: (data: UpdateMatchParam) => updateMatch(data),
     onSuccess: (updatedMatch) => {
       queryClient.setQueryData<Match[]>(MATCHES_LIST_QUERY_KEY(leagueSlug), (oldMatches) => {
-        return oldMatches?.map((m) => (m.slug === updatedMatch.slug ? updatedMatch : m));
+        return oldMatches?.map((m) => (m.slug_match === updatedMatch.slug_match ? updatedMatch : m));
       });
     },
   });

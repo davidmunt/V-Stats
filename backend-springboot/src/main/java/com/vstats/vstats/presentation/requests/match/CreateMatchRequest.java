@@ -4,9 +4,9 @@ import lombok.Data;
 
 @Data
 public class CreateMatchRequest {
-    private String name; 
-    private String slugTeamLocal; 
-    private String slugTeamVisitor;
-    private String image; 
+    private String name;
+    private String slug_team_local;
+    private String slug_team_visitor;
+    private String image;
     private String date;
 }

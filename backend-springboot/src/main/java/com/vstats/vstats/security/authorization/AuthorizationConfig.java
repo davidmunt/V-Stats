@@ -2,8 +2,8 @@ package com.vstats.vstats.security.authorization;
 
 import com.vstats.vstats.infrastructure.repositories.CategoryRepository;
 import com.vstats.vstats.infrastructure.repositories.LeagueRepository;
+import com.vstats.vstats.infrastructure.repositories.MatchRepository;
 import com.vstats.vstats.infrastructure.repositories.SeasonTeamRepository;
-import com.vstats.vstats.infrastructure.repositories.TeamRepository;
 import com.vstats.vstats.infrastructure.repositories.VenueRepository;
 import com.vstats.vstats.security.AuthUtils;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +18,7 @@ public class AuthorizationConfig {
     private final VenueRepository venueRepository;
     private final CategoryRepository categoryRepository;
     private final SeasonTeamRepository seasonTeamRepository;
+    private final MatchRepository matchRepository;
 
     public boolean isLeagueAdmin(String slug) {
         if (!isAuthenticated())
@@ -38,6 +39,25 @@ public class AuthorizationConfig {
                 .map(seasonTeam -> {
                     try {
                         Long adminId = seasonTeam.getLeague()
+                                .getAdmin()
+                                .getIdAdmin();
+
+                        return adminId.equals(authUtils.getCurrentUserId());
+                    } catch (NullPointerException e) {
+                        return false;
+                    }
+                })
+                .orElse(false);
+    }
+
+    public boolean isMatchAdmin(String slug) {
+        if (!isAuthenticated())
+            return false;
+
+        return matchRepository.findBySlug(slug)
+                .map(match -> {
+                    try {
+                        Long adminId = match.getLeague()
                                 .getAdmin()
                                 .getIdAdmin();
 

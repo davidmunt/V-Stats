@@ -40,6 +40,14 @@ public @interface CheckSecurity {
         }
     }
 
+    public @interface Matches {
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target(ElementType.METHOD)
+        @PreAuthorize("@authZ.isMatchAdmin(#slug)")
+        public @interface CanManage {
+        }
+    }
+
     public @interface Venues {
         @Retention(RetentionPolicy.RUNTIME)
         @Target(ElementType.METHOD)
