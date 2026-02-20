@@ -10,8 +10,8 @@
 # ====================
 # BACKEND - FastAPI
 # ====================
-/backend-fastapi/__pycache__/
 /backend-fastapi/*.py[cod]
+**/__pycache__/
 /backend-fastapi/venv/
 /backend-fastapi/.env
 /backend-fastapi/*.log
