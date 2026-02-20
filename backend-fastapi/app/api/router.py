@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
-from app.api.routes import pruebas
+from app.api.routes import coach
 
 router = APIRouter()
 
-router.include_router(router=pruebas.router, tags=["Pruebas"], prefix="/pruebas")
+router.include_router(router=coach.router, tags=["Coaches"], prefix="/coaches")

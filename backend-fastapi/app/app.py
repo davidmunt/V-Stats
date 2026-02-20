@@ -1,10 +1,11 @@
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
-from conduit.api.router import router as api_router
-from conduit.core.config import get_app_settings
-from conduit.core.exceptions import add_exception_handlers
-from conduit.core.logging import configure_logger
+from app.api.router import router as api_router
+from app.core.config import get_app_settings
+from app.core.exceptions import add_exception_handlers
+from app.core.logging import configure_logger
+from app.core.container import Container, container_instance
 
 
 def create_app() -> FastAPI:
@@ -19,6 +20,8 @@ def create_app() -> FastAPI:
     - Registrar manejadores de excepciones
     - Configurar logging
     """
+
+    container_instance.coach_service()
     settings = get_app_settings()
 
     app = FastAPI(**settings.fastapi_kwargs)

@@ -1,12 +1,12 @@
 from sqlalchemy import delete, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from conduit.domain.dtos.prueba import (
+from app.domain.dtos.prueba import (
     PruebaRecordDTO,
     CreatePruebaDTO,
 )
-from conduit.domain.mapper import IModelMapper
-from conduit.infrastructure.models.prueba import Prueba
+from app.domain.mapper import IModelMapper
+from app.infrastructure.models.prueba import Prueba
 
 
 class PruebaRepository:

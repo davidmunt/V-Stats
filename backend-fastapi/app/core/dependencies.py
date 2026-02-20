@@ -3,17 +3,17 @@ from typing import Annotated
 from fastapi import Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from conduit.api.schemas.requests.article import ArticlesFilters, ArticlesPagination
-from conduit.core.container import container
-from conduit.core.security import HTTPTokenHeader
-from conduit.domain.dtos.user import UserDTO
-from conduit.services.article import ArticleService
-from conduit.services.auth import UserAuthService
-from conduit.services.auth_token import AuthTokenService
-from conduit.services.comment import CommentService
-from conduit.services.profile import ProfileService
-from conduit.services.tag import TagService
-from conduit.services.user import UserService
+from app.api.schemas.requests.article import ArticlesFilters, ArticlesPagination
+from app.core.container import container
+from app.core.security import HTTPTokenHeader
+from app.domain.dtos.user import UserDTO
+from app.services.article import ArticleService
+from app.services.auth import UserAuthService
+from app.services.auth_token import AuthTokenService
+from app.services.comment import CommentService
+from app.services.profile import ProfileService
+from app.services.tag import TagService
+from app.services.user import UserService
 
 # Este archivo define las dependencias de FastAPI que se pueden inyectar en los endpoints.
 # Aquí se gestionan cosas como:

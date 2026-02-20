@@ -3,7 +3,7 @@ import logging
 import structlog
 from structlog.typing import EventDict, Processor
 
-from conduit.core.config import get_app_settings
+from app.core.config import get_app_settings
 
 __all__ = ["configure_logger"]
 

@@ -1,9 +1,9 @@
 from dataclasses import asdict
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from conduit.domain.dtos.prueba import PruebaDTO, CreatePruebaDTO, UpdatePruebaDTO
-from conduit.domain.repositories.prueba import IPruebaRepository
-from conduit.domain.services.prueba import IPruebaService
+from app.domain.dtos.prueba import PruebaDTO, CreatePruebaDTO, UpdatePruebaDTO
+from app.domain.repositories.prueba import IPruebaRepository
+from app.domain.services.prueba import IPruebaService
 
 
 class PruebaService(IPruebaService):

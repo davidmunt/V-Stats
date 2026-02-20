@@ -1,10 +1,10 @@
 from functools import lru_cache
 
-from conduit.core.settings.app import AppSettings
-from conduit.core.settings.base import AppEnvTypes, BaseAppSettings
-from conduit.core.settings.development import DevAppSettings
-from conduit.core.settings.production import ProdAppSettings
-from conduit.core.settings.test import TestAppSettings
+from app.core.settings.app import AppSettings
+from app.core.settings.base import AppEnvTypes, BaseAppSettings
+from app.core.settings.development import DevAppSettings
+from app.core.settings.production import ProdAppSettings
+from app.core.settings.test import TestAppSettings
 
 # Este archivo define la configuración de la aplicación según el entorno (desarrollo, pruebas o producción)
 # y provee la función get_app_settings() para obtener los settings actuales de manera cacheada.

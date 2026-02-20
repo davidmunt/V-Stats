@@ -1,22 +1,21 @@
 import logging
 from typing import Any
 
-from conduit.core.settings.base import BaseAppSettings
-from version import response
-
+from app.core.settings.base import BaseAppSettings
 
 class AppSettings(BaseAppSettings):
     """
-    Base application settings
+    Base application settings for V-Stats
     """
 
     debug: bool = False
-    docs_url: str = "/"
+    docs_url: str = "/docs" 
     openapi_prefix: str = ""
     openapi_url: str = "/openapi.json"
     redoc_url: str = "/redoc"
-    title: str = response["message"]
-    version: str = response["version"]
+    
+    title: str = "V-Stats API"
+    version: str = "1.0.0"
 
     secret_key: str
 

@@ -3,7 +3,7 @@ import logging
 from pydantic import computed_field
 from sqlalchemy import NullPool
 
-from conduit.core.settings.app import AppSettings
+from app.core.settings.app import AppSettings
 
 
 class TestAppSettings(AppSettings):

@@ -1,4 +1,4 @@
-from conduit.core.settings.app import AppSettings
+from app.core.settings.app import AppSettings
 
 
 class ProdAppSettings(AppSettings):

@@ -1,51 +1,17 @@
 import contextlib
 from collections.abc import AsyncIterator
-
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from conduit.core.config import get_app_settings
-from conduit.core.settings.base import BaseAppSettings
-from conduit.domain.mapper import IModelMapper
-from conduit.domain.repositories.article import IArticleRepository
-from conduit.domain.repositories.article_tag import IArticleTagRepository
-from conduit.domain.repositories.comment import ICommentRepository
-from conduit.domain.repositories.favorite import IFavoriteRepository
-from conduit.domain.repositories.follower import IFollowerRepository
-from conduit.domain.repositories.tag import ITagRepository
-from conduit.domain.repositories.user import IUserRepository
-from conduit.domain.services.article import IArticleService
-from conduit.domain.services.auth import IUserAuthService
-from conduit.domain.services.auth_token import IAuthTokenService
-from conduit.domain.services.comment import ICommentService
-from conduit.domain.services.profile import IProfileService
-from conduit.domain.services.tag import ITagService
-from conduit.domain.services.user import IUserService
-from conduit.infrastructure.mappers.article import ArticleModelMapper
-from conduit.infrastructure.mappers.comment import CommentModelMapper
-from conduit.infrastructure.mappers.tag import TagModelMapper
-from conduit.infrastructure.mappers.user import UserModelMapper
-from conduit.infrastructure.repositories.article import ArticleRepository
-from conduit.infrastructure.repositories.article_tag import ArticleTagRepository
-from conduit.infrastructure.repositories.comment import CommentRepository
-from conduit.infrastructure.repositories.favorite import FavoriteRepository
-from conduit.infrastructure.repositories.follower import FollowerRepository
-from conduit.infrastructure.repositories.tag import TagRepository
-from conduit.infrastructure.repositories.user import UserRepository
-from conduit.services.article import ArticleService
-from conduit.services.auth import UserAuthService
-from conduit.services.auth_token import AuthTokenService
-from conduit.services.comment import CommentService
-from conduit.services.profile import ProfileService
-from conduit.services.tag import TagService
-from conduit.services.user import UserService
+from app.core.config import get_app_settings
+from app.core.settings.base import BaseAppSettings
 
-# Este archivo define el "contenedor de dependencias" de la aplicación.
-# Su función es instanciar y proporcionar de manera centralizada todos los servicios, repositorios y mappers
-# para que puedan ser usados en cualquier parte del proyecto, gestionando además la sesión de la base de datos
-# de forma asíncrona y asegurando commit/rollback automáticos.
+# Solo importamos lo que realmente existe en tus carpetas
+from app.infrastructure.mappers.coach import CoachModelMapper
+from app.infrastructure.repositories.coach import CoachRepository
+from app.services.coach import CoachService
 
 class Container:
-    """Dependency injector project container."""
+    """Dependency injector project container for V-Stats."""
 
     def __init__(self, settings: BaseAppSettings) -> None:
         self._settings = settings
@@ -75,83 +41,18 @@ class Container:
             finally:
                 await session.close()
 
+    # --- MAPPERS ---
     @staticmethod
-    def user_model_mapper() -> IModelMapper:
-        return UserModelMapper()
+    def coach_model_mapper():
+        return CoachModelMapper()
 
-    @staticmethod
-    def tag_model_mapper() -> IModelMapper:
-        return TagModelMapper()
+    # --- REPOSITORIES ---
+    def coach_repository(self):
+        return CoachRepository(coach_mapper=self.coach_model_mapper())
 
-    @staticmethod
-    def article_model_mapper() -> IModelMapper:
-        return ArticleModelMapper()
+    # --- SERVICES ---
+    def coach_service(self):
+        return CoachService(coach_repository=self.coach_repository())
 
-    @staticmethod
-    def comment_model_mapper() -> IModelMapper:
-        return CommentModelMapper()
-
-    def user_repository(self) -> IUserRepository:
-        return UserRepository(user_mapper=self.user_model_mapper())
-
-    @staticmethod
-    def follower_repository() -> IFollowerRepository:
-        return FollowerRepository()
-
-    def tags_repository(self) -> ITagRepository:
-        return TagRepository(tag_mapper=self.tag_model_mapper())
-
-    def article_repository(self) -> IArticleRepository:
-        return ArticleRepository(article_mapper=self.article_model_mapper())
-
-    def article_tag_repository(self) -> IArticleTagRepository:
-        return ArticleTagRepository(tag_mapper=self.tag_model_mapper())
-
-    def comment_repository(self) -> ICommentRepository:
-        return CommentRepository(comment_mapper=self.comment_model_mapper())
-
-    @staticmethod
-    def favorite_repository() -> IFavoriteRepository:
-        return FavoriteRepository()
-
-    def auth_token_service(self) -> IAuthTokenService:
-        return AuthTokenService(
-            secret_key=self._settings.jwt_secret_key,
-            token_expiration_minutes=self._settings.jwt_token_expiration_minutes,
-            algorithm=self._settings.jwt_algorithm,
-        )
-
-    def user_auth_service(self) -> IUserAuthService:
-        return UserAuthService(
-            user_service=self.user_service(),
-            auth_token_service=self.auth_token_service(),
-        )
-
-    def user_service(self) -> IUserService:
-        return UserService(user_repo=self.user_repository())
-
-    def profile_service(self) -> IProfileService:
-        return ProfileService(
-            user_service=self.user_service(), follower_repo=self.follower_repository()
-        )
-
-    def tag_service(self) -> ITagService:
-        return TagService(tag_repo=self.tags_repository())
-
-    def article_service(self) -> IArticleService:
-        return ArticleService(
-            article_repo=self.article_repository(),
-            article_tag_repo=self.article_tag_repository(),
-            favorite_repo=self.favorite_repository(),
-            profile_service=self.profile_service(),
-        )
-
-    def comment_service(self) -> ICommentService:
-        return CommentService(
-            article_repo=self.article_repository(),
-            comment_repo=self.comment_repository(),
-            profile_service=self.profile_service(),
-        )
-
-
-container = Container(settings=get_app_settings())
+# Instancia global para ser usada en el wiring
+container_instance = Container(settings=get_app_settings())

@@ -1,3 +1,4 @@
+from typing import Optional
 from app.domain.dtos.coach import CoachDTO
 from app.domain.mapper import IModelMapper
 from app.infrastructure.models.coach import Coach
@@ -5,44 +6,39 @@ from app.infrastructure.models.coach import Coach
 class CoachModelMapper(IModelMapper[Coach, CoachDTO]):
 
     @staticmethod
-    def to_dto(model: Coach) -> CoachDTO:
-        if not model:
+    def to_dto(model: Coach) -> Optional[CoachDTO]:
+        """
+        Convierte el modelo de SQLAlchemy (Base de Datos) al DTO de Dominio.
+        """
+        if model is None:
             return None
             
         return CoachDTO(
-            id_coach=model.id_coach,
-            slug=model.slug,
+            slug_coach=model.slug,
+            slug_team=model.team.slug if hasattr(model, "team") and model.team else "none",
             name=model.name,
             email=model.email,
-            password=model.password,
             avatar=model.avatar,
-            id_team=model.id_team,
-            refresh_token=model.refresh_token,
-            dark_mode=model.dark_mode,
+            user_type="coach",
             is_active=model.is_active,
-            status=model.status,
-            created_at=model.created_at,
-            updated_at=model.updated_at,
-            boxed_at=model.boxed_at
+            status=model.status
         )
 
     @staticmethod
-    def from_dto(dto: CoachDTO) -> Coach:
-        if not dto:
+    def from_dto(dto: CoachDTO) -> Optional[Coach]:
+        """
+        Convierte el DTO de Dominio al modelo de SQLAlchemy para persistencia.
+        """
+        if dto is None:
             return None
 
         model = Coach(
-            slug=dto.slug,
+            slug=dto.slug_coach,
             name=dto.name,
             email=dto.email,
-            password=dto.password,
             avatar=dto.avatar,
             id_team=dto.id_team,
-            refresh_token=dto.refresh_token,
-            dark_mode=dto.dark_mode,
-            is_active=dto.is_active,
-            status=dto.status,
-            boxed_at=dto.boxed_at
+            status=dto.status if hasattr(dto, "status") else "active"
         )
         
         if hasattr(dto, "id_coach") and dto.id_coach is not None:

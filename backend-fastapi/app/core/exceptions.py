@@ -6,7 +6,7 @@ from starlette.exceptions import HTTPException
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
-from conduit.core.utils.errors import format_errors
+from app.core.utils.errors import format_errors
 
 # Este archivo define las excepciones personalizadas de la aplicación y los handlers para FastAPI.
 # Aquí se centraliza cómo se manejan los errores, incluyendo:
