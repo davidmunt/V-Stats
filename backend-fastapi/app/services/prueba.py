@@ -15,7 +15,6 @@ class PruebaService(IPruebaService):
     async def create_new_prueba(
         self, session: AsyncSession, create_dto: CreatePruebaDTO
     ) -> PruebaDTO:
-        # Llama al repositorio para crear la entidad
         prueba = await self._prueba_repo.add(session=session, create_item=create_dto)
         return PruebaDTO(**asdict(prueba))
 

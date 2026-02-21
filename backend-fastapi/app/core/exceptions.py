@@ -8,13 +8,6 @@ from starlette.responses import JSONResponse
 
 from app.core.utils.errors import format_errors
 
-# Este archivo define las excepciones personalizadas de la aplicación y los handlers para FastAPI.
-# Aquí se centraliza cómo se manejan los errores, incluyendo:
-# - Errores internos de la aplicación (BaseInternalException y sus subclases, como UserNotFoundException o ArticleNotFoundException).
-# - Errores de validación de requests (RequestValidationError).
-# - Errores HTTP estándar (HTTPException).
-# La función add_exception_handlers registra todos los handlers en la app para que cualquier endpoint tenga manejo consistente de errores.
-
 class BaseInternalException(Exception):
     """
     Base error class for inherit all internal errors.

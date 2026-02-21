@@ -27,14 +27,14 @@ class BaseAppSettings(BaseSettings):
     postgres_db: str
 
     jwt_secret_key: str
-    jwt_token_expiration_minutes: int = 60 * 24 * 7  # one week.
+    jwt_token_expiration_minutes: int = 60 * 24 * 7  
     jwt_algorithm: str = "HS256"
 
     class Config:
         env_file = ".env"
         extra = Extra.ignore
 
-    @computed_field  # type: ignore
+    @computed_field 
     @property
     def sql_db_uri(self) -> URL:
         return URL.create(
@@ -46,7 +46,7 @@ class BaseAppSettings(BaseSettings):
             database=self.postgres_db,
         )
 
-    @computed_field  # type: ignore
+    @computed_field 
     @property
     def sqlalchemy_engine_props(self) -> dict:
         return dict(url=self.sql_db_uri)

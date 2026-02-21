@@ -15,14 +15,6 @@ from app.services.profile import ProfileService
 from app.services.tag import TagService
 from app.services.user import UserService
 
-# Este archivo define las dependencias de FastAPI que se pueden inyectar en los endpoints.
-# Aquí se gestionan cosas como:
-# - La sesión de base de datos (DBSession) de forma asíncrona.
-# - Servicios y repositorios a través del contenedor (container).
-# - Autenticación JWT, tanto obligatoria como opcional.
-# - Parámetros de query y paginación para artículos.
-# Permite que los endpoints reciban automáticamente los objetos necesarios sin tener que instanciarlos manualmente.
-
 token_security = HTTPTokenHeader(
     name="Authorization",
     scheme_name="JWT Token",

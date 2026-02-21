@@ -1,40 +1,40 @@
 from typing import Optional
-from app.domain.dtos.coach import CoachDTO
+from app.domain.dtos.analyst import AnalystDTO
 from app.domain.mapper import IModelMapper
-from app.infrastructure.models.coach import Coach
+from app.infrastructure.models.analyst import Analyst
 
-class CoachModelMapper(IModelMapper[Coach, CoachDTO]):
+class AnalystModelMapper(IModelMapper[Analyst, AnalystDTO]):
 
     @staticmethod
-    def to_dto(model: Coach) -> Optional[CoachDTO]:
+    def to_dto(model: Analyst) -> Optional[AnalystDTO]:
         """
         Convierte el modelo de SQLAlchemy (Base de Datos) al DTO de Dominio.
         """
         if model is None:
             return None
             
-        return CoachDTO(
-            slug_coach=model.slug,
+        return AnalystDTO(
+            slug_analyst=model.slug,
             slug_team=model.team.slug if hasattr(model, "team") and model.team else "none",
             name=model.name,
             email=model.email,
             avatar=model.avatar,
-            id_coach=model.id_coach,
-            user_type="coach",
+            id_analyst=model.id_analyst,
+            user_type="analyst",
             is_active=model.is_active,
             status=model.status
         )
 
     @staticmethod
-    def from_dto(dto: CoachDTO) -> Optional[Coach]:
+    def from_dto(dto: AnalystDTO) -> Optional[Analyst]:
         """
         Convierte el DTO de Dominio al modelo de SQLAlchemy para persistencia.
         """
         if dto is None:
             return None
 
-        model = Coach(
-            slug=dto.slug_coach,
+        model = Analyst(
+            slug=dto.slug_analyst,
             name=dto.name,
             email=dto.email,
             avatar=dto.avatar,
@@ -42,7 +42,7 @@ class CoachModelMapper(IModelMapper[Coach, CoachDTO]):
             status=dto.status if hasattr(dto, "status") else "active"
         )
         
-        if hasattr(dto, "id_coach") and dto.id_coach is not None:
-            model.id_coach = dto.id_coach
+        if hasattr(dto, "id_analyst") and dto.id_analyst is not None:
+            model.id_analyst = dto.id_analyst
             
         return model

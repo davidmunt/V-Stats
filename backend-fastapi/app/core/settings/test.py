@@ -20,7 +20,7 @@ class TestAppSettings(AppSettings):
     class Config(AppSettings.Config):
         env_file = ".env.test"
 
-    @computed_field  # type: ignore
+    @computed_field  
     @property
     def sqlalchemy_engine_props(self) -> dict:
         return dict(

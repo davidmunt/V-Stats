@@ -19,7 +19,7 @@ class DevAppSettings(AppSettings):
     class Config(AppSettings.Config):
         env_file = ".env.dev"
 
-    @computed_field  # type: ignore
+    @computed_field  
     @property
     def sqlalchemy_engine_props(self) -> dict:
         return dict(url=self.sql_db_uri, echo=True)

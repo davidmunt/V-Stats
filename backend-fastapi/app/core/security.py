@@ -5,13 +5,6 @@ from starlette.exceptions import HTTPException
 from starlette.requests import Request
 from starlette.status import HTTP_403_FORBIDDEN
 
-# Este archivo define utilidades de seguridad para la API.
-# La clase `HTTPTokenHeader` extiende `APIKeyHeader` de FastAPI para manejar
-# tokens JWT en las cabeceras de autorización.
-# Valida la presencia del token, su esquema ("Token <valor>") y controla
-# si se debe lanzar un error o no cuando falta o es inválido.
-# Se utiliza principalmente en dependencias de FastAPI para proteger rutas.
-
 class HTTPTokenHeader(APIKeyHeader):
 
     def __init__(self, raise_error: bool, *args: Any, **kwargs: Any):

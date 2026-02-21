@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
+from app.core.container import container_instance
 
 from app.api.router import router as api_router
 from app.core.config import get_app_settings
@@ -22,6 +23,7 @@ def create_app() -> FastAPI:
     """
 
     container_instance.coach_service()
+    container_instance.analyst_service()
     settings = get_app_settings()
 
     app = FastAPI(**settings.fastapi_kwargs)

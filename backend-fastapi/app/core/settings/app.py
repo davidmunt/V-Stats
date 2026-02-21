@@ -19,7 +19,7 @@ class AppSettings(BaseAppSettings):
 
     secret_key: str
 
-    api_prefix: str = "/api/v1"
+    api_prefix: str = "/api"
 
     allowed_hosts: list[str] = ["*"]
 

@@ -6,12 +6,9 @@ from app.core.settings.development import DevAppSettings
 from app.core.settings.production import ProdAppSettings
 from app.core.settings.test import TestAppSettings
 
-# Este archivo define la configuración de la aplicación según el entorno (desarrollo, pruebas o producción)
-# y provee la función get_app_settings() para obtener los settings actuales de manera cacheada.
-
 AppEnvType = DevAppSettings | TestAppSettings | ProdAppSettings
 
-environments: dict[str, type[AppEnvType]] = {  # type: ignore
+environments: dict[str, type[AppEnvType]] = {  
     AppEnvTypes.development: DevAppSettings,
     AppEnvTypes.testing: TestAppSettings,
     AppEnvTypes.production: ProdAppSettings,
@@ -25,4 +22,4 @@ def get_app_settings() -> AppSettings:
     """
     app_env = BaseAppSettings().app_env
     config = environments[app_env]
-    return config()  # type: ignore
+    return config()  

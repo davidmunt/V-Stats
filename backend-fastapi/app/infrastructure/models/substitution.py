@@ -23,7 +23,7 @@ class Substitution(Base):
     id_libero_player: Mapped[Optional[int]] = mapped_column(ForeignKey("players.id_player"), nullable=True)
 
     libero_is_replacing: Mapped[Optional[bool]] = mapped_column(Boolean)
-    position: Mapped[int] = mapped_column(Integer, nullable=False) # 1 a 6
+    position: Mapped[int] = mapped_column(Integer, nullable=False) 
 
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     status: Mapped[str] = mapped_column(String, default="active")

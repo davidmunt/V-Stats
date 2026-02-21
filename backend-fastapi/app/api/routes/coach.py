@@ -1,32 +1,29 @@
 from typing import List
 from fastapi import APIRouter, Depends
-from dependency_injector.wiring import inject, Provide
-
-from app.api.schemas.responses.coach import CoachResponse
-from app.core.container import Container
-from app.domain.services.coach import ICoachService
+from app.api.schemas.responses.coach import CoachResponse, CoachesListResponse
+from app.core.container import container_instance 
 
 router = APIRouter()
 
-@router.get("/free", response_model=List[CoachResponse])
-@inject
-async def get_free_coaches(
-    coach_service: ICoachService = Depends(Provide[Container.coach_service]),
-    session_generator = Depends(Provide[Container.session]) # Inyectamos el generador de sesión
-) -> List[CoachResponse]:
-    
-    # Obtenemos la sesión del generador
-    async for session in session_generator:
-        coaches_dtos = await coach_service.get_free_coaches(session)
-        return [CoachResponse.from_dto(dto) for dto in coaches_dtos]
+def get_coach_service():
+    return container_instance.coach_service()
 
-@router.get("/assigned", response_model=List[CoachResponse])
-@inject
+@router.get("/free", response_model=CoachesListResponse) 
+async def get_free_coaches(
+    service = Depends(get_coach_service)
+) -> CoachesListResponse:
+    async with container_instance.context_session() as session:
+        dtos = await service.get_free_coaches(session)
+        return CoachesListResponse(
+            coaches=[CoachResponse.from_dto(d) for d in dtos]
+        )
+
+@router.get("/assigned", response_model=CoachesListResponse)
 async def get_assigned_coaches(
-    coach_service: ICoachService = Depends(Provide[Container.coach_service]),
-    session_generator = Depends(Provide[Container.session])
-) -> List[CoachResponse]:
-    
-    async for session in session_generator:
-        coaches_dtos = await coach_service.get_assigned_coaches(session)
-        return [CoachResponse.from_dto(dto) for dto in coaches_dtos]
+    service = Depends(get_coach_service)
+) -> CoachesListResponse:
+    async with container_instance.context_session() as session:
+        dtos = await service.get_assigned_coaches(session)
+        return CoachesListResponse(
+            coaches=[CoachResponse.from_dto(d) for d in dtos]
+        )

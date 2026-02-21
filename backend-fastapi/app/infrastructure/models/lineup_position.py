@@ -18,7 +18,7 @@ class LineupPosition(Base):
     id_player: Mapped[int] = mapped_column(ForeignKey("players.id_player"), nullable=False)
 
     is_on_court: Mapped[Optional[bool]] = mapped_column(Boolean)
-    initial_position: Mapped[Optional[int]] = mapped_column(Integer) # 1 a 6
+    initial_position: Mapped[Optional[int]] = mapped_column(Integer)
     current_position: Mapped[Optional[int]] = mapped_column(Integer)
 
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)

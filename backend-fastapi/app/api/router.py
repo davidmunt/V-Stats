@@ -1,7 +1,8 @@
 from fastapi import APIRouter
 
-from app.api.routes import coach
+from app.api.routes import coach, analyst
 
 router = APIRouter()
 
 router.include_router(router=coach.router, tags=["Coaches"], prefix="/coaches")
+router.include_router(router=analyst.router, tags=["Analysts"], prefix="/analysts")

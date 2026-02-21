@@ -11,12 +11,6 @@ DEFAULT_LOGGER_NAME = "conduit-api"
 
 settings = get_app_settings()
 
-# Este archivo configura el sistema de logging de la aplicación usando `structlog`.
-# Permite registrar logs estructurados o en consola, controlar el nivel de logs, 
-# y estandarizar el formato de mensajes, incluyendo timestamp, nivel, logger y contexto.
-# Además limpia logs duplicados de Uvicorn y ajusta logs de librerías externas (passlib, asyncio).
-# La función `configure_logger` es la principal para inicializar el logging según el entorno y preferencias.
-
 def rename_event_key(_: logging.Logger, __: str, event_dict: EventDict) -> EventDict:
     """
     Rename `event` field to `message`.
@@ -52,10 +46,7 @@ def configure_logger(json_logs: bool = False) -> None:
     ]
 
     if json_logs:
-        # We rename the `event` key to `message` only in JSON logs.
         shared_processors.append(rename_event_key)
-        # Format the exception only for JSON logs, as we want to pretty-print them when
-        # using the ConsoleRenderer.
         shared_processors.append(structlog.processors.format_exc_info)
 
     structlog.configure(
@@ -77,32 +68,24 @@ def configure_logger(json_logs: bool = False) -> None:
 def _configure_default_logging_by_custom(
     shared_processors: list[Processor], log_renderer: structlog.types.Processor
 ) -> None:
-    # Use `ProcessorFormatter` to format all `logging` entries.
     formatter = structlog.stdlib.ProcessorFormatter(
         foreign_pre_chain=shared_processors,
         processors=[
-            # Remove _record & _from_structlog.
             structlog.stdlib.ProcessorFormatter.remove_processors_meta,
             log_renderer,
         ],
     )
 
     handler = logging.StreamHandler()
-    # Use structlog `ProcessorFormatter` to format all `logging` entries.
     handler.setFormatter(formatter)
 
-    # Disable the `passlib` logger.
     logging.getLogger("passlib").setLevel(logging.ERROR)
     logging.getLogger("asyncio").setLevel(logging.WARNING)
 
-    # Set logging level.
     root_logger = logging.getLogger()
     root_logger.addHandler(handler)
     root_logger.setLevel(settings.logging_level)
 
     for _log in ["uvicorn", "uvicorn.error", "uvicorn.access"]:
-        # Clear the log handlers for uvicorn loggers, and enable propagation
-        # so the messages are caught by our root logger and formatted correctly
-        # by structlog.
         logging.getLogger(_log).handlers.clear()
         logging.getLogger(_log).propagate = True

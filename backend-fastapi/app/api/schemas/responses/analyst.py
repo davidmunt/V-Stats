@@ -1,8 +1,8 @@
 from pydantic import BaseModel
 from typing import List, Optional
 
-class CoachResponse(BaseModel):
-    slug_coach: str
+class AnalystResponse(BaseModel):
+    slug_analyst: str
     name: str
     email: str
     avatar: Optional[str]
@@ -14,7 +14,7 @@ class CoachResponse(BaseModel):
     @classmethod
     def from_dto(cls, dto):
         return cls(
-            slug_coach=dto.slug_coach,
+            slug_analyst=dto.slug_analyst,
             name=dto.name,
             email=dto.email,
             avatar=dto.avatar,
@@ -24,5 +24,5 @@ class CoachResponse(BaseModel):
             status=dto.status
         )
 
-class CoachesListResponse(BaseModel):
-    coaches: List[CoachResponse]
+class AnalystsListResponse(BaseModel):
+    analysts: List[AnalystResponse]
