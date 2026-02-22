@@ -12,12 +12,13 @@ public class CorsConfig {
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             @Override
-            public void addCorsMappings(CorsRegistry corsRegistry) { 
+            public void addCorsMappings(CorsRegistry corsRegistry) {
                 corsRegistry.addMapping("/**")
-                        .allowedOrigins("http://localhost:5173") 
+                        .allowedOrigins("http://localhost:5173")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
-                        .allowedHeaders("*")
-                        .allowCredentials(true);
+                        .allowedHeaders("Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin")
+                        .allowCredentials(true)
+                        .exposedHeaders("Set-Cookie");
             }
         };
     }
