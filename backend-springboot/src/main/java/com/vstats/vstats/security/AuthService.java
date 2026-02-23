@@ -119,15 +119,7 @@ public class AuthService {
                 .build();
         refreshTokenRepository.save(session);
 
-        ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
-                .httpOnly(true)
-                .secure(false)
-                .path("/")
-                .maxAge(refreshExpMillis / 1000)
-                .sameSite("Lax")
-                .build();
-
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        setRefreshCookie(response, refreshToken, getRefreshExpByRole(type));
 
         return mapToResponse(savedEntity, type, accessToken);
     }
@@ -172,15 +164,7 @@ public class AuthService {
 
         refreshTokenRepository.save(session);
 
-        ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
-                .httpOnly(true)
-                .secure(false)
-                .path("/")
-                .maxAge(refreshExpMillis / 1000)
-                .sameSite("Lax")
-                .build();
-
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        setRefreshCookie(response, refreshToken, getRefreshExpByRole(type));
 
         return mapToResponse(userDetails.getEntity(), type, accessToken);
     }
@@ -243,6 +227,61 @@ public class AuthService {
 
         Object userEntity = findUserByIdAndType(session.getIdUser(), type);
         return mapToResponse(userEntity, type, newAccessToken);
+    }
+
+    @Transactional
+    public void logoutDevice(HttpServletRequest request, HttpServletResponse response) {
+        String refreshToken = recoverTokenFromCookie(request, "refreshToken");
+        if (refreshToken == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No se encontró el refresh token");
+        }
+
+        String hashedInput = tokenService.hashToken(refreshToken);
+        RefreshTokenEntity session = refreshTokenRepository.findByHashedToken(hashedInput)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Sesión inválida"));
+
+        if (session.isRevoked()) {
+            handlePotentialAttack(refreshToken);
+            revokeEntireFamily(session.getIdFamily());
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Acceso denegado");
+        }
+
+        session.setRevoked(true);
+        refreshTokenRepository.save(session);
+
+        blacklistRepository.save(RefreshTokenBlacklistEntity.builder()
+                .idUser(session.getIdUser())
+                .userType(session.getUserType())
+                .token(hashedInput)
+                .blacklistedAt(LocalDateTime.now())
+                .reason("LOGOUT_DEVICE")
+                .build());
+
+        setRefreshCookie(response, "", 0);
+    }
+
+    @Transactional
+    public void logoutAll(HttpServletRequest request, HttpServletResponse response) {
+        String refreshToken = recoverTokenFromCookie(request, "refreshToken");
+        if (refreshToken == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No se encontró el refresh token");
+        }
+
+        String hashedInput = tokenService.hashToken(refreshToken);
+        RefreshTokenEntity session = refreshTokenRepository.findByHashedToken(hashedInput)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Sesión inválida"));
+
+        if (session.isRevoked()) {
+            handlePotentialAttack(refreshToken);
+            revokeEntireFamily(session.getIdFamily());
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Acceso denegado");
+        }
+
+        String email = tokenService.extractEmail(refreshToken);
+
+        forceGlobalLogout(email);
+        revokeAllUserSessions(email);
+        setRefreshCookie(response, "", 0);
     }
 
     private UserResponse mapToResponse(Object entity, String type, String token) {

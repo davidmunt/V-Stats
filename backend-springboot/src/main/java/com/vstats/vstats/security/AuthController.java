@@ -4,14 +4,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.vstats.vstats.presentation.requests.auth.LoginUserRequest;
 import com.vstats.vstats.presentation.requests.auth.RegisterUserRequest;
 import com.vstats.vstats.presentation.responses.UserResponse;
-
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -44,5 +41,17 @@ public class AuthController {
             HttpServletRequest request,
             HttpServletResponse response) {
         return ResponseEntity.ok(authService.refresh(request, response));
+    }
+
+    @PostMapping("/logoutDevice")
+    public ResponseEntity<Void> logoutDevice(HttpServletRequest request, HttpServletResponse response) {
+        authService.logoutDevice(request, response);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/logoutAll")
+    public ResponseEntity<Void> logoutAll(HttpServletRequest request, HttpServletResponse response) {
+        authService.logoutAll(request, response);
+        return ResponseEntity.noContent().build();
     }
 }
