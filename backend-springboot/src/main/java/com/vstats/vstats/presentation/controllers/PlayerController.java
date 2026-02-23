@@ -4,6 +4,8 @@ import com.vstats.vstats.application.services.PlayerService;
 import com.vstats.vstats.presentation.requests.player.CreatePlayerRequest;
 import com.vstats.vstats.presentation.requests.player.UpdatePlayerRequest;
 import com.vstats.vstats.presentation.responses.PlayerResponse;
+import com.vstats.vstats.security.authorization.CheckSecurity;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,7 @@ public class PlayerController {
     private final PlayerService playerService;
 
     @PostMapping
+    @CheckSecurity.Players.CanCreate
     public ResponseEntity<Map<String, PlayerResponse>> create(@RequestBody CreatePlayerRequest request) {
         return new ResponseEntity<>(
                 Map.of("player", playerService.createPlayer(request)),
@@ -53,6 +56,7 @@ public class PlayerController {
     }
 
     @PutMapping("/{slug}")
+    @CheckSecurity.Players.CanManage
     public ResponseEntity<Map<String, PlayerResponse>> update(
             @PathVariable String slug,
             @RequestBody UpdatePlayerRequest request) {
@@ -60,6 +64,7 @@ public class PlayerController {
     }
 
     @DeleteMapping("/{slug}")
+    @CheckSecurity.Players.CanManage
     public ResponseEntity<Void> delete(@PathVariable String slug) {
         playerService.deletePlayer(slug);
         return ResponseEntity.noContent().build();

@@ -8,7 +8,11 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "league_admins")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class LeagueAdminEntity {
 
     @Id
@@ -32,8 +36,8 @@ public class LeagueAdminEntity {
     private String refreshToken;
 
     @Builder.Default
-    @Column(name = "dark_mode")
-    private Boolean darkMode = false;
+    @Column(name = "session_version", nullable = false)
+    private Integer sessionVersion = 0;
 
     @Builder.Default
     @Column(name = "is_active")

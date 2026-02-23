@@ -15,17 +15,27 @@ import org.springframework.validation.annotation.Validated;
 @ConfigurationProperties("api.security")
 public class AuthProperties {
 
-    @NotNull
-    private Token token;
+    private Token token = new Token();
+    private Refresh refresh = new Refresh();
 
     @Getter
     @Setter
-    @Validated
     public static class Token {
-        @NotBlank
         private String secret;
+        private Expiration expiration = new Expiration();
+    }
 
-        @NotNull
-        private long expiration;
+    @Getter
+    @Setter
+    public static class Refresh {
+        private Expiration expiration = new Expiration();
+    }
+
+    @Getter
+    @Setter
+    public static class Expiration {
+        private Long user;
+        private Long staff;
+        private Long admin;
     }
 }

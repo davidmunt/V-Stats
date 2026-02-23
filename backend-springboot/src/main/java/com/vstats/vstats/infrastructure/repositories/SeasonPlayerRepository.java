@@ -1,7 +1,7 @@
 package com.vstats.vstats.infrastructure.repositories;
 
-import com.vstats.vstats.domain.entities.PlayerEntity;
 import com.vstats.vstats.domain.entities.SeasonPlayerEntity;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
@@ -12,6 +12,8 @@ import java.util.Optional;
 @Repository
 public interface SeasonPlayerRepository
         extends JpaRepository<SeasonPlayerEntity, Long>, JpaSpecificationExecutor<SeasonPlayerEntity> {
+
+    Optional<SeasonPlayerEntity> findByPlayer_Slug(String slug);
 
     boolean existsByPlayer_SlugAndSeason_IdSeason(String slug, Long idSeason);
 

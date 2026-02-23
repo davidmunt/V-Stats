@@ -40,8 +40,8 @@ public class AnalystEntity {
     private String refreshToken;
 
     @Builder.Default
-    @Column(name = "dark_mode")
-    private Boolean darkMode = false;
+    @Column(name = "session_version", nullable = false)
+    private Integer sessionVersion = 0;
 
     @Builder.Default
     @Column(name = "is_active")

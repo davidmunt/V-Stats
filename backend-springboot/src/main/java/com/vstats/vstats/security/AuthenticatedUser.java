@@ -16,13 +16,16 @@ public class AuthenticatedUser implements UserDetails {
     private final String password;
     private final String role;
     private final Object entity;
+    private final Integer sessionVersion;
 
-    public AuthenticatedUser(Long id, String email, String password, String role, Object entity) {
+    public AuthenticatedUser(Long id, String email, String password, String role, Object entity,
+            Integer sessionVersion) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.role = role;
         this.entity = entity;
+        this.sessionVersion = sessionVersion;
     }
 
     @Override
@@ -39,6 +42,10 @@ public class AuthenticatedUser implements UserDetails {
     @Override
     public String getPassword() {
         return password;
+    }
+
+    public Integer getSessionVersion() {
+        return sessionVersion;
     }
 
     @Override

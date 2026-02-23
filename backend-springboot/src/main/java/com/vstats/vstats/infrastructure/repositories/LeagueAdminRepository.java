@@ -12,6 +12,8 @@ public interface LeagueAdminRepository extends JpaRepository<LeagueAdminEntity, 
 
     boolean existsBySlug(String slug);
 
+    boolean existsByEmail(String email);
+
     Optional<LeagueAdminEntity> findByEmail(String email);
 
 }

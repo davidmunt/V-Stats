@@ -4,10 +4,10 @@ import lombok.Data;
 
 @Data
 public class CreatePlayerRequest {
-    private String slugTeam; 
-    private String name; 
+    private String slug_team;
+    private String name;
     private String role;
-    private String email; 
+    private String email;
     private String avatar;
     private Integer dorsal;
 }

@@ -17,11 +17,13 @@ public class RefreshTokenBlacklistEntity {
     @Column(name = "id_blacklist")
     private Long idBlacklist;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_user", nullable = false)
-    private LeagueAdminEntity user;
+    @Column(name = "id_user", nullable = false)
+    private Long idUser;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "user_type", nullable = false)
+    private String userType;
+
+    @Column(nullable = false)
     private String token;
 
     @Column(name = "blacklisted_at")

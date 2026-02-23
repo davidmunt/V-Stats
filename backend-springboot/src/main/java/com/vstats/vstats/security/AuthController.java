@@ -10,6 +10,9 @@ import com.vstats.vstats.presentation.requests.auth.RegisterUserRequest;
 import com.vstats.vstats.presentation.responses.UserResponse;
 
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -21,12 +24,37 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponse> register(@Valid @RequestBody RegisterUserRequest register) {
-        return ResponseEntity.ok(authService.register(register));
+    public ResponseEntity<UserResponse> register(@Valid @RequestBody RegisterUserRequest register,
+            @RequestHeader(value = "User-Agent", defaultValue = "unknown") String userAgent,
+            HttpServletResponse response) {
+        return ResponseEntity.ok(authService.register(register, userAgent, response));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserResponse> authenticate(@Valid @RequestBody LoginUserRequest authenticate) {
-        return ResponseEntity.ok(authService.authenticate(authenticate));
+    public ResponseEntity<UserResponse> login(
+            @Valid @RequestBody LoginUserRequest authenticate,
+            @RequestHeader(value = "User-Agent", defaultValue = "unknown") String userAgent,
+            HttpServletResponse response) {
+        return ResponseEntity.ok(authService.login(authenticate, userAgent, response));
     }
+
+    // @PostMapping("/refresh")
+    // public ResponseEntity<UserResponse> refresh(
+    // @Valid @RequestBody LoginUserRequest authenticate,
+    // @RequestHeader(value = "User-Agent", defaultValue = "unknown") String
+    // userAgent,
+    // HttpServletResponse response) {
+    // return ResponseEntity.ok(authService.refresh(authenticate, userAgent,
+    // response));
+    // }
+
+    // @PostMapping("/logout")
+    // public ResponseEntity<UserResponse> logout(
+    // @Valid @RequestBody LoginUserRequest authenticate,
+    // @RequestHeader(value = "User-Agent", defaultValue = "unknown") String
+    // userAgent,
+    // HttpServletResponse response) {
+    // return ResponseEntity.ok(authService.logout(authenticate, userAgent,
+    // response));
+    // }
 }

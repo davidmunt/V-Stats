@@ -8,7 +8,11 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class UserEntity {
 
     @Id
@@ -35,8 +39,8 @@ public class UserEntity {
     private Boolean premium = false;
 
     @Builder.Default
-    @Column(name = "dark_mode")
-    private Boolean darkMode = false;
+    @Column(name = "session_version", nullable = false)
+    private Integer sessionVersion = 0;
 
     @Builder.Default
     @Column(name = "is_active")

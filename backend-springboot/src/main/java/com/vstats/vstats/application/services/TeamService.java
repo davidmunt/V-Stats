@@ -35,7 +35,6 @@ public class TeamService {
     private final VenueRepository venueRepository;
     private final CoachRepository coachRepository;
     private final AnalystRepository analystRepository;
-    private final LeagueAdminRepository adminRepository;
 
     @Transactional
     public TeamResponse createTeam(CreateTeamRequest request) {
@@ -148,22 +147,34 @@ public class TeamService {
             ts.getTeam().setImage(request.getImage());
 
         if (request.getSlug_coach() != null) {
+            if (ts.getCoach() != null) {
+                ts.getCoach().setTeam(null);
+            }
+
             if (request.getSlug_coach().isBlank()) {
                 ts.setCoach(null);
             } else {
-                CoachEntity coach = coachRepository.findBySlug(request.getSlug_coach())
+                CoachEntity newCoach = coachRepository.findBySlug(request.getSlug_coach())
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Coach no encontrado"));
-                ts.setCoach(coach);
+
+                newCoach.setTeam(ts.getTeam());
+                ts.setCoach(newCoach);
             }
         }
 
         if (request.getSlug_analyst() != null) {
+            if (ts.getAnalyst() != null) {
+                ts.getAnalyst().setTeam(null);
+            }
+
             if (request.getSlug_analyst().isBlank()) {
                 ts.setAnalyst(null);
             } else {
-                AnalystEntity analyst = analystRepository.findBySlug(request.getSlug_analyst())
+                AnalystEntity newAnalyst = analystRepository.findBySlug(request.getSlug_analyst())
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Analista no encontrado"));
-                ts.setAnalyst(analyst);
+
+                newAnalyst.setTeam(ts.getTeam());
+                ts.setAnalyst(newAnalyst);
             }
         }
 
@@ -210,12 +221,6 @@ public class TeamService {
                 .slug_coach(ts.getCoach() != null ? ts.getCoach().getSlug() : null)
                 .slug_analist(ts.getAnalyst() != null ? ts.getAnalyst().getSlug() : null)
                 .build();
-    }
-
-    private Long getAdminIdBySlug(String slug) {
-        return adminRepository.findBySlug(slug)
-                .orElseThrow(() -> new RuntimeException("Admin no encontrado"))
-                .getIdAdmin();
     }
 
     private String generateUniqueSlug(String name) {

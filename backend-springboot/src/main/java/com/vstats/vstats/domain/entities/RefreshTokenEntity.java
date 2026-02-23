@@ -2,7 +2,6 @@ package com.vstats.vstats.domain.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
@@ -18,16 +17,30 @@ public class RefreshTokenEntity {
     @Column(name = "id_refresh_token")
     private Long idRefreshToken;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_user", nullable = false)
-    private LeagueAdminEntity user;
+    @Column(name = "id_user", nullable = false)
+    private Long idUser;
+
+    @Column(name = "user_type", nullable = false)
+    private String userType;
 
     @Column(nullable = false, unique = true)
-    private String token;
+    private String hashedToken;
+
+    @Column(name = "id_family", nullable = false)
+    private java.util.UUID idFamily;
+
+    @Column(name = "id_device")
+    private String idDevice;
+
+    @Column(name = "session_version", nullable = false)
+    private Integer sessionVersion;
+
+    @Builder.Default
+    private boolean revoked = false;
 
     @Column(name = "expires_at", nullable = false)
     private LocalDateTime expiresAt;
 
-    @CreationTimestamp
+    @org.hibernate.annotations.CreationTimestamp
     private LocalDateTime createdAt;
 }

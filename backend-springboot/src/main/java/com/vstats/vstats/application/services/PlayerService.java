@@ -52,7 +52,7 @@ public class PlayerService {
         SeasonEntity currentSeason = seasonRepository.findByIsActiveTrue()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No hay temporada activa"));
 
-        SeasonTeamEntity seasonTeam = seasonTeamRepository.findByTeam_SlugAndSeason_IsActiveTrue(request.getSlugTeam())
+        SeasonTeamEntity seasonTeam = seasonTeamRepository.findByTeam_SlugAndSeason_IsActiveTrue(request.getSlug_team())
                 .orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "El equipo no compite esta temporada"));
 

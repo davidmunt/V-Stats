@@ -1,5 +1,7 @@
 package com.vstats.vstats.application.services;
 
+import java.util.List;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +14,8 @@ import com.vstats.vstats.infrastructure.repositories.CoachRepository;
 import com.vstats.vstats.infrastructure.repositories.LeagueAdminRepository;
 import com.vstats.vstats.infrastructure.repositories.UserRepository;
 import com.vstats.vstats.presentation.requests.auth.UpdateUserRequest;
+import com.vstats.vstats.presentation.responses.AnalystResponse;
+import com.vstats.vstats.presentation.responses.CoachResponse;
 import com.vstats.vstats.presentation.responses.UserResponse;
 import com.vstats.vstats.security.AuthUtils;
 
@@ -43,6 +47,54 @@ public class UserService {
         };
 
         return mapToResponse(entity, role, token);
+    }
+
+    public List<CoachResponse> getFreeCoaches() {
+        String role = authUtils.getCurrentUserRole();
+
+        if (!role.equals("admin"))
+            throw new SecurityException("Only admins can access this resource");
+
+        List<CoachEntity> entities = coachRepo.findAllByTeamIsNull();
+        return entities.stream()
+                .map(this::mapToCoachResponse)
+                .toList();
+    }
+
+    public List<AnalystResponse> getFreeAnalysts() {
+        String role = authUtils.getCurrentUserRole();
+
+        if (!role.equals("admin"))
+            throw new SecurityException("Only admins can access this resource");
+
+        List<AnalystEntity> entities = analystRepo.findAllByTeamIsNull();
+        return entities.stream()
+                .map(this::mapToAnalystResponse)
+                .toList();
+    }
+
+    public List<CoachResponse> getAssignedCoaches() {
+        String role = authUtils.getCurrentUserRole();
+
+        if (!role.equals("admin"))
+            throw new SecurityException("Only admins can access this resource");
+
+        List<CoachEntity> entities = coachRepo.findAllByTeamIsNotNull();
+        return entities.stream()
+                .map(this::mapToCoachResponse)
+                .toList();
+    }
+
+    public List<AnalystResponse> getAssignedAnalysts() {
+        String role = authUtils.getCurrentUserRole();
+
+        if (!role.equals("admin"))
+            throw new SecurityException("Only admins can access this resource");
+
+        List<AnalystEntity> entities = analystRepo.findAllByTeamIsNotNull();
+        return entities.stream()
+                .map(this::mapToAnalystResponse)
+                .toList();
     }
 
     @Transactional
@@ -137,5 +189,27 @@ public class UserService {
         }
 
         return builder.build();
+    }
+
+    private CoachResponse mapToCoachResponse(CoachEntity e) {
+        return CoachResponse.builder()
+                .name(e.getName())
+                .email(e.getEmail())
+                .avatar(e.getAvatar())
+                .slug_coach(e.getSlug())
+                .user_type("coach") // Añadimos esto para que no sea null
+                .slug_team(e.getTeam() != null ? e.getTeam().getSlug() : null)
+                .build();
+    }
+
+    private AnalystResponse mapToAnalystResponse(AnalystEntity e) {
+        return AnalystResponse.builder()
+                .name(e.getName())
+                .email(e.getEmail())
+                .avatar(e.getAvatar())
+                .slug_analyst(e.getSlug())
+                .user_type("analyst")
+                .slug_team(e.getTeam() != null ? e.getTeam().getSlug() : null)
+                .build();
     }
 }

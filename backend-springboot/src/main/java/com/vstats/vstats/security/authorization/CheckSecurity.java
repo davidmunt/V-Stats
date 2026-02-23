@@ -48,6 +48,20 @@ public @interface CheckSecurity {
         }
     }
 
+    public @interface Players {
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target(ElementType.METHOD)
+        @PreAuthorize("@authZ.isTeamCoach(#request.slugTeam)")
+        public @interface CanCreate {
+        }
+
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target(ElementType.METHOD)
+        @PreAuthorize("@authZ.isPlayerCoach(#slug)")
+        public @interface CanManage {
+        }
+    }
+
     public @interface Venues {
         @Retention(RetentionPolicy.RUNTIME)
         @Target(ElementType.METHOD)

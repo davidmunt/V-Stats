@@ -3,6 +3,7 @@ package com.vstats.vstats.security.authorization;
 import com.vstats.vstats.infrastructure.repositories.CategoryRepository;
 import com.vstats.vstats.infrastructure.repositories.LeagueRepository;
 import com.vstats.vstats.infrastructure.repositories.MatchRepository;
+import com.vstats.vstats.infrastructure.repositories.SeasonPlayerRepository;
 import com.vstats.vstats.infrastructure.repositories.SeasonTeamRepository;
 import com.vstats.vstats.infrastructure.repositories.VenueRepository;
 import com.vstats.vstats.security.AuthUtils;
@@ -18,6 +19,7 @@ public class AuthorizationConfig {
     private final VenueRepository venueRepository;
     private final CategoryRepository categoryRepository;
     private final SeasonTeamRepository seasonTeamRepository;
+    private final SeasonPlayerRepository seasonPlayerRepository;
     private final MatchRepository matchRepository;
 
     public boolean isLeagueAdmin(String slug) {
@@ -66,6 +68,23 @@ public class AuthorizationConfig {
                         return false;
                     }
                 })
+                .orElse(false);
+    }
+
+    public boolean isTeamCoach(String teamSlug) {
+        if (!isAuthenticated())
+            return false;
+        return seasonTeamRepository.findByTeam_Slug(teamSlug)
+                .map(st -> st.getCoach() != null &&
+                        st.getCoach().getIdCoach().equals(authUtils.getCurrentUserId()))
+                .orElse(false);
+    }
+
+    public boolean isPlayerCoach(String playerSlug) {
+        if (!isAuthenticated())
+            return false;
+        return seasonPlayerRepository.findByPlayer_Slug(playerSlug)
+                .map(player -> isTeamCoach(player.getSeasonTeam().getTeam().getSlug()))
                 .orElse(false);
     }
 
