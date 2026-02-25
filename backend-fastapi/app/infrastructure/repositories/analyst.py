@@ -23,6 +23,12 @@ class AnalystRepository(IAnalystRepository):
         result = await session.execute(query)
         analyst_model = result.scalar_one_or_none()
         return self.mapper.to_dto(analyst_model)
+    
+    async def get_by_email(self, session: AsyncSession, email: str) -> Optional[AnalystDTO]:
+        query = select(Analyst).where(Analyst.email == email).options(selectinload(Analyst.team))
+        result = await session.execute(query)
+        analyst_model = result.scalar_one_or_none()
+        return self.mapper.to_dto(analyst_model)
 
     async def get_free_analysts(self, session: AsyncSession) -> List[AnalystDTO]:
         query = select(Analyst).where(Analyst.id_team == None)

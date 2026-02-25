@@ -24,6 +24,12 @@ class CoachRepository(ICoachRepository):
         coach_model = result.scalar_one_or_none()
         return self.mapper.to_dto(coach_model)
 
+    async def get_by_email(self, session: AsyncSession, email: str) -> Optional[CoachDTO]:
+        query = select(Coach).where(Coach.email == email).options(selectinload(Coach.team))
+        result = await session.execute(query)
+        coach_model = result.scalar_one_or_none()
+        return self.mapper.to_dto(coach_model)
+
     async def get_free_coaches(self, session: AsyncSession) -> List[CoachDTO]:
         query = select(Coach).where(Coach.id_team == None)
         result = await session.execute(query)

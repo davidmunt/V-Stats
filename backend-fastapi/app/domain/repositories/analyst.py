@@ -1,5 +1,5 @@
 import abc
-from typing import Any, List
+from typing import Any, List, Optional
 from app.domain.dtos.analyst import AnalystDTO
 
 class IAnalystRepository(abc.ABC):
@@ -11,6 +11,10 @@ class IAnalystRepository(abc.ABC):
 
     @abc.abstractmethod
     async def get_by_id(self, session: Any, analyst_id: int) -> AnalystDTO:
+        ...
+
+    @abc.abstractmethod
+    async def get_by_email(self, session: Any, email: str) -> Optional[AnalystDTO]:
         ...
 
     @abc.abstractmethod

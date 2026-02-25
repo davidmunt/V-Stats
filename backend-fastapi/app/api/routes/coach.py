@@ -1,5 +1,6 @@
 from typing import List
 from fastapi import APIRouter, Depends
+from app.api.dependencies.auth import RoleChecker
 from app.api.schemas.responses.coach import CoachResponse, CoachesListResponse
 from app.core.container import container_instance 
 

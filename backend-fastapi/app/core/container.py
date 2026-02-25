@@ -13,6 +13,13 @@ from app.infrastructure.mappers.analyst import AnalystModelMapper
 from app.infrastructure.repositories.analyst import AnalystRepository
 from app.services.analyst import AnalystService
 
+from app.infrastructure.mappers.league import LeagueModelMapper
+from app.infrastructure.repositories.league import LeagueRepository
+from app.services.league import LeagueService
+
+from app.infrastructure.mappers.team import TeamModelMapper 
+from app.infrastructure.repositories.team import TeamRepository 
+
 class Container:
     """Dependency injector project container for V-Stats."""
 
@@ -53,5 +60,30 @@ class Container:
 
     def analyst_service(self):
         return AnalystService(analyst_repository=self.analyst_repository())
+    
+    @staticmethod    
+    def league_model_mapper():
+        return LeagueModelMapper()
+
+    def league_repository(self):
+        return LeagueRepository(league_mapper=self.league_model_mapper())
+    
+    def league_repository(self):
+        return LeagueRepository(mapper=self.league_model_mapper())
+
+    def league_service(self):
+        return LeagueService(
+            coach_repo=self.coach_repository(),
+            analyst_repo=self.analyst_repository(),
+            team_repo=self.team_repository(),
+            league_repo=self.league_repository()
+        )
+    
+    @staticmethod
+    def team_model_mapper():
+        return TeamModelMapper()
+
+    def team_repository(self):
+        return TeamRepository(team_mapper=self.team_model_mapper())
 
 container_instance = Container(settings=get_app_settings())

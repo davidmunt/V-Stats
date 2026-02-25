@@ -1,5 +1,5 @@
 import abc
-from typing import Any, List
+from typing import Any, List, Optional
 from app.domain.dtos.coach import CoachDTO
 
 class ICoachRepository(abc.ABC):
@@ -11,6 +11,10 @@ class ICoachRepository(abc.ABC):
 
     @abc.abstractmethod
     async def get_by_id(self, session: Any, coach_id: int) -> CoachDTO:
+        ...
+
+    @abc.abstractmethod
+    async def get_by_email(self, session: Any, email: str) -> Optional[CoachDTO]:
         ...
 
     @abc.abstractmethod

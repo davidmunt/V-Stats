@@ -12,25 +12,15 @@ class HTTPTokenHeader(APIKeyHeader):
         self.raise_error = raise_error
 
     async def __call__(self, request: Request) -> str | None:
-        api_key = request.headers.get(self.model.name)
+        api_key = request.headers.get("Authorization") 
         if not api_key:
-            if not self.raise_error:
-                return ""
-            raise HTTPException(
-                status_code=HTTP_403_FORBIDDEN,
-                detail="Missing authorization credentials",
-            )
+            if not self.raise_error: return ""
+            raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Missing auth credentials")
 
         try:
             token_prefix, token = api_key.split(" ")
+            if token_prefix.lower() != "bearer":
+                raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Invalid token type")
+            return token
         except ValueError:
-            raise HTTPException(
-                status_code=HTTP_403_FORBIDDEN, detail="Invalid token schema"
-            )
-
-        if token_prefix.lower() != "token":
-            raise HTTPException(
-                status_code=HTTP_403_FORBIDDEN, detail="Invalid token schema"
-            )
-
-        return token
+            raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Invalid token schema")
