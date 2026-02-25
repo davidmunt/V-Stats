@@ -1,8 +1,8 @@
 export interface LineupPosition {
-  id_lineup_position: string;
-  id_lineup: string;
-  id_team: string;
-  id_player: string;
+  slug_lineup_position: string;
+  slug_lineup: string;
+  slug_team: string;
+  slug_player: string;
   dorsal: number;
   is_on_court: boolean;
   initial_position: number;

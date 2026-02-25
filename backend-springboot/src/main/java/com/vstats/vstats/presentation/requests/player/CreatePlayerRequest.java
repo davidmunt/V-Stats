@@ -7,7 +7,6 @@ public class CreatePlayerRequest {
     private String slug_team;
     private String name;
     private String role;
-    private String email;
-    private String avatar;
+    private String image;
     private Integer dorsal;
 }

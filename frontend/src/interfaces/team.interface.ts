@@ -1,10 +1,9 @@
 export interface Team {
-  id_team: string;
-  id_venue: string;
-  id_coach: string | null;
-  id_analyst: string | null;
-  id_league: string;
-  slug: string;
+  slug_team: string;
+  slug_venue: string;
+  slug_coach: string | null;
+  slug_analyst: string | null;
+  slug_league: string;
   name: string;
   image: string;
   created_at: Date;

@@ -7,6 +7,8 @@ import { ACCESS_TOKEN_KEY } from "@/constants/token.constant";
 import { useCurrentUserQuery } from "@/queries/auth/useCurrentUser";
 import { useLoginMutation } from "@/mutations/auth/useLogin";
 import { useRegisterMutation } from "@/mutations/auth/useRegister";
+import { useLogoutDeviceMutation } from "@/mutations/auth/useLogoutDevice";
+import { useLogoutAllMutation } from "@/mutations/auth/useLogoutAll";
 import type { UserRole } from "@/interfaces/user.interface";
 
 type Props = {
@@ -24,6 +26,8 @@ const AuthProvider = ({ children }: Props) => {
 
   const loginMutation = useLoginMutation();
   const registerMutation = useRegisterMutation();
+  const logoutDeviceMutation = useLogoutDeviceMutation();
+  const logoutAllMutation = useLogoutAllMutation();
 
   const login = async (email: string, password: string) => {
     await loginMutation.mutateAsync({ email, password });
@@ -35,8 +39,20 @@ const AuthProvider = ({ children }: Props) => {
     setHasToken(true);
   };
 
-  const logout = () => {
+  // const logoutDevice = async () => {
+  //   tokenService.removeToken(ACCESS_TOKEN_KEY);
+  //   await logoutDeviceMutation.reset();
+  //   setHasToken(false);
+  //   navigate("/auth", { replace: true });
+  // };
+
+  const logoutDevice = async () => {
+    logoutDeviceMutation.mutate();
+  };
+
+  const logoutAll = async () => {
     tokenService.removeToken(ACCESS_TOKEN_KEY);
+    await logoutAllMutation.reset();
     setHasToken(false);
     navigate("/auth", { replace: true });
   };
@@ -51,7 +67,8 @@ const AuthProvider = ({ children }: Props) => {
         isLoading,
         login,
         register,
-        logout,
+        logoutDevice,
+        logoutAll,
       }}
     >
       {children}

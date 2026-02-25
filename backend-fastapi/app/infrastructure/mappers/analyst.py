@@ -20,6 +20,7 @@ class AnalystModelMapper(IModelMapper[Analyst, AnalystDTO]):
             email=model.email,
             avatar=model.avatar,
             id_analyst=model.id_analyst,
+            id_team=model.id_team,
             user_type="analyst",
             is_active=model.is_active,
             status=model.status

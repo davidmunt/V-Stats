@@ -1,12 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
-import { getAnalystById } from "@/services/analyst/analystService";
+import { getAnalystBySlug } from "@/services/analyst/analystService";
 
-export const ANALYST_DETAIL_KEY = (id: string) => ["analysts", "detail", id];
+export const ANALYST_DETAIL_KEY = (slug: string) => ["analysts", "detail", slug];
 
-export const useAnalystDetailQuery = (id: string | null) => {
+export const useAnalystDetailQuery = (slug: string | null) => {
   return useQuery({
-    queryKey: ANALYST_DETAIL_KEY(id || ""),
-    queryFn: () => getAnalystById(id!),
-    enabled: !!id,
+    queryKey: ANALYST_DETAIL_KEY(slug || ""),
+    queryFn: () => getAnalystBySlug(slug!),
+    enabled: !!slug,
   });
 };

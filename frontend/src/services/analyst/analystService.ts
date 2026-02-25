@@ -10,16 +10,16 @@ interface SingleAnalystResponse {
 }
 
 export const getFreeAnalysts = async (): Promise<Analyst[]> => {
-  const response = await apiClient.get<AnalystsResponse>("express", `/analysts/free`);
+  const response = await apiClient.get<AnalystsResponse>("spring", `/api/user/free/analysts`);
   return response.data.analysts;
 };
 
 export const getAssignedAnalysts = async (): Promise<Analyst[]> => {
-  const response = await apiClient.get<AnalystsResponse>("express", `/analysts/assigned`);
+  const response = await apiClient.get<AnalystsResponse>("spring", `/api/user/assigned/analysts`);
   return response.data.analysts;
 };
 
-export const getAnalystById = async (id: string): Promise<Analyst> => {
-  const response = await apiClient.get<SingleAnalystResponse>("express", `/analyst/${id}`);
+export const getAnalystBySlug = async (slug_analyst: string): Promise<Analyst> => {
+  const response = await apiClient.get<SingleAnalystResponse>("express", `/analyst/${slug_analyst}`);
   return response.data.analyst;
 };

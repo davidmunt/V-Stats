@@ -1,6 +1,5 @@
 export interface TeamStanding {
-  id_team: string;
-  slug: string;
+  slug_team: string;
   name: string;
   image: string;
   played: number;

@@ -2,12 +2,12 @@ export type ActionType = "SERVE" | "RECEPTION" | "SET" | "ATTACK" | "BLOCK" | "E
 export type ResultType = "SUCCESS" | "FAIL" | "ACE" | "BLOCKED" | "ERROR";
 
 export interface Action {
-  id_action: string;
-  id_match: string;
-  id_set: string;
-  id_team: string;
-  id_player: string;
-  id_point_for_team?: string;
+  slug_action: string;
+  slug_match: string;
+  slug_set: string;
+  slug_team: string;
+  slug_player: string;
+  slug_point_for_team?: string;
   player_position: number;
   action_type: ActionType;
   result: ResultType;

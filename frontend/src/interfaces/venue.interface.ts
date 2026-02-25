@@ -1,8 +1,7 @@
 export type VenueStatus = "ACTIVE" | "INACTIVE" | "MAINTENANCE";
 
 export interface Venue {
-  id_venue: string;
-  slug: string;
+  slug_venue: string;
   name: string;
   address: string;
   city: string;

@@ -7,7 +7,11 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "players")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class PlayerEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,10 +24,8 @@ public class PlayerEntity {
     @Column(nullable = false)
     private String name;
 
-    @Column(unique = true)
-    private String email;
-
-    private String avatar;
+    @Column(columnDefinition = "TEXT")
+    private String image;
 
     @Builder.Default
     @Column(name = "is_active")

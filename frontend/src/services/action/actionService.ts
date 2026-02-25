@@ -11,11 +11,11 @@ interface SingleActionResponse {
 }
 
 export const createAction = async ({
-  slug,
-  id_point_for_team,
+  slug_set,
+  slug_point_for_team,
   action_type,
-  id_player,
-  id_team,
+  slug_player,
+  slug_team,
   player_position,
   result,
   end_x,
@@ -23,11 +23,11 @@ export const createAction = async ({
   start_x,
   start_y,
 }: CreateActionParam): Promise<Action> => {
-  const response = await apiClient.post<SingleActionResponse>("express", `/set/${slug}/action`, {
-    id_point_for_team,
+  const response = await apiClient.post<SingleActionResponse>("express", `/set/${slug_set}/action`, {
+    slug_point_for_team,
     action_type,
-    id_player,
-    id_team,
+    slug_player,
+    slug_team,
     player_position,
     result,
     end_x,
@@ -38,6 +38,6 @@ export const createAction = async ({
   return response.data.action;
 };
 
-export const cancelLastAction = async (slug: string, teamSlug: string): Promise<void> => {
-  await apiClient.delete<void>("express", `/set/${slug}/${teamSlug}/action`);
+export const cancelLastAction = async (slug_set: string, team_slug: string): Promise<void> => {
+  await apiClient.delete<void>("express", `/set/${slug_set}/${team_slug}/action`);
 };

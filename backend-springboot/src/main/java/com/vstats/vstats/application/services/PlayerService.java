@@ -42,11 +42,9 @@ public class PlayerService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El dorsal no puede ser negativo");
         }
 
-        if (request.getEmail() != null && !request.getEmail().isBlank()) {
-            playerRepository.findByEmail(request.getEmail()).ifPresent(other -> {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "El email ya está registrado por otro jugador");
-            });
+        if (seasonPlayerRepository.existsByDorsalAndSeasonTeam_Team_Slug(request.getDorsal(), request.getSlug_team())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "El dorsal " + request.getDorsal() + " ya está asignado en este equipo");
         }
 
         SeasonEntity currentSeason = seasonRepository.findByIsActiveTrue()
@@ -67,8 +65,7 @@ public class PlayerService {
                         PlayerEntity.builder()
                                 .name(request.getName())
                                 .slug(slug)
-                                .email(request.getEmail())
-                                .avatar(request.getAvatar())
+                                .image(request.getImage())
                                 .status("active")
                                 .isActive(true)
                                 .build()));
@@ -164,18 +161,17 @@ public class PlayerService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El dorsal no puede ser negativo");
         }
 
-        if (request.getEmail() != null && !request.getEmail().equals(sp.getPlayer().getEmail())) {
-            playerRepository.findByEmail(request.getEmail()).ifPresent(other -> {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "El email ya está registrado por otro jugador");
-            });
+        if (seasonPlayerRepository.existsByDorsalAndSeasonTeam_IdTeamSeasonAndIdSeasonPlayerNot(
+                request.getDorsal(),
+                sp.getSeasonTeam().getIdTeamSeason(),
+                sp.getIdSeasonPlayer())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Ese dorsal ya lo tiene otro compañero");
         }
 
         PlayerEntity p = sp.getPlayer();
         p.setName(request.getName());
-        p.setEmail(request.getEmail());
-        if (request.getAvatar() != null)
-            p.setAvatar(request.getAvatar());
+        if (request.getImage() != null)
+            p.setImage(request.getImage());
 
         sp.setDorsal(request.getDorsal());
         sp.setRole(request.getRole());
@@ -216,10 +212,10 @@ public class PlayerService {
                 .slug_team(sp.getSeasonTeam().getTeam().getSlug())
                 .slug_season(sp.getSeason().getName())
                 .name(sp.getPlayer().getName())
-                .email(sp.getPlayer().getEmail())
                 .dorsal(sp.getDorsal().toString())
                 .role(sp.getRole())
-                .avatar(sp.getPlayer().getAvatar())
+                .image(sp.getPlayer().getImage())
+                .status(sp.getStatus())
                 .isActive(sp.getIsActive())
                 .createdAt(sp.getPlayer().getCreatedAt())
                 .build();

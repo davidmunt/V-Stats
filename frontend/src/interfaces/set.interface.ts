@@ -1,7 +1,6 @@
 export interface Set {
-  slug: string;
-  id_set: string;
-  id_match: string;
+  slug_set: string;
+  slug_match: string;
   set_number: number;
   local_points: number;
   visitor_points: number;

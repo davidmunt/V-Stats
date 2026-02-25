@@ -1,4 +1,4 @@
-import { useCategoryLeaguesQuery } from "@/queries/categoryLeagues/useCategoryLeagues";
+import { useCategoryLeaguesQuery } from "@/queries/category/useCategories";
 
 interface CategorySelectProps {
   value: string;
@@ -19,7 +19,7 @@ export const CategorySelect = ({ value, onChange }: CategorySelectProps) => {
 
       {categories?.map((cat) => (
         //cambiar de slug a slug_...
-        <option key={cat.slug} value={cat.slug}>
+        <option key={cat.slug_category} value={cat.slug_category}>
           {cat.name}
         </option>
       ))}

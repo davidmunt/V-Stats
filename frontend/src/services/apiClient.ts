@@ -13,20 +13,45 @@ const axiosInstance = axios.create();
 axiosInstance.interceptors.request.use((config) => {
   const jwtToken = token.getToken(ACCESS_TOKEN_KEY);
   if (jwtToken) {
-    config.headers.Authorization = `Token ${jwtToken}`;
+    config.headers.Authorization = `Bearer ${jwtToken}`;
   }
   return config;
 });
 
+let isRefreshing = false;
 axiosInstance.interceptors.response.use(
   (response) => response,
-  (error: AxiosError) => {
-    if (error.response) {
-      const { status } = error.response;
-      if (status === 401 || status === 403) {
+  async (error: AxiosError) => {
+    const originalRequest = error.config;
+    if (!error.response || !originalRequest) {
+      return Promise.reject(error);
+    }
+    const { status } = error.response;
+    if (status === 401 && !isRefreshing) {
+      isRefreshing = true;
+      try {
+        const response = await axiosInstance.post(
+          `${API_URLS.spring}/api/auth/refresh`,
+          {},
+          {
+            withCredentials: true,
+          },
+        );
+        const newToken = response.data.accessToken;
+        token.setToken(ACCESS_TOKEN_KEY, newToken);
+        if (originalRequest.headers) {
+          originalRequest.headers.Authorization = `Bearer ${newToken}`;
+        }
+        isRefreshing = false;
+        return axiosInstance(originalRequest);
+      } catch (refreshError) {
+        isRefreshing = false;
         token.removeToken(ACCESS_TOKEN_KEY);
+        window.location.href = "/auth";
+        return Promise.reject(refreshError);
       }
     }
+
     return Promise.reject(error);
   },
 );

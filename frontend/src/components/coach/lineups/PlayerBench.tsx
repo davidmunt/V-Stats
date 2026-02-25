@@ -19,7 +19,7 @@ interface DraggablePlayerProps {
 
 const DraggablePlayer = ({ player }: DraggablePlayerProps) => {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
-    id: player.id_player,
+    id: player.slug_player,
     data: { player },
   });
 
@@ -63,12 +63,12 @@ export const PlayerBench = ({ allPlayers, lineupState }: PlayerBenchProps) => {
 
   // Dentro de PlayerBench.tsx
   const playerIdsOnCourt = Object.values(lineupState)
-    .filter((p): p is Player => Boolean(p && p.id_player)) // Doble comprobación
-    .map((p) => p.id_player);
+    .filter((p): p is Player => Boolean(p && p.slug_player)) // Doble comprobación
+    .map((p) => p.slug_player);
 
   const benchPlayers = (allPlayers || []).filter((p) => {
-    if (!p || !p.id_player) return false;
-    return !playerIdsOnCourt.includes(p.id_player);
+    if (!p || !p.slug_player) return false;
+    return !playerIdsOnCourt.includes(p.slug_player);
   });
 
   return (
@@ -92,7 +92,7 @@ export const PlayerBench = ({ allPlayers, lineupState }: PlayerBenchProps) => {
             .sort((a, b) => (a.dorsal || 0) - (b.dorsal || 0))
             .map((player) =>
               // Verificación final antes de renderizar el Draggable
-              player?.id_player ? <DraggablePlayer key={player.id_player} player={player} /> : null,
+              player?.slug_player ? <DraggablePlayer key={player.slug_player} player={player} /> : null,
             )}
         </div>
       )}

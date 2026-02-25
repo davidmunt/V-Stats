@@ -30,6 +30,8 @@ public class UserEntity {
     private String email;
 
     private String password;
+
+    @Column(columnDefinition = "TEXT")
     private String avatar;
 
     @Column(name = "refresh_token")

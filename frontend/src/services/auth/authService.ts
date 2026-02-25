@@ -4,12 +4,12 @@ import type { Auth } from "@/interfaces/auth.interface";
 import type { User } from "@/interfaces/user.interface";
 
 export const login = async ({ email, password }: LoginParam): Promise<Auth> => {
-  const response = await apiClient.post<Auth>("express", "/auth/login", { email, password });
+  const response = await apiClient.post<Auth>("spring", "/api/auth/login", { email, password });
   return response.data;
 };
 
 export const register = async ({ name, email, password, user_type }: RegisterParam): Promise<Auth> => {
-  const response = await apiClient.post<Auth>("express", "/auth/register", {
+  const response = await apiClient.post<Auth>("spring", "/api/auth/register", {
     name,
     email,
     password,
@@ -19,11 +19,19 @@ export const register = async ({ name, email, password, user_type }: RegisterPar
 };
 
 export const getCurrentUser = async (): Promise<User> => {
-  const response = await apiClient.get<User>("express", "/auth/me");
+  const response = await apiClient.get<User>("spring", "/api/user");
   return response.data;
 };
 
+export const logoutDevice = async () => {
+  await apiClient.post<Auth>("spring", "/api/auth/logoutDevice");
+};
+
+export const logoutAll = async () => {
+  await apiClient.post<Auth>("spring", "/api/auth/logoutAll");
+};
+
 export const updateUser = async (data: UpdateUserParam): Promise<User> => {
-  const response = await apiClient.put<User>("express", "/auth/me", data);
+  const response = await apiClient.put<User>("spring", "/api/user/updateUser", data);
   return response.data;
 };

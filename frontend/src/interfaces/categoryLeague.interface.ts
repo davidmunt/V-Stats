@@ -1,6 +1,5 @@
 export interface CategoryLeague {
-  id_category_league: string;
-  slug: string;
+  slug_category: string;
   name: string;
   description: string;
   image: string;

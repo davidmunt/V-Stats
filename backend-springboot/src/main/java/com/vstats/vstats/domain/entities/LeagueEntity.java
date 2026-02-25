@@ -29,6 +29,7 @@ public class LeagueEntity {
     @Column(nullable = false)
     private String country;
 
+    @Column(columnDefinition = "TEXT")
     private String image;
 
     @ManyToOne(fetch = FetchType.LAZY)

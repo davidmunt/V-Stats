@@ -20,6 +20,7 @@ class CoachModelMapper(IModelMapper[Coach, CoachDTO]):
             email=model.email,
             avatar=model.avatar,
             id_coach=model.id_coach,
+            id_team=model.id_team,
             user_type="coach",
             is_active=model.is_active,
             status=model.status

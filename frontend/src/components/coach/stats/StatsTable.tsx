@@ -18,8 +18,8 @@ export const StatsTable = ({ actions, myTeamId }: StatsTableProps) => {
     const total = filtered.length;
     if (total === 0) return { total: 0, points: 0, errors: 0, efficiency: 0 };
 
-    const points = filtered.filter((a) => a.id_point_for_team === myTeamId).length;
-    const errors = filtered.filter((a) => a.id_point_for_team !== myTeamId && a.id_point_for_team !== null).length;
+    const points = filtered.filter((a) => a.slug_point_for_team === myTeamId).length;
+    const errors = filtered.filter((a) => a.slug_point_for_team !== myTeamId && a.slug_point_for_team !== null).length;
 
     return {
       total,
@@ -80,7 +80,8 @@ export const StatsTable = ({ actions, myTeamId }: StatsTableProps) => {
         <div className="text-center">
           <p className="text-[10px] font-bold text-gray-400 uppercase">Ef. Global</p>
           <p className="text-xl font-black text-slate-800">
-            {actions.length > 0 ? Math.round((actions.filter((a) => a.id_point_for_team === myTeamId).length / actions.length) * 100) : 0}%
+            {actions.length > 0 ? Math.round((actions.filter((a) => a.slug_point_for_team === myTeamId).length / actions.length) * 100) : 0}
+            %
           </p>
         </div>
       </div>

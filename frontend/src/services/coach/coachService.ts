@@ -10,16 +10,16 @@ interface SingleCoachResponse {
 }
 
 export const getFreeCoaches = async (): Promise<Coach[]> => {
-  const response = await apiClient.get<CoachesResponse>("express", `/coaches/free`);
+  const response = await apiClient.get<CoachesResponse>("spring", `/api/user/free/coaches`);
   return response.data.coaches;
 };
 
 export const getAssignedCoaches = async (): Promise<Coach[]> => {
-  const response = await apiClient.get<CoachesResponse>("express", `/coaches/assigned`);
+  const response = await apiClient.get<CoachesResponse>("spring", `/api/user/assigned/coaches`);
   return response.data.coaches;
 };
 
-export const getCoachById = async (id: string): Promise<Coach> => {
-  const response = await apiClient.get<SingleCoachResponse>("express", `/coach/${id}`);
+export const getCoachBySlug = async (slug_coach: string): Promise<Coach> => {
+  const response = await apiClient.get<SingleCoachResponse>("express", `/coach/${slug_coach}`);
   return response.data.coach;
 };

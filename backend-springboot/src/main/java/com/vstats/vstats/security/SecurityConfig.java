@@ -28,6 +28,7 @@ public class SecurityConfig {
     private static final String[] PUBLIC_READ_ENDPOINTS = {
             "/api/leagues/**",
             "/api/teams/**",
+            "/api/lineups/**",
             "/api/players/**",
             "/api/categories/**",
             "/api/venues/**",

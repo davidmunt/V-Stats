@@ -5,10 +5,9 @@ import lombok.Data;
 @Data
 
 public class UpdatePlayerRequest {
-    private String name; 
+    private String name;
     private String role;
-    private String email; 
-    private String avatar;
+    private String image;
     private Integer dorsal;
     private String status;
 }

@@ -1,13 +1,13 @@
 export interface SaveLineupParam {
-  matchSlug: string;
-  teamSlug: string;
+  slug_match: string;
+  slug_team: string;
   positions: {
-    player_id: string;
+    slug_player: string;
     position: number;
   }[];
 }
 
 export interface UpdateLineupPositionParam {
-  positionSlug: string;
-  player_id: string;
+  slug_position: string;
+  slug_player: string;
 }

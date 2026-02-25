@@ -7,6 +7,7 @@ import { useNextMatchForCoachQuery } from "@/queries/match/useNextMatchForCoach"
 import { usePlayersCoachQuery } from "@/queries/players/usePlayersCoach";
 import { useCoachLineupQuery } from "@/queries/lineups/useCoachLineup";
 import { useSaveLineupMutation } from "@/mutations/lineups/useSaveLineup";
+import { useCurrentUserQuery } from "@/queries/auth/useCurrentUser";
 
 import type { Player } from "@/interfaces/player.interface";
 import LoadingFallback from "@/components/LoadingFallback";
@@ -19,11 +20,15 @@ interface LineupManagerProps {
 }
 
 export const LineupManager = ({ coachSlug }: LineupManagerProps) => {
-  const { data: match, isLoading: isLoadingMatch } = useNextMatchForCoachQuery(coachSlug);
+  const { data: currentUser } = useCurrentUserQuery();
+  const { data: match, isLoading: isLoadingMatch } = useNextMatchForCoachQuery();
   const nextMatch = match || null;
   const { data: players, isLoading: isLoadingPlayers } = usePlayersCoachQuery(coachSlug);
-  const { data: existingLineupData, isLoading: isLoadingLineup } = useCoachLineupQuery(nextMatch?.slug || "", coachSlug);
-  const saveMutation = useSaveLineupMutation(nextMatch?.slug || "", coachSlug);
+  const { data: existingLineupData, isLoading: isLoadingLineup } = useCoachLineupQuery(
+    nextMatch?.slug_match || "",
+    currentUser?.slug_team || "",
+  );
+  const saveMutation = useSaveLineupMutation(nextMatch?.slug_match || "", coachSlug);
   const [lineupState, setLineupState] = useState<Record<number, Player | null>>({
     1: null,
     2: null,
@@ -50,16 +55,16 @@ export const LineupManager = ({ coachSlug }: LineupManagerProps) => {
 
         if (positionKey >= 1 && positionKey <= 7) {
           baseState[positionKey] = {
-            id_player: pos.id_player,
+            slug_player: pos.slug_player,
             name: pos.name,
             dorsal: pos.dorsal,
             role: pos.role,
             image: pos.image,
-            slug: "",
-            id_team: existingLineupData.lineup.id_team,
+            slug: pos.slug_player, // Usamos el slug del jugador
+            slug_team: existingLineupData.lineup.slug_team, // Nombre correcto según tu interfaz
             status: "active",
             is_active: true,
-          } as Player;
+          } as unknown as Player; // Doble conversión para evitar el error de overlap
         }
       });
 
@@ -78,7 +83,7 @@ export const LineupManager = ({ coachSlug }: LineupManagerProps) => {
       setLineupState((prev) => {
         const newState = { ...prev };
         Object.keys(newState).forEach((key) => {
-          if (newState[Number(key)]?.id_player === draggedPlayer.id_player) {
+          if (newState[Number(key)]?.slug_player === draggedPlayer.slug_player) {
             newState[Number(key)] = null;
           }
         });
@@ -91,7 +96,7 @@ export const LineupManager = ({ coachSlug }: LineupManagerProps) => {
       setLineupState((prev) => {
         const newState = { ...prev };
         Object.keys(newState).forEach((key) => {
-          if (newState[Number(key)]?.id_player === draggedPlayer.id_player) {
+          if (newState[Number(key)]?.slug_player === draggedPlayer.slug_player) {
             newState[Number(key)] = null;
           }
         });
@@ -113,13 +118,13 @@ export const LineupManager = ({ coachSlug }: LineupManagerProps) => {
     const positionsToSave = Object.entries(lineupState)
       .filter((entry) => entry[1] !== null)
       .map(([pos, player]) => ({
-        player_id: player!.id_player,
+        slug_player: player!.slug_player, // Nombre corregido
         position: Number(pos),
       }));
     try {
       await saveMutation.mutateAsync({
-        matchSlug: nextMatch!.slug,
-        teamSlug: coachSlug,
+        slug_match: nextMatch!.slug_match, // Nombre corregido según SaveLineupParam
+        slug_team: currentUser?.slug_team || "", // Nombre corregido y valor real del equipo
         positions: positionsToSave,
       });
       Swal.fire({

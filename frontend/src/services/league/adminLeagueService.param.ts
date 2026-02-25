@@ -1,17 +1,15 @@
 export interface CreateLeagueParam {
   name: string;
   country: string;
-  category: string;
-  season: string;
+  slug_category: string;
   image?: string;
 }
 
 export interface UpdateLeagueParam {
-  slug: string;
+  slug_league: string;
   name: string;
   country: string;
-  category: string;
-  season: string;
+  slug_category: string;
   image?: string;
   status: string;
   is_active: boolean;
@@ -27,5 +25,5 @@ export interface GetFilteredLeagueParam {
 }
 
 export interface DeleteLeagueParam {
-  slug: string;
+  slug_league: string;
 }

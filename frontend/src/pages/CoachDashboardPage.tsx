@@ -12,10 +12,10 @@ import LoadingFallback from "@/components/LoadingFallback";
 const CoachDashboardPage = () => {
   const [currentView, setCurrentView] = useState<string>("players");
   const { data: coach, isLoading: isLoadingCoach } = useCurrentUserQuery();
-  const { data: league, isLoading: isLoadingLeague } = useCoachLeagueQuery(coach?.slug || "");
+  const { data: league, isLoading: isLoadingLeague } = useCoachLeagueQuery();
 
   if (isLoadingCoach || isLoadingLeague) return <LoadingFallback />;
-  const hasTeam = !!coach?.id_team;
+  const hasTeam = !!coach?.slug_team;
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -32,9 +32,9 @@ const CoachDashboardPage = () => {
         ) : (
           <>
             {currentView === "players" && <PlayersManager />}
-            {currentView === "lineup" && <LineupManager coachSlug={coach?.slug || "slug"} />}
-            {currentView === "positionTable" && <CoachStandings leagueSlug={league?.slug || ""} />}
-            {currentView === "calendar" && <CoachMatchesCalendar coachSlug={coach?.slug || ""} />}
+            {currentView === "lineup" && <LineupManager coachSlug={coach?.slug_user || "slug"} />}
+            {currentView === "positionTable" && <CoachStandings leagueSlug={league?.slug_league || ""} />}
+            {currentView === "calendar" && <CoachMatchesCalendar coachSlug={coach?.slug_user || ""} />}
             {currentView === "stats" && <StatsManager />}
           </>
         )}

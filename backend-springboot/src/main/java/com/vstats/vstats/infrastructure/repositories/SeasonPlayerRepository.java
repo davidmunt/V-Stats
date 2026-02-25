@@ -17,6 +17,12 @@ public interface SeasonPlayerRepository
 
     boolean existsByPlayer_SlugAndSeason_IdSeason(String slug, Long idSeason);
 
+    boolean existsByDorsalAndSeasonTeam_Team_Slug(Integer dorsal, String teamSlug);
+
+    // Cambiado 'IdSeasonTeam' por 'IdTeamSeason'
+    boolean existsByDorsalAndSeasonTeam_IdTeamSeasonAndIdSeasonPlayerNot(Integer dorsal, Long idTeamSeason,
+            Long idSeasonPlayer);
+
     // Buscar por el slug del jugador en la temporada activa
     Optional<SeasonPlayerEntity> findByPlayer_SlugAndSeason_IsActiveTrue(String playerSlug);
 

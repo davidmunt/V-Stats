@@ -12,9 +12,9 @@ export const useUpdatePlayerMutation = (coachSlug: string) => {
     mutationFn: (data: UpdatePlayerParam) => updatePlayer(data),
     onSuccess: (updatedPlayer) => {
       queryClient.setQueryData<Player[]>(PLAYERS_COACH_LIST_KEY(coachSlug), (oldPlayers) => {
-        return oldPlayers?.map((p) => (p.slug === updatedPlayer.slug ? updatedPlayer : p));
+        return oldPlayers?.map((p) => (p.slug_player === updatedPlayer.slug_player ? updatedPlayer : p));
       });
-      queryClient.setQueryData(PLAYER_DETAIL_QUERY_KEY(updatedPlayer.slug), updatedPlayer);
+      queryClient.setQueryData(PLAYER_DETAIL_QUERY_KEY(updatedPlayer.slug_player), updatedPlayer);
     },
   });
 };

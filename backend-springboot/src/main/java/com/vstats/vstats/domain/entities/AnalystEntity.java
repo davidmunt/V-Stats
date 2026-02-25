@@ -30,6 +30,8 @@ public class AnalystEntity {
     private String email;
 
     private String password;
+
+    @Column(columnDefinition = "TEXT")
     private String avatar;
 
     @ManyToOne(fetch = FetchType.LAZY)

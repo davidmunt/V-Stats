@@ -2,9 +2,8 @@ export type PlayerRole = "SETTER" | "MIDDLE" | "OUTSIDE" | "OPPOSITE" | "LIBERO"
 export type PlayerStatus = "ACTIVE" | "INACTIVE" | "INJURED" | "SUSPENDED";
 
 export interface Player {
-  id_player: string;
-  slug: string;
-  id_team: string;
+  slug_player: string;
+  slug_team: string;
   name: string;
   dorsal: number;
   role: PlayerRole;

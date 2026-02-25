@@ -1,12 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
-import { getCoachById } from "@/services/coach/coachService";
+import { getCoachBySlug } from "@/services/coach/coachService";
 
-export const COACH_DETAIL_KEY = (id: string) => ["coaches", "detail", id];
+export const COACH_DETAIL_KEY = (slug: string) => ["coaches", "detail", slug];
 
-export const useCoachByIdQuery = (id: string | null) => {
+export const useCoachByIdQuery = (slug: string | null) => {
   return useQuery({
-    queryKey: COACH_DETAIL_KEY(id || ""),
-    queryFn: () => getCoachById(id!),
-    enabled: !!id,
+    queryKey: COACH_DETAIL_KEY(slug || ""),
+    queryFn: () => getCoachBySlug(slug!),
+    enabled: !!slug,
   });
 };

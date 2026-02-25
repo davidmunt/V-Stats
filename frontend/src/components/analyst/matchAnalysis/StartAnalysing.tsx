@@ -24,7 +24,7 @@ export const StartAnalysing = ({ match, analystSlug }: StartAnalysingProps) => {
     }
 
     try {
-      await startMutation.mutateAsync(match.slug);
+      await startMutation.mutateAsync(match.slug_match);
     } catch (error: unknown) {
       const errMsg =
         (error as { response?: { data?: { message?: string } } })?.response?.data?.message ||

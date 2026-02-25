@@ -6,7 +6,7 @@ interface HeatMapAvantagesProps {
 }
 
 export const HeatMapAvantages = ({ actions, myTeamId }: HeatMapAvantagesProps) => {
-  const ofensivePoints = actions.filter((s) => s.id_point_for_team === myTeamId);
+  const ofensivePoints = actions.filter((s) => s.slug_point_for_team === myTeamId);
 
   return (
     <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">

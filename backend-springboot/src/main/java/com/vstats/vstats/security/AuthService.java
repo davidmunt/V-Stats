@@ -10,7 +10,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
 import com.vstats.vstats.domain.entities.AnalystEntity;
@@ -66,9 +65,9 @@ public class AuthService {
         if (request.getUser_type() == null || request.getUser_type().trim().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El tipo de usuario es obligatorio.");
         }
-        if (request.getPassword().length() < 6) {
+        if (request.getPassword().length() < 5) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "La contraseña debe tener al menos 6 caracteres.");
+                    "La contraseña debe tener al menos 5 caracteres.");
         }
 
         Boolean emailExists = switch (request.getUser_type().toLowerCase()) {
@@ -85,27 +84,39 @@ public class AuthService {
         String slug = generateUniqueSlug(request.getName());
         String type = request.getUser_type().toLowerCase();
 
-        String accessToken = tokenService.generateAccessToken(request.getEmail(), type);
+        Object savedEntity = switch (type) {
+            case "admin" -> adminRepo.save(LeagueAdminEntity.builder()
+                    .name(request.getName()).email(request.getEmail())
+                    .avatar("https://static.productionready.io/images/smiley-cyrus.jpg")
+                    .password(encodedPassword).slug(slug).status("active").build());
+            case "coach" -> coachRepo.save(CoachEntity.builder()
+                    .name(request.getName()).email(request.getEmail())
+                    .avatar("https://static.productionready.io/images/smiley-cyrus.jpg")
+                    .password(encodedPassword).slug(slug).status("active").build());
+            case "analyst" -> analystRepo.save(AnalystEntity.builder()
+                    .name(request.getName()).email(request.getEmail())
+                    .avatar("https://static.productionready.io/images/smiley-cyrus.jpg")
+                    .password(encodedPassword).slug(slug).status("active").build());
+            default -> userRepo.save(UserEntity.builder()
+                    .name(request.getName()).email(request.getEmail())
+                    .avatar("https://static.productionready.io/images/smiley-cyrus.jpg")
+                    .password(encodedPassword).slug(slug).status("active").build());
+        };
+
+        AuthenticatedUser authUser = new AuthenticatedUser(
+                getEntityId(savedEntity),
+                request.getEmail(),
+                null,
+                type,
+                savedEntity,
+                0);
+
+        String accessToken = tokenService.generateAccessToken(authUser);
         String refreshToken = tokenService.generateRefreshToken(request.getEmail(), type);
 
         var hashedRefreshToken = tokenService.hashToken(refreshToken);
         UUID familyId = UUID.randomUUID();
         long refreshExpMillis = getRefreshExpByRole(type);
-
-        Object savedEntity = switch (type) {
-            case "admin" -> adminRepo.save(LeagueAdminEntity.builder()
-                    .name(request.getName()).email(request.getEmail())
-                    .password(encodedPassword).slug(slug).status("active").build());
-            case "coach" -> coachRepo.save(CoachEntity.builder()
-                    .name(request.getName()).email(request.getEmail())
-                    .password(encodedPassword).slug(slug).status("active").build());
-            case "analyst" -> analystRepo.save(AnalystEntity.builder()
-                    .name(request.getName()).email(request.getEmail())
-                    .password(encodedPassword).slug(slug).status("active").build());
-            default -> userRepo.save(UserEntity.builder()
-                    .name(request.getName()).email(request.getEmail())
-                    .password(encodedPassword).slug(slug).status("active").build());
-        };
 
         RefreshTokenEntity session = RefreshTokenEntity.builder()
                 .idUser(getEntityId(savedEntity))
@@ -132,9 +143,9 @@ public class AuthService {
         if (request.getPassword() == null || request.getPassword().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La contraseña es obligatoria.");
         }
-        if (request.getPassword().length() < 6) {
+        if (request.getPassword().length() < 5) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "La contraseña debe tener al menos 6 caracteres.");
+                    "La contraseña debe tener al menos 5 caracteres.");
         }
         var auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
@@ -142,7 +153,7 @@ public class AuthService {
         AuthenticatedUser userDetails = (AuthenticatedUser) auth.getPrincipal();
         String type = userDetails.getRole().toLowerCase();
 
-        String accessToken = tokenService.generateAccessToken(userDetails.getEmail(), type);
+        String accessToken = tokenService.generateAccessToken(userDetails);
         String refreshToken = tokenService.generateRefreshToken(userDetails.getEmail(), type);
 
         var hashedRefreshToken = tokenService.hashToken(refreshToken);
@@ -214,7 +225,14 @@ public class AuthService {
         String email = tokenService.extractEmail(refreshToken);
         String type = session.getUserType().toLowerCase();
 
-        String newAccessToken = tokenService.generateAccessToken(email, type);
+        String newAccessToken = tokenService.generateAccessToken(
+                new AuthenticatedUser(
+                        session.getIdUser(),
+                        email,
+                        null,
+                        type,
+                        findUserByIdAndType(session.getIdUser(), type),
+                        userVersion));
         String newRefreshToken = tokenService.generateRefreshToken(email, type);
         String newHashedToken = tokenService.hashToken(newRefreshToken);
 

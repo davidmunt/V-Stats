@@ -32,18 +32,40 @@ public class TokenService {
     private final AnalystRepository analystRepo;
     private final UserRepository userRepo;
 
-    public String generateAccessToken(String email, String role) {
-        long expiration = switch (role.toLowerCase()) {
-            case "admin" -> properties.getToken().getExpiration().getAdmin();
-            case "coach", "analyst" -> properties.getToken().getExpiration().getStaff();
-            default -> properties.getToken().getExpiration().getUser();
-        };
+    // public String generateAccessToken(String email, String role) {
+    // long expiration = switch (role.toLowerCase()) {
+    // case "admin" -> properties.getToken().getExpiration().getAdmin();
+    // case "coach", "analyst" -> properties.getToken().getExpiration().getStaff();
+    // default -> properties.getToken().getExpiration().getUser();
+    // };
 
+    // Map<String, Object> claims = new HashMap<>();
+    // claims.put("role", role.toLowerCase());
+    // claims.put("type", "access");
+
+    // return buildToken(claims, email, expiration);
+    // }
+
+    public String generateAccessToken(AuthenticatedUser user) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("role", role.toLowerCase());
+
+        // 1. Metemos el rol
+        claims.put("role", user.getRole());
+
+        claims.put("role", user.getRole());
+
+        // 2. Metemos la versión (VITAL para que el filtro no de 403)
+        claims.put("session_version", user.getSessionVersion());
+
+        // 3. Metemos el tipo de token
         claims.put("type", "access");
 
-        return buildToken(claims, email, expiration);
+        // 4. Usamos las propiedades para obtener el tiempo de expiración
+        // Ajusta 'user', 'staff' o 'admin' según el tipo de usuario si es necesario,
+        // o usa un valor genérico si lo tienes así definido.
+        long expiration = properties.getToken().getExpiration().getAdmin();
+
+        return buildToken(claims, user.getUsername(), expiration);
     }
 
     public String generateRefreshToken(String email, String role) {

@@ -14,8 +14,8 @@ interface PlayerFormProps {
 export const PlayerForm = ({ initialData, onCancel, onSuccess }: PlayerFormProps) => {
   const isEditing = !!initialData;
   const { data: coach } = useCurrentUserQuery();
-  const createMutation = useCreatePlayerMutation(coach?.slug ? coach?.slug : "slug");
-  const updateMutation = useUpdatePlayerMutation(initialData?.slug || "");
+  const createMutation = useCreatePlayerMutation(coach?.slug_user ? coach?.slug_user : "slug");
+  const updateMutation = useUpdatePlayerMutation(initialData?.slug_player || "");
 
   const [formData, setFormData] = useState({
     name: initialData?.name || "",
@@ -41,7 +41,7 @@ export const PlayerForm = ({ initialData, onCancel, onSuccess }: PlayerFormProps
     try {
       if (isEditing && initialData) {
         await updateMutation.mutateAsync({
-          slug: initialData.slug,
+          slug_player: initialData.slug_player,
           ...formData,
         });
         await Swal.fire({
@@ -53,7 +53,7 @@ export const PlayerForm = ({ initialData, onCancel, onSuccess }: PlayerFormProps
         });
       } else {
         await createMutation.mutateAsync({
-          slug: coach?.slug || "",
+          slug_team: coach?.slug_team || "",
           ...formData,
         });
         await Swal.fire({

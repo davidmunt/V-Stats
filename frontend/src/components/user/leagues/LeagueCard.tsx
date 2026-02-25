@@ -18,7 +18,7 @@ export const LeagueCard = ({ league }: LeagueCardProps) => {
         />
         <div className="absolute top-3 right-3">
           <span className="px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-[10px] font-black uppercase text-slate-700 shadow-sm">
-            {league.id_category_league}
+            {league.slug_category}
           </span>
         </div>
       </div>
@@ -38,7 +38,7 @@ export const LeagueCard = ({ league }: LeagueCardProps) => {
         </div>
 
         <button
-          onClick={() => navigate(`/league/${league.slug}`)}
+          onClick={() => navigate(`/league/${league.slug_league}`)}
           className="mt-auto w-full py-3 bg-slate-900 text-white rounded-xl font-bold text-sm hover:bg-blue-600 transition-colors flex items-center justify-center gap-2 group/btn"
         >
           Explorar Liga

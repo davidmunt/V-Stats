@@ -11,7 +11,7 @@ interface SubstitutionPanelProps {
 
 export const SubstitutionPanel = ({ idLineup, selectedPosition, allPositions, onSuccess }: SubstitutionPanelProps) => {
   const substitutionMutation = useCreateSubstitutionMutation();
-  const substitutePlayer = allPositions.find((p) => p.id_team === selectedPosition.id_team && p.current_position === 7);
+  const substitutePlayer = allPositions.find((p) => p.slug_team === selectedPosition.slug_team && p.current_position === 7);
 
   const handleSubstitute = async () => {
     if (!substitutePlayer) return;
@@ -29,8 +29,8 @@ export const SubstitutionPanel = ({ idLineup, selectedPosition, allPositions, on
       try {
         await substitutionMutation.mutateAsync({
           id_lineup: idLineup,
-          id_player_in: substitutePlayer.id_player,
-          id_player_out: selectedPosition.id_player,
+          id_player_in: substitutePlayer.slug_player,
+          id_player_out: selectedPosition.slug_player,
         });
         onSuccess();
       } catch (error: unknown) {

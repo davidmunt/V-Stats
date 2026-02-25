@@ -13,10 +13,9 @@ public class PlayerResponse {
     private String slug_season;
     private String slug_player;
     private String name;
-    private String email;
     private String dorsal;
     private String role;
-    private String avatar;
+    private String image;
     private String status;
     private Boolean isActive;
     private LocalDateTime createdAt;

@@ -30,7 +30,6 @@ public class AuthenticatedUser implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Si quieres usar minúsculas, asegúrate de que el prefijo sea ROLE_
         return List.of(new SimpleGrantedAuthority("ROLE_" + role.toLowerCase()));
     }
 

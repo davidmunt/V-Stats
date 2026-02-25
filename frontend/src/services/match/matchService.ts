@@ -62,7 +62,7 @@ export const deleteMatch = async ({ matchSlug }: { matchSlug: string }): Promise
 };
 
 export const getMatchesFromLeague = async (slug: string): Promise<Match[]> => {
-  const response = await apiClient.get<MatchesResponse>("spring", `api/matches/league/${slug}`);
+  const response = await apiClient.get<MatchesResponse>("spring", `/api/matches/league/${slug}`);
   return response.data.matches;
 };
 
@@ -71,13 +71,13 @@ export const getMatchesForCoach = async (slug: string): Promise<Match[]> => {
   return response.data.matches;
 };
 
-export const getNextMatchForCoach = async (slug: string): Promise<Match> => {
-  const response = await apiClient.get<SingleMatchResponse>("express", `/match/next/coach/${slug}`);
+export const getNextMatchForCoach = async (): Promise<Match> => {
+  const response = await apiClient.get<SingleMatchResponse>("fastapi", `/api/matches/next`);
   return response.data.match;
 };
 
-export const getNextMatchForAnalyst = async (slug: string): Promise<Match> => {
-  const response = await apiClient.get<SingleMatchResponse>("express", `/match/next/analyst/${slug}`);
+export const getNextMatchForAnalyst = async (): Promise<Match> => {
+  const response = await apiClient.get<SingleMatchResponse>("fastapi", `/api/matches/next`);
   return response.data.match;
 };
 

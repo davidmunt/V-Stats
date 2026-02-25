@@ -17,30 +17,31 @@ export interface SingleLineupResponse {
 
 export interface AllLineupsResponse {
   lineups: {
-    id_lineup: string;
-    team_id: { name: string; slug: string };
+    slug_lineup: string;
+    slug_team: { name: string; slug_team: string };
     positions: LineupPositionPopulated[];
   }[];
 }
 
-export const saveLineup = async ({ matchSlug, teamSlug, positions }: SaveLineupParam): Promise<void> => {
-  await apiClient.post("express", `/lineup/${matchSlug}/${teamSlug}`, {
+export const saveLineup = async ({ slug_match, slug_team, positions }: SaveLineupParam): Promise<void> => {
+  await apiClient.post("spring", `/api/lineups/${slug_match}`, {
+    slug_team,
     positions,
   });
 };
 
-export const updateLineupPosition = async ({ positionSlug, player_id }: UpdateLineupPositionParam): Promise<void> => {
-  await apiClient.put("express", `/lineup/position/${positionSlug}`, {
-    player_id,
+export const updateLineupPosition = async ({ slug_position, slug_player }: UpdateLineupPositionParam): Promise<void> => {
+  await apiClient.put("express", `/lineup/position/${slug_position}`, {
+    slug_player,
   });
 };
 
-export const getLineupByTeam = async (matchSlug: string, teamSlug: string): Promise<SingleLineupResponse> => {
-  const response = await apiClient.get<SingleLineupResponse>("express", `/lineup/${matchSlug}/${teamSlug}`);
+export const getLineupByTeam = async (slug_match: string, slug_team: string): Promise<SingleLineupResponse> => {
+  const response = await apiClient.get<SingleLineupResponse>("spring", `/api/lineups/${slug_match}/${slug_team}`);
   return response.data;
 };
 
-export const getMatchLineups = async (matchSlug: string): Promise<MatchLineupsResponse> => {
-  const response = await apiClient.get<{ lineups: MatchLineupsResponse }>("express", `/lineups/${matchSlug}`);
+export const getMatchLineups = async (slug_match: string): Promise<MatchLineupsResponse> => {
+  const response = await apiClient.get<{ lineups: MatchLineupsResponse }>("express", `/lineups/${slug_match}`);
   return response.data.lineups;
 };

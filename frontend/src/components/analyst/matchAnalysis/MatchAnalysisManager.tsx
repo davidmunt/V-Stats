@@ -15,14 +15,14 @@ import { useFinishedSetsQuery } from "@/queries/set/useSetsFromMatch";
 export const MatchAnalysisManager = ({ analystSlug }: { analystSlug: string }) => {
   const [selectedPosition, setSelectedPosition] = useState<LineupPosition | null>(null);
   const { data: match, isLoading: isLoadingMatch } = useNextMatchForAnalystQuery(analystSlug);
-  const { data: actualSet, isLoading: isLoadingSet } = useActualSetQuery(match?.slug || "");
-  const { data: lineups, isLoading: isLoadingMatchLineups } = useMatchLineupsQuery(match?.slug || "");
-  const { data: finishedSetsData } = useFinishedSetsQuery(match?.slug || "");
+  const { data: actualSet, isLoading: isLoadingSet } = useActualSetQuery(match?.slug_match || "");
+  const { data: lineups, isLoading: isLoadingMatchLineups } = useMatchLineupsQuery(match?.slug_match || "");
+  const { data: finishedSetsData } = useFinishedSetsQuery(match?.slug_match || "");
   const previousMatchId = useRef<string | null>(null);
   const lastScore = useRef({ local: 0, visitor: 0 });
 
   useEffect(() => {
-    if (previousMatchId.current && (!match || match.id_match !== previousMatchId.current)) {
+    if (previousMatchId.current && (!match || match.slug_match !== previousMatchId.current)) {
       const { local, visitor } = lastScore.current;
 
       Swal.fire({
@@ -56,7 +56,7 @@ export const MatchAnalysisManager = ({ analystSlug }: { analystSlug: string }) =
       });
     }
     if (match) {
-      previousMatchId.current = match.id_match;
+      previousMatchId.current = match.slug_match;
       if (finishedSetsData && finishedSetsData.length > 0) {
         const score = finishedSetsData.reduce(
           (acc, set) => {
@@ -97,7 +97,7 @@ export const MatchAnalysisManager = ({ analystSlug }: { analystSlug: string }) =
 
   return (
     <div className="flex flex-col gap-6 max-w-[1600px] mx-auto p-4">
-      <Scoreboard matchSlug={match.slug} />
+      <Scoreboard matchSlug={match.slug_match} />
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         <div className="lg:col-span-8 bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
           <AnalysisCourt homeLineup={homeLineupMap} awayLineup={awayLineupMap} onPlayerClick={(player) => setSelectedPosition(player)} />
@@ -106,17 +106,19 @@ export const MatchAnalysisManager = ({ analystSlug }: { analystSlug: string }) =
           {selectedPosition ? (
             <>
               <SubstitutionPanel
-                idLineup={lineups?.home?.id_team === selectedPosition.id_team ? lineups.home.id_lineup : lineups?.away?.id_lineup || ""}
+                idLineup={
+                  lineups?.home?.slug_team === selectedPosition.slug_team ? lineups.home.slug_lineup : lineups?.away?.slug_lineup || ""
+                }
                 selectedPosition={selectedPosition}
                 allPositions={[...(lineups?.home?.positions || []), ...(lineups?.away?.positions || [])]}
                 onSuccess={() => setSelectedPosition(null)}
               />
 
               <ActionPanel
-                setSlug={actualSet.slug}
+                setSlug={actualSet.slug_set}
                 selectedPosition={selectedPosition}
-                teamLocalId={match.id_team_local}
-                teamVisitorId={match.id_team_visitor}
+                teamLocalId={match.slug_team_local}
+                teamVisitorId={match.slug_team_visitor}
                 onSuccess={() => setSelectedPosition(null)}
               />
             </>

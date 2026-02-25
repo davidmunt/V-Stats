@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 @Entity
 @Table(name = "refresh_token_blacklist")
 @Getter
@@ -30,4 +33,15 @@ public class RefreshTokenBlacklistEntity {
     private LocalDateTime blacklistedAt;
 
     private String reason;
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @Column(name = "boxed_at")
+    private LocalDateTime boxedAt;
 }

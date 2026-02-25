@@ -3,11 +3,13 @@ package com.vstats.vstats.presentation.controllers;
 import com.vstats.vstats.presentation.requests.lineup.*;
 import com.vstats.vstats.presentation.responses.LineupResponse;
 import com.vstats.vstats.presentation.responses.LineupsMatchResponse;
+import com.vstats.vstats.security.authorization.CheckSecurity;
 import com.vstats.vstats.application.services.LineupService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -22,13 +24,12 @@ public class LineupController {
     private final LineupService lineupService;
 
     @PostMapping("/{slugMatch}")
+    @PreAuthorize("hasRole('coach')")
     public ResponseEntity<Map<String, LineupResponse>> create(
             @PathVariable String slugMatch,
             @RequestBody CreateLineupRequest request) {
-        // El coachId lo podrías sacar del token JWT más adelante, ahora simulamos uno
-        Long coachId = 1234567890L;
         return new ResponseEntity<>(
-                Map.of("lineup", lineupService.createLineup(request, slugMatch, coachId)),
+                Map.of("lineup", lineupService.createLineup(request, slugMatch)),
                 HttpStatus.CREATED);
     }
 
@@ -37,8 +38,22 @@ public class LineupController {
         return ResponseEntity.ok(lineupService.getLineupsByMatch(slugMatch));
     }
 
-    @GetMapping("/{slugTeam}")
-    public ResponseEntity<Map<String, LineupResponse>> getOne(@PathVariable String slugTeam) {
-        return ResponseEntity.ok(Map.of("match", lineupService.getLineup(slugTeam)));
+    @GetMapping("/{slugMatch}/{slugTeam}")
+    @PreAuthorize("hasRole('coach')")
+    public ResponseEntity<Map<String, Object>> getOne(
+            @PathVariable String slugMatch,
+            @PathVariable String slugTeam) {
+
+        LineupResponse data = lineupService.getLineup(slugMatch, slugTeam);
+
+        if (data.getSlug() == null) {
+            return ResponseEntity.ok(Map.of(
+                    "lineup", Map.of(),
+                    "positions", new ArrayList<>()));
+        }
+
+        return ResponseEntity.ok(Map.of(
+                "lineup", data,
+                "positions", data.getPositions()));
     }
 }

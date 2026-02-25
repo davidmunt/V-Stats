@@ -26,7 +26,12 @@ export const Scoreboard = ({ matchSlug }: ScoreboardProps) => {
 
   const handleAddPoint = async (teamId: string) => {
     try {
-      await addPoint.mutateAsync({ setSlug: actualSet.slug, id_team: teamId, id_point_for_team: teamId, action_type: "POINT_ADJUSTMENT" });
+      await addPoint.mutateAsync({
+        setSlug: actualSet.slug_set,
+        id_team: teamId,
+        id_point_for_team: teamId,
+        action_type: "POINT_ADJUSTMENT",
+      });
     } catch (error: unknown) {
       const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || "Error";
       Swal.fire({
@@ -41,7 +46,7 @@ export const Scoreboard = ({ matchSlug }: ScoreboardProps) => {
   const handleRemovePoint = async (teamSlug: string) => {
     try {
       await deletePoint.mutateAsync({
-        setSlug: actualSet.slug,
+        setSlug: actualSet.slug_set,
         teamSlug: teamSlug,
       });
     } catch (error: unknown) {
@@ -65,14 +70,14 @@ export const Scoreboard = ({ matchSlug }: ScoreboardProps) => {
           <span className="font-bold text-sm uppercase tracking-wider text-center">{teamHome.name}</span>
           <div className="flex items-center gap-4">
             <button
-              onClick={() => handleRemovePoint(teamHome.slug)}
+              onClick={() => handleRemovePoint(teamHome.slug_team)}
               className="w-8 h-8 flex items-center justify-center rounded-full bg-red-500/20 hover:bg-red-500 transition-colors text-red-500 hover:text-white"
             >
               -
             </button>
             <span className="text-6xl font-black tabular-nums">{actualSet.local_points}</span>
             <button
-              onClick={() => handleAddPoint(teamHome.id_team)}
+              onClick={() => handleAddPoint(teamHome.slug_team)}
               className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-600 hover:bg-blue-700 shadow-lg active:scale-90 transition-transform text-2xl font-bold"
             >
               +
@@ -92,14 +97,14 @@ export const Scoreboard = ({ matchSlug }: ScoreboardProps) => {
           <span className="font-bold text-sm uppercase tracking-wider text-center">{teamAway.name}</span>
           <div className="flex items-center gap-4">
             <button
-              onClick={() => handleAddPoint(teamAway.id_team)}
+              onClick={() => handleAddPoint(teamAway.slug_team)}
               className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-600 hover:bg-blue-700 shadow-lg active:scale-90 transition-transform text-2xl font-bold"
             >
               +
             </button>
             <span className="text-6xl font-black tabular-nums">{actualSet.visitor_points}</span>
             <button
-              onClick={() => handleRemovePoint(teamAway.slug)}
+              onClick={() => handleRemovePoint(teamAway.slug_team)}
               className="w-8 h-8 flex items-center justify-center rounded-full bg-red-500/20 hover:bg-red-500 transition-colors text-red-500 hover:text-white"
             >
               -

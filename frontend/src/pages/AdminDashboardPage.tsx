@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CategoriesManager } from "@/components/admin/CategortyLeague/CategoriesManager";
+import { CategoriesManager } from "@/components/admin/category/CategoriesManager";
 import { LeaguesManager } from "@/components/admin/league/LeaguesManager";
 import { VenuesManager } from "@/components/admin/venue/VenuesManager";
 import Sidebar from "@/components/reutilizables/SideBarDashboards";

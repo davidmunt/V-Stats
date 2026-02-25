@@ -11,8 +11,4 @@ public interface PlayerRepository extends JpaRepository<PlayerEntity, Long> {
     Optional<PlayerEntity> findBySlug(String slug);
 
     boolean existsBySlug(String slug);
-
-    // List<PlayerEntity> findAllByIdTeam(String idTeam);
-
-    Optional<PlayerEntity> findByEmail(String email);
 }

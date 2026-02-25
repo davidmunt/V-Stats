@@ -22,8 +22,8 @@ const getRoleDetails = (role: PlayerRole) => {
 
 export const PlayersList = ({ onCreate, onEdit }: PlayersListProps) => {
   const { data: coach } = useCurrentUserQuery();
-  const { data: players, isLoading, isError } = usePlayersCoachQuery(coach?.slug ? coach?.slug : "slug");
-  const deleteMutation = useDeletePlayerMutation(coach?.slug || "");
+  const { data: players, isLoading, isError } = usePlayersCoachQuery(coach?.slug_user ? coach?.slug_user : "slug");
+  const deleteMutation = useDeletePlayerMutation(coach?.slug_user || "");
 
   const handleDelete = (playerSlug: string) => {
     deleteMutation.mutate({ slug: playerSlug });
@@ -64,7 +64,7 @@ export const PlayersList = ({ onCreate, onEdit }: PlayersListProps) => {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {players.map((player) => (
-                  <tr key={player.id_player} className="hover:bg-gray-50 transition-colors">
+                  <tr key={player.slug_player} className="hover:bg-gray-50 transition-colors">
                     <td className="py-4 px-4 font-black text-xl text-blue-600">{player.dorsal}</td>
 
                     <td className="py-4 px-4">
@@ -108,7 +108,7 @@ export const PlayersList = ({ onCreate, onEdit }: PlayersListProps) => {
                           Editar
                         </button>
                         <button
-                          onClick={() => handleDelete(player.slug)}
+                          onClick={() => handleDelete(player.slug_player)}
                           disabled={deleteMutation.isPending}
                           className="text-red-500 hover:text-red-700 text-sm font-semibold disabled:opacity-50"
                         >

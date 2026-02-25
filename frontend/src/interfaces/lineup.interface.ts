@@ -1,17 +1,17 @@
 import type { LineupPosition } from "./lineupPosition.interface";
 
 export interface Lineup {
-  id_lineup: string;
-  id_match: string;
-  id_team: string;
+  slug_lineup: string;
+  slug_match: string;
+  slug_team: string;
   created_at: Date;
   status: string;
   is_active: boolean;
 }
 
 export interface LineupWithPositions {
-  id_lineup: string;
-  id_team: string;
+  slug_lineup: string;
+  slug_team: string;
   positions: LineupPosition[];
 }
 

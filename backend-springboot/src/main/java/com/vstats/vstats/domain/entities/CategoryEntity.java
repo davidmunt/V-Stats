@@ -33,6 +33,7 @@ public class CategoryEntity {
     @Column(nullable = false)
     private String description;
 
+    @Column(columnDefinition = "TEXT")
     private String image;
 
     @Builder.Default

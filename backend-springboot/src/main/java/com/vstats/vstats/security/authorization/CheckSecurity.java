@@ -51,7 +51,7 @@ public @interface CheckSecurity {
     public @interface Players {
         @Retention(RetentionPolicy.RUNTIME)
         @Target(ElementType.METHOD)
-        @PreAuthorize("@authZ.isTeamCoach(#request.slugTeam)")
+        @PreAuthorize("@authZ.isTeamCoach(#request.slug_team)")
         public @interface CanCreate {
         }
 

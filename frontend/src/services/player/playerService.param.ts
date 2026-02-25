@@ -1,5 +1,5 @@
 export interface CreatePlayerParam {
-  slug: string;
+  slug_team: string;
   name: string;
   dorsal: number;
   role: string;
@@ -7,7 +7,7 @@ export interface CreatePlayerParam {
 }
 
 export interface UpdatePlayerParam {
-  slug: string;
+  slug_player: string;
   name: string;
   dorsal: number;
   role: string;

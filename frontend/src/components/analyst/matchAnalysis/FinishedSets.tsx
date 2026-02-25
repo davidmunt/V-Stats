@@ -18,7 +18,7 @@ const FinishedSets: React.FC<Props> = ({ matchSlug }) => {
           const localWon = set.local_points > set.visitor_points;
 
           return (
-            <div key={set.id_set} className="flex items-center bg-slate-800 border border-slate-700 rounded px-1.5 py-0.5 shadow-sm">
+            <div key={set.slug_set} className="flex items-center bg-slate-800 border border-slate-700 rounded px-1.5 py-0.5 shadow-sm">
               <span className="text-[10px] text-gray-400 font-medium mr-1">S{set.set_number}</span>
               <div className="flex items-center gap-1 text-[11px] font-mono">
                 <span className={`${localWon ? "text-yellow-400 font-bold" : "text-gray-300"}`}>{set.local_points}</span>

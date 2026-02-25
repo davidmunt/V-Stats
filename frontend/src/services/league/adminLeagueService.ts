@@ -24,32 +24,29 @@ export interface LeaguesFilteredResponse {
   };
 }
 
-export const createLeague = async ({ name, country, category, season, image }: CreateLeagueParam): Promise<League> => {
-  const response = await apiClient.post<SingleLeagueResponse>("express", "/league", {
+export const createLeague = async ({ name, country, slug_category, image }: CreateLeagueParam): Promise<League> => {
+  const response = await apiClient.post<SingleLeagueResponse>("spring", "/api/leagues", {
     name,
     country,
-    category,
-    season,
+    slug_category,
     image,
   });
   return response.data.league;
 };
 
 export const updateLeague = async ({
-  slug,
+  slug_league,
   name,
   country,
-  category,
-  season,
+  slug_category,
   image,
   status,
   is_active,
 }: UpdateLeagueParam): Promise<League> => {
-  const response = await apiClient.put<SingleLeagueResponse>("express", `/league/${slug}`, {
+  const response = await apiClient.put<SingleLeagueResponse>("spring", `/api/leagues/${slug_league}`, {
     name,
     country,
-    category,
-    season,
+    slug_category,
     image,
     status,
     is_active,
@@ -57,8 +54,8 @@ export const updateLeague = async ({
   return response.data.league;
 };
 
-export const deleteLeague = async ({ slug }: DeleteLeagueParam): Promise<void> => {
-  await apiClient.delete<void>("express", `/league/${slug}`);
+export const deleteLeague = async ({ slug_league }: DeleteLeagueParam): Promise<void> => {
+  await apiClient.delete<void>("spring", `/api/leagues/${slug_league}`);
 };
 
 export const getFilteredLeagues = async (params: GetFilteredLeagueParam): Promise<LeaguesFilteredResponse> => {
@@ -77,16 +74,16 @@ export const getFilteredLeagues = async (params: GetFilteredLeagueParam): Promis
 };
 
 export const getMyLeagues = async (): Promise<League[]> => {
-  const response = await apiClient.get<LeaguesResponse>("express", "/league/my-leagues");
+  const response = await apiClient.get<LeaguesResponse>("spring", "/api/leagues");
   return response.data.leagues;
 };
 
-export const getCoachLeague = async (slug: string): Promise<League> => {
-  const response = await apiClient.get<SingleLeagueResponse>("express", `/league/coach/${slug}`);
+export const getCoachLeague = async (): Promise<League> => {
+  const response = await apiClient.get<SingleLeagueResponse>("fastapi", `/api/leagues/my-league`);
   return response.data.league;
 };
 
 export const getLeagueBySlug = async (slug: string): Promise<League> => {
-  const response = await apiClient.get<SingleLeagueResponse>("express", `/league/${slug}`);
+  const response = await apiClient.get<SingleLeagueResponse>("spring", `/api/leagues/${slug}`);
   return response.data.league;
 };

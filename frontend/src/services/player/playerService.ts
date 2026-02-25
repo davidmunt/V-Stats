@@ -10,9 +10,9 @@ interface SinglePlayerResponse {
   player: Player;
 }
 
-export const createPlayer = async ({ slug, name, dorsal, role, image }: CreatePlayerParam): Promise<Player> => {
-  const response = await apiClient.post<SinglePlayerResponse>("express", "/player", {
-    slug,
+export const createPlayer = async ({ slug_team, name, dorsal, role, image }: CreatePlayerParam): Promise<Player> => {
+  const response = await apiClient.post<SinglePlayerResponse>("spring", "/api/players", {
+    slug_team,
     name,
     dorsal,
     role,
@@ -21,8 +21,8 @@ export const createPlayer = async ({ slug, name, dorsal, role, image }: CreatePl
   return response.data.player;
 };
 
-export const updatePlayer = async ({ slug, name, dorsal, role, image, status, is_active }: UpdatePlayerParam): Promise<Player> => {
-  const response = await apiClient.put<SinglePlayerResponse>("express", `/player/${slug}`, {
+export const updatePlayer = async ({ slug_player, name, dorsal, role, image, status, is_active }: UpdatePlayerParam): Promise<Player> => {
+  const response = await apiClient.put<SinglePlayerResponse>("spring", `/api/players/${slug_player}`, {
     name,
     dorsal,
     role,
@@ -33,8 +33,8 @@ export const updatePlayer = async ({ slug, name, dorsal, role, image, status, is
   return response.data.player;
 };
 
-export const deletePlayer = async (slug: string): Promise<void> => {
-  await apiClient.delete<void>("express", `/player/${slug}`);
+export const deletePlayer = async (slug_player: string): Promise<void> => {
+  await apiClient.delete<void>("spring", `/api/players/${slug_player}`);
 };
 
 export const getPlayersFromLeague = async (slug: string): Promise<Player[]> => {
@@ -43,7 +43,7 @@ export const getPlayersFromLeague = async (slug: string): Promise<Player[]> => {
 };
 
 export const getPlayersFromCoach = async (slug: string): Promise<Player[]> => {
-  const response = await apiClient.get<PlayersResponse>("express", `/coach/${slug}/players`);
+  const response = await apiClient.get<PlayersResponse>("spring", `/api/players/coach/${slug}`);
   return response.data.players;
 };
 

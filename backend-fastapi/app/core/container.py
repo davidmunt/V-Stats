@@ -20,6 +20,10 @@ from app.services.league import LeagueService
 from app.infrastructure.mappers.team import TeamModelMapper 
 from app.infrastructure.repositories.team import TeamRepository 
 
+from app.infrastructure.mappers.match import MatchModelMapper
+from app.infrastructure.repositories.match import MatchRepository
+from app.services.match import MatchService
+
 class Container:
     """Dependency injector project container for V-Stats."""
 
@@ -30,7 +34,6 @@ class Container:
 
     @contextlib.asynccontextmanager
     async def context_session(self) -> AsyncIterator[AsyncSession]:
-        """Proporciona una sesión asíncrona con gestión de transacciones."""
         session = self._session()
         try:
             yield session
@@ -41,6 +44,7 @@ class Container:
         finally:
             await session.close()
 
+    # --- COACH ---
     @staticmethod
     def coach_model_mapper():
         return CoachModelMapper()
@@ -51,6 +55,7 @@ class Container:
     def coach_service(self):
         return CoachService(coach_repository=self.coach_repository())
     
+    # --- ANALYST ---
     @staticmethod    
     def analyst_model_mapper():
         return AnalystModelMapper()
@@ -61,14 +66,13 @@ class Container:
     def analyst_service(self):
         return AnalystService(analyst_repository=self.analyst_repository())
     
+    # --- LEAGUE ---
     @staticmethod    
     def league_model_mapper():
         return LeagueModelMapper()
 
     def league_repository(self):
-        return LeagueRepository(league_mapper=self.league_model_mapper())
-    
-    def league_repository(self):
+        # Usamos 'mapper' porque así lo definimos en el __init__ de LeagueRepository
         return LeagueRepository(mapper=self.league_model_mapper())
 
     def league_service(self):
@@ -79,11 +83,28 @@ class Container:
             league_repo=self.league_repository()
         )
     
+    # --- TEAM ---
     @staticmethod
     def team_model_mapper():
         return TeamModelMapper()
 
     def team_repository(self):
         return TeamRepository(team_mapper=self.team_model_mapper())
+    
+    # --- MATCH ---
+    @staticmethod    
+    def match_model_mapper():
+        return MatchModelMapper()
+
+    def match_repository(self):
+        # Usamos 'match_mapper' porque así está en el repo de infraestructura
+        return MatchRepository(match_mapper=self.match_model_mapper())
+
+    def match_service(self):
+        return MatchService(
+            match_repository=self.match_repository(),
+            coach_repository=self.coach_repository(),
+            analyst_repository=self.analyst_repository()
+        )
 
 container_instance = Container(settings=get_app_settings())

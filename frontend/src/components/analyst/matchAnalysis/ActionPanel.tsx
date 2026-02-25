@@ -32,16 +32,16 @@ export const ActionPanel = ({ setSlug, selectedPosition, teamLocalId, teamVisito
 
     let pointForTeamId: string | null = null;
     if (tempResult === "++") {
-      pointForTeamId = selectedPosition.id_team;
+      pointForTeamId = selectedPosition.slug_team;
     } else if (tempResult === "--") {
-      pointForTeamId = selectedPosition.id_team === teamLocalId ? teamVisitorId : teamLocalId;
+      pointForTeamId = selectedPosition.slug_team === teamLocalId ? teamVisitorId : teamLocalId;
     }
 
     try {
       await addActionMutation.mutateAsync({
         setSlug: setSlug,
-        id_team: selectedPosition.id_team,
-        id_player: selectedPosition.id_player,
+        id_team: selectedPosition.slug_team,
+        id_player: selectedPosition.slug_player,
         action_type: selectedType,
         result: tempResult,
         player_position: selectedPosition.current_position,

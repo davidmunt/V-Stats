@@ -2,7 +2,7 @@ import { useAuthContext } from "@/hooks/useAuthContext";
 import { Link } from "react-router-dom";
 
 const Header = () => {
-  const { isAuthenticated, logout, user } = useAuthContext();
+  const { isAuthenticated, logoutDevice, user } = useAuthContext();
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
@@ -14,7 +14,7 @@ const Header = () => {
         <div className="flex items-center gap-6">
           {isAuthenticated && user ? (
             <div className="flex items-center gap-4">
-              <Link to={`/profile/${user.id}`} className="flex items-center gap-3 group border-r border-gray-200 pr-4">
+              <Link to={`/profile/${user.slug_user}`} className="flex items-center gap-3 group border-r border-gray-200 pr-4">
                 <div className="text-right hidden sm:block">
                   <p className="text-sm font-medium text-gray-900 group-hover:text-blue-600 transition-colors">{user.name}</p>
                   <p className="text-xs text-gray-500">Mi Perfil</p>
@@ -26,7 +26,7 @@ const Header = () => {
                 />
               </Link>
 
-              <button onClick={logout} className="text-sm font-medium text-gray-600 hover:text-red-600 transition-colors">
+              <button onClick={logoutDevice} className="text-sm font-medium text-gray-600 hover:text-red-600 transition-colors">
                 Cerrar Sesión
               </button>
             </div>

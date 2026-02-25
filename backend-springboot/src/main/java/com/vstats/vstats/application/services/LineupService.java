@@ -5,6 +5,8 @@ import com.vstats.vstats.infrastructure.repositories.*;
 import com.vstats.vstats.presentation.requests.lineup.*;
 import com.vstats.vstats.presentation.responses.LineupResponse;
 import com.vstats.vstats.presentation.responses.LineupsMatchResponse;
+import com.vstats.vstats.security.AuthUtils;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,18 +27,109 @@ public class LineupService {
         private final LineupPositionRepository lineupPositionRepository;
         private final MatchRepository matchRepository;
         private final TeamRepository teamRepository;
+        private final CoachRepository coachRepository;
         private final SeasonPlayerRepository seasonPlayerRepository;
+        private final AuthUtils authUtils;
+
+        // @Transactional
+        // public LineupResponse createLineup(CreateLineupRequest request, String
+        // slugMatch) {
+        // Long coachId = authUtils.getCurrentUserId();
+        // CoachEntity coach = coachRepository.findById(coachId)
+        // .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN,
+        // "No tienes permiso para crear esta alineación"));
+        // Long teamId = coach.getTeam().getIdTeam();
+        // MatchEntity match = matchRepository.findBySlug(slugMatch)
+        // .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+        // "Partido no encontrado"));
+
+        // TeamEntity team = teamRepository.findById(teamId)
+        // .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+        // "Equipo no encontrado"));
+
+        // List<CreateLineupRequest.PlayerPositionRequest> posReq =
+        // request.getPositions();
+        // if (posReq == null || posReq.size() < 6 || posReq.size() > 7) {
+        // throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+        // "La alineación debe tener entre 6 y 7 jugadores");
+        // }
+
+        // Set<Integer> uniquePositions = posReq.stream()
+        // .map(CreateLineupRequest.PlayerPositionRequest::getPosition)
+        // .peek(p -> {
+        // if (p < 1 || p > 7)
+        // throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+        // "Posición inválida: " + p);
+        // })
+        // .collect(Collectors.toSet());
+
+        // if (uniquePositions.size() != posReq.size()) {
+        // throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+        // "No puede haber posiciones duplicadas");
+        // }
+
+        // LineupEntity lineup = lineupRepository
+        // .findByMatch_IdMatchAndTeam_IdTeam(match.getIdMatch(), team.getIdTeam())
+        // .orElseGet(() -> {
+        // String slug = "lineup-" + slugMatch + "-" + team.getSlug();
+        // return lineupRepository.save(LineupEntity.builder()
+        // .slug(slug)
+        // .match(match)
+        // .team(team)
+        // .status("active")
+        // .isActive(true)
+        // .build());
+        // });
+
+        // if (lineup.getIdLineup() != null) {
+        // lineupPositionRepository.deleteByLineup_IdLineup(lineup.getIdLineup());
+        // }
+
+        // List<LineupPositionEntity> savedPositions = new ArrayList<>();
+
+        // for (CreateLineupRequest.PlayerPositionRequest pReq : posReq) {
+        // SeasonPlayerEntity sp = seasonPlayerRepository
+        // .findByPlayer_SlugAndSeason_IsActiveTrue(pReq.getPlayer_id())
+        // .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+        // "Jugador no encontrado: " + pReq.getPlayer_id()));
+
+        // LineupPositionEntity lp = LineupPositionEntity.builder()
+        // .slug(lineup.getSlug() + "-pos-" + pReq.getPosition())
+        // .lineup(lineup)
+        // .player(sp.getPlayer())
+        // .initialPosition(pReq.getPosition())
+        // .currentPosition(pReq.getPosition())
+        // .isOnCourt(pReq.getPosition() <= 6)
+        // .status("active")
+        // .isActive(true)
+        // .build();
+
+        // savedPositions.add(lineupPositionRepository.save(lp));
+        // }
+
+        // return mapToResponse(lineup, savedPositions);
+        // }
 
         @Transactional
-        public LineupResponse createLineup(CreateLineupRequest request, String slugMatch, Long coachId) {
+        public LineupResponse createLineup(CreateLineupRequest request, String slugMatch) {
+                Long currentUserId = authUtils.getCurrentUserId();
+                CoachEntity coach = coachRepository.findById(currentUserId)
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN,
+                                                "No tienes permiso: No eres un entrenador registrado"));
+
+                TeamEntity team = coach.getTeam();
+
+                if (!team.getSlug().equals(request.getSlugTeam())) {
+                        throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                                        "No puedes gestionar alineaciones de otro equipo");
+                }
+
+                // 2. Buscar el Partido
                 MatchEntity match = matchRepository.findBySlug(slugMatch)
                                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                                                 "Partido no encontrado"));
 
-                TeamEntity team = teamRepository.findBySlug(request.getSlugTeam())
-                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                                                "Equipo no encontrado"));
-
+                // 3. Validaciones de la solicitud (Mantengo tu lógica de 6-7 jugadores)
                 List<CreateLineupRequest.PlayerPositionRequest> posReq = request.getPositions();
                 if (posReq == null || posReq.size() < 6 || posReq.size() > 7) {
                         throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
@@ -57,6 +150,7 @@ public class LineupService {
                                         "No puede haber posiciones duplicadas");
                 }
 
+                // 4. Obtener o Crear la cabecera de la alineación
                 LineupEntity lineup = lineupRepository
                                 .findByMatch_IdMatchAndTeam_IdTeam(match.getIdMatch(), team.getIdTeam())
                                 .orElseGet(() -> {
@@ -70,20 +164,28 @@ public class LineupService {
                                                         .build());
                                 });
 
-                if (lineup.getIdLineup() != null) {
-                        lineupPositionRepository.deleteByLineup_IdLineup(lineup.getIdLineup());
-                }
+                // 5. Limpieza de posiciones previas
+                lineupPositionRepository.deleteByLineup_IdLineup(lineup.getIdLineup());
+                lineupPositionRepository.flush(); // Forzamos el borrado antes de insertar los nuevos slugs
 
+                // 6. Guardar nuevas posiciones con validación de equipo
                 List<LineupPositionEntity> savedPositions = new ArrayList<>();
-
                 for (CreateLineupRequest.PlayerPositionRequest pReq : posReq) {
                         SeasonPlayerEntity sp = seasonPlayerRepository
                                         .findByPlayer_SlugAndSeason_IsActiveTrue(pReq.getPlayer_id())
                                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                                                         "Jugador no encontrado: " + pReq.getPlayer_id()));
 
+                        // SEGURIDAD: ¿El jugador es de mi equipo?
+                        if (!sp.getSeasonTeam().getTeam().getIdTeam().equals(team.getIdTeam())) {
+                                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                                "El jugador " + sp.getPlayer().getName() + " no pertenece a tu equipo");
+                        }
+
                         LineupPositionEntity lp = LineupPositionEntity.builder()
-                                        .slug(lineup.getSlug() + "-pos-" + pReq.getPosition())
+                                        // Añadimos el player_id al slug para evitar colisiones
+                                        .slug(lineup.getSlug() + "-pos-" + pReq.getPosition() + "-"
+                                                        + pReq.getPlayer_id())
                                         .lineup(lineup)
                                         .player(sp.getPlayer())
                                         .initialPosition(pReq.getPosition())
@@ -145,56 +247,86 @@ public class LineupService {
                                 .name(sp != null ? sp.getPlayer().getName() : null)
                                 .dorsal(sp != null ? sp.getDorsal() : null)
                                 .role(sp != null ? sp.getRole() : null)
-                                .image(sp != null ? sp.getPlayer().getAvatar() : null)
+                                .image(sp != null ? sp.getPlayer().getImage() : null)
                                 .build();
         }
 
-        public LineupResponse getLineup(String slugTeam) {
-                LineupEntity lineup = lineupRepository
-                                .findByMatch_IdMatchAndTeam_IdTeam(null, teamRepository.findBySlug(slugTeam)
-                                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                                                                "Equipo no encontrado"))
-                                                .getIdTeam())
+        public LineupResponse getLineup(String slugMatch, String slugTeam) {
+                // 1. Buscamos el partido y el equipo por sus slugs
+                MatchEntity match = matchRepository.findBySlug(slugMatch)
                                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                                                "Alineación no encontrada"));
+                                                "Partido no encontrado"));
 
-                List<LineupPositionEntity> positions = lineupPositionRepository.findAll().stream()
-                                .filter(lp -> lp.getLineup().getIdLineup().equals(lineup.getIdLineup()))
-                                .collect(Collectors.toList());
+                TeamEntity team = teamRepository.findBySlug(slugTeam)
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                                "Equipo no encontrado"));
+
+                // 2. Intentamos buscar la alineación
+                Optional<LineupEntity> lineupOpt = lineupRepository
+                                .findByMatch_IdMatchAndTeam_IdTeam(match.getIdMatch(), team.getIdTeam());
+
+                // 3. Si NO existe la alineación, devolvemos una respuesta con lista vacía en
+                // lugar de 404
+                if (lineupOpt.isEmpty()) {
+                        // Creamos un objeto "vacío" o temporal para el response,
+                        // o simplemente pasamos una lista vacía a tu mapper
+                        return mapToResponse(null, new ArrayList<>());
+                        // Nota: Asegúrate de que tu mapToResponse controle si el primer parámetro es
+                        // null
+                }
+
+                // 4. Si existe, buscamos sus posiciones de forma eficiente
+                LineupEntity lineup = lineupOpt.get();
+                List<LineupPositionEntity> positions = lineupPositionRepository
+                                .findAllByLineup_IdLineup(lineup.getIdLineup());
 
                 return mapToResponse(lineup, positions);
         }
 
         private LineupResponse mapToResponse(LineupEntity lineup, List<LineupPositionEntity> positions) {
-                List<LineupResponse.PlayerPosition> positionResponses = positions.stream()
-                                .map(lp -> {
-                                        SeasonPlayerEntity sp = seasonPlayerRepository
-                                                        .findByPlayer_IdPlayerAndSeason_IsActiveTrue(
-                                                                        lp.getPlayer().getIdPlayer())
-                                                        .orElse(null);
+                if (lineup == null) {
+                        return LineupResponse.builder()
+                                        .positions(new ArrayList<>())
+                                        .build();
+                }
 
+                // Forzamos el tipo en el map para que el compilador no se pierda
+                List<LineupResponse.PlayerPosition> posList = positions.stream()
+                                .map(lp -> {
+                                        PlayerEntity p = lp.getPlayer();
+
+                                        // Construimos el objeto explícitamente
                                         return LineupResponse.PlayerPosition.builder()
+                                                        .slug(lp.getSlug())
                                                         .slug_lineup_position(lp.getSlug())
-                                                        .slug_player(lp.getPlayer() != null ? lp.getPlayer().getSlug()
-                                                                        : "unknown")
+                                                        .slug_lineup(lineup.getSlug())
+                                                        .slug_team(lineup.getTeam().getSlug())
+                                                        .slug_player(p.getSlug())
+                                                        .name(p.getName())
+                                                        // Si PlayerEntity no tiene role/dorsal, usamos valores de la
+                                                        // posición o defecto
+                                                        .role("PLAYER")
+                                                        .image(p.getImage())
+                                                        .dorsal(0) // El dorsal real está en SeasonPlayer, pon 0 o
+                                                                   // búscalo si es crítico
+                                                        .is_on_court(lp.getIsOnCourt())
                                                         .initial_position(lp.getInitialPosition())
                                                         .current_position(lp.getCurrentPosition())
-                                                        .is_on_court(lp.getIsOnCourt())
-                                                        .name(lp.getPlayer() != null ? lp.getPlayer().getName() : null)
-                                                        .image(lp.getPlayer() != null ? lp.getPlayer().getAvatar()
-                                                                        : null)
-                                                        .dorsal(sp != null ? sp.getDorsal() : null)
-                                                        .role(sp != null ? sp.getRole() : null)
+                                                        .status(lp.getStatus())
+                                                        .is_active(lp.getIsActive())
                                                         .build();
                                 })
-                                .sorted(Comparator.comparing(LineupResponse.PlayerPosition::getInitial_position))
                                 .collect(Collectors.toList());
 
                 return LineupResponse.builder()
+                                .slug(lineup.getSlug())
                                 .slug_lineup(lineup.getSlug())
                                 .slug_match(lineup.getMatch().getSlug())
-                                .slug_team(lineup.getTeam() != null ? lineup.getTeam().getSlug() : "unknown")
-                                .positions(positionResponses)
+                                .slug_team(lineup.getTeam().getSlug())
+                                .status(lineup.getStatus())
+                                .is_active(lineup.getIsActive())
+                                .created_at(lineup.getCreatedAt() != null ? lineup.getCreatedAt().toString() : "")
+                                .positions(posList)
                                 .build();
         }
 }

@@ -1,8 +1,8 @@
 export interface CreateActionParam {
-  slug: string;
-  id_team?: string;
-  id_player?: string;
-  id_point_for_team: string;
+  slug_set: string;
+  slug_team?: string;
+  slug_player?: string;
+  slug_point_for_team: string;
   player_position?: number;
   action_type?: string;
   result?: string;
