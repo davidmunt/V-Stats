@@ -34,8 +34,9 @@ public class LineupController {
     }
 
     @GetMapping("/match/{slugMatch}")
-    public ResponseEntity<LineupsMatchResponse> getByMatch(@PathVariable String slugMatch) {
-        return ResponseEntity.ok(lineupService.getLineupsByMatch(slugMatch));
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Map<String, LineupsMatchResponse>> getByMatch(@PathVariable String slugMatch) {
+        return ResponseEntity.ok(Map.of("lineups", lineupService.getLineupsByMatch(slugMatch)));
     }
 
     @GetMapping("/{slugMatch}/{slugTeam}")

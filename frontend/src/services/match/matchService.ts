@@ -82,12 +82,12 @@ export const getNextMatchForAnalyst = async (): Promise<Match> => {
 };
 
 export const getTeamsFromMatch = async (slug: string): Promise<Team[]> => {
-  const response = await apiClient.get<TeamsResponse>("express", `/match/${slug}/teams`);
+  const response = await apiClient.get<TeamsResponse>("fastapi", `/api/teams/${slug}/match`);
   return response.data.teams;
 };
 
 export const startMatch = async (matchSlug: string): Promise<void> => {
-  await apiClient.patch("express", `/match/${matchSlug}/start`);
+  await apiClient.patch("fastapi", `/api/matches/${matchSlug}/start`);
 };
 
 export const getMatchBySlug = async (slug: string): Promise<Match> => {

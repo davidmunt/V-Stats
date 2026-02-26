@@ -1,5 +1,5 @@
 import abc
-from typing import Any, Optional
+from typing import Any, List, Optional
 from app.domain.dtos.set import SetDTO
 
 class ISetService(abc.ABC):
@@ -8,4 +8,14 @@ class ISetService(abc.ABC):
     @abc.abstractmethod
     async def get_actual_set(self, session: Any, match_slug: str) -> Optional[SetDTO]:
         """Lógica para obtener el set actual de un partido mediante su slug."""
+        ...
+
+    @abc.abstractmethod
+    async def get_finished_sets(self, session: Any, match_slug: str) -> List[SetDTO]:
+        """Lógica para obtener los sets finalizados de un partido."""
+        ...
+
+    @abc.abstractmethod
+    async def update_actual_set_status(self, session: Any, match_slug: str, new_status: str) -> None:
+        """Lógica para forzar un cambio de estado en el set actual."""
         ...

@@ -1,32 +1,27 @@
 import contextlib
 from collections.abc import AsyncIterator
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-
 from app.core.config import get_app_settings
 from app.core.settings.base import BaseAppSettings
 
 from app.infrastructure.mappers.coach import CoachModelMapper
 from app.infrastructure.repositories.coach import CoachRepository
 from app.services.coach import CoachService
-
 from app.infrastructure.mappers.analyst import AnalystModelMapper
 from app.infrastructure.repositories.analyst import AnalystRepository
 from app.services.analyst import AnalystService
-
 from app.infrastructure.mappers.league import LeagueModelMapper
 from app.infrastructure.repositories.league import LeagueRepository
 from app.services.league import LeagueService
-
-from app.infrastructure.mappers.team import TeamModelMapper 
-from app.infrastructure.repositories.team import TeamRepository 
-
 from app.infrastructure.mappers.match import MatchModelMapper
 from app.infrastructure.repositories.match import MatchRepository
 from app.services.match import MatchService
-
 from app.infrastructure.mappers.set import SetModelMapper
 from app.infrastructure.repositories.set import SetRepository
 from app.services.set import SetService
+from app.infrastructure.mappers.team import TeamModelMapper
+from app.infrastructure.repositories.team import TeamRepository
+from app.services.team import TeamService
 
 class Container:
     """Dependency injector project container for V-Stats."""
@@ -87,14 +82,6 @@ class Container:
             league_repo=self.league_repository()
         )
     
-    # --- TEAM ---
-    @staticmethod
-    def team_model_mapper():
-        return TeamModelMapper()
-
-    def team_repository(self):
-        return TeamRepository(team_mapper=self.team_model_mapper())
-    
     # --- MATCH ---
     @staticmethod    
     def match_model_mapper():
@@ -108,7 +95,8 @@ class Container:
         return MatchService(
             match_repository=self.match_repository(),
             coach_repository=self.coach_repository(),
-            analyst_repository=self.analyst_repository()
+            analyst_repository=self.analyst_repository(),
+            set_repository=self.set_repository()
         )
     
     # --- SET ---
@@ -121,5 +109,16 @@ class Container:
 
     def set_service(self):
         return SetService(set_repository=self.set_repository())
+    
+    # --- TEAM ---
+    @staticmethod
+    def team_model_mapper():
+        return TeamModelMapper()
+
+    def team_repository(self):
+        return TeamRepository(team_mapper=self.team_model_mapper())
+    
+    def team_service(self):
+        return TeamService(team_repository=self.team_repository())
 
 container_instance = Container(settings=get_app_settings())

@@ -15,6 +15,6 @@ export const getActualSetFromMath = async (slug: string): Promise<Set> => {
 };
 
 export const getFinishedSetsByMatch = async (slug: string): Promise<Set[]> => {
-  const response = await apiClient.get<SetsResponse>("express", `/sets/finished/${slug}`);
+  const response = await apiClient.get<SetsResponse>("fastapi", `/api/sets/finished/${slug}`);
   return response.data.sets;
 };

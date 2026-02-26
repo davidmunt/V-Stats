@@ -201,22 +201,55 @@ public class LineupService {
                 return mapToResponse(lineup, savedPositions);
         }
 
+        ///////////////////////// 77
         public LineupsMatchResponse getLineupsByMatch(String slugMatch) {
                 MatchEntity match = matchRepository.findBySlug(slugMatch)
                                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                                                 "Partido no encontrado"));
 
-                Optional<LineupEntity> homeLineup = lineupRepository.findByMatch_SlugAndTeam_IdTeam(
-                                slugMatch, match.getLocalTeam().getIdTeam());
+                // Usamos el método que busca el dorsal real
+                Optional<LineupEntity> homeLineup = lineupRepository.findByMatch_IdMatchAndTeam_IdTeam(
+                                match.getIdMatch(), match.getLocalTeam().getIdTeam());
 
-                Optional<LineupEntity> awayLineup = lineupRepository.findByMatch_SlugAndTeam_IdTeam(
-                                slugMatch, match.getVisitorTeam().getIdTeam());
+                Optional<LineupEntity> awayLineup = lineupRepository.findByMatch_IdMatchAndTeam_IdTeam(
+                                match.getIdMatch(), match.getVisitorTeam().getIdTeam());
 
                 return LineupsMatchResponse.builder()
                                 .home(homeLineup.map(this::mapToData).orElse(null))
                                 .away(awayLineup.map(this::mapToData).orElse(null))
                                 .build();
         }
+
+        private LineupsMatchResponse.LineupData mapToLineupData(LineupEntity lineup) {
+                // Buscamos las posiciones de esta alineación específica
+                List<LineupPositionEntity> positionEntities = lineupPositionRepository
+                                .findAllByLineup_IdLineup(lineup.getIdLineup());
+
+                // Las convertimos al DTO interno de PlayerPosition que espera el front
+                List<LineupsMatchResponse.PlayerPosition> positions = positionEntities.stream()
+                                .map(lp -> LineupsMatchResponse.PlayerPosition.builder()
+                                                .slug_lineup_position(lp.getSlug())
+                                                .slug_player(lp.getPlayer().getSlug())
+                                                .name(lp.getPlayer().getName())
+                                                .image(lp.getPlayer().getImage())
+                                                .dorsal(0)
+                                                .role("PLAYER")
+                                                .initial_position(lp.getInitialPosition())
+                                                .current_position(lp.getCurrentPosition())
+                                                .is_on_court(lp.getIsOnCourt())
+                                                .build())
+                                .collect(Collectors.toList());
+
+                return LineupsMatchResponse.LineupData.builder()
+                                .slug_lineup(lineup.getSlug())
+                                .slug_match(lineup.getMatch().getSlug())
+                                .slug_team(lineup.getTeam().getSlug())
+                                .status(lineup.getStatus())
+                                .is_active(lineup.getIsActive())
+                                .positions(positions)
+                                .build();
+        }
+        ///////////////////////////////////
 
         private LineupsMatchResponse.LineupData mapToData(LineupEntity lineup) {
                 List<LineupPositionEntity> positions = lineupPositionRepository
@@ -234,20 +267,23 @@ public class LineupService {
         }
 
         private LineupsMatchResponse.PlayerPosition mapToPlayerPosition(LineupPositionEntity lp) {
+                // Buscamos la relación del jugador con la temporada para sacar el dorsal
+                // Usamos el ID del jugador y el estado activo de la temporada
                 SeasonPlayerEntity sp = seasonPlayerRepository
                                 .findByPlayer_IdPlayerAndSeason_IsActiveTrue(lp.getPlayer().getIdPlayer())
                                 .orElse(null);
 
                 return LineupsMatchResponse.PlayerPosition.builder()
                                 .slug_lineup_position(lp.getSlug())
-                                .slug_player(sp != null ? sp.getPlayer().getSlug() : "unknown")
+                                .slug_player(lp.getPlayer().getSlug())
                                 .initial_position(lp.getInitialPosition())
                                 .current_position(lp.getCurrentPosition())
                                 .is_on_court(lp.getIsOnCourt())
-                                .name(sp != null ? sp.getPlayer().getName() : null)
-                                .dorsal(sp != null ? sp.getDorsal() : null)
-                                .role(sp != null ? sp.getRole() : null)
-                                .image(sp != null ? sp.getPlayer().getImage() : null)
+                                .name(lp.getPlayer().getName())
+                                .image(lp.getPlayer().getImage())
+                                // AQUÍ ESTÁ LA MAGIA: Si existe en la temporada, ponemos su dorsal y rol real
+                                .dorsal(sp != null ? sp.getDorsal() : 0)
+                                .role(sp != null ? sp.getRole() : "PLAYER")
                                 .build();
         }
 
@@ -294,6 +330,9 @@ public class LineupService {
                 List<LineupResponse.PlayerPosition> posList = positions.stream()
                                 .map(lp -> {
                                         PlayerEntity p = lp.getPlayer();
+                                        SeasonPlayerEntity sp = seasonPlayerRepository
+                                                        .findByPlayer_IdPlayerAndSeason_IsActiveTrue(p.getIdPlayer())
+                                                        .orElse(null);
 
                                         // Construimos el objeto explícitamente
                                         return LineupResponse.PlayerPosition.builder()
@@ -305,10 +344,12 @@ public class LineupService {
                                                         .name(p.getName())
                                                         // Si PlayerEntity no tiene role/dorsal, usamos valores de la
                                                         // posición o defecto
-                                                        .role("PLAYER")
+                                                        .role(sp != null ? sp.getRole() : "PLAYER")
                                                         .image(p.getImage())
-                                                        .dorsal(0) // El dorsal real está en SeasonPlayer, pon 0 o
-                                                                   // búscalo si es crítico
+                                                        .dorsal(sp != null ? sp.getDorsal() : 0) // El dorsal real está
+                                                                                                 // en SeasonPlayer, pon
+                                                                                                 // 0 o
+                                                        // búscalo si es crítico
                                                         .is_on_court(lp.getIsOnCourt())
                                                         .initial_position(lp.getInitialPosition())
                                                         .current_position(lp.getCurrentPosition())

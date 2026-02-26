@@ -37,11 +37,10 @@ class MatchModelMapper(IModelMapper[Match, MatchDTO]):
         if dto is None:
             return None
 
-        # Nota: La creación requiere IDs reales de base de datos para las FKs
         model = Match(
             slug=dto.slug_match,
             id_league=dto.id_league,
-            date=dto.date, # Debería ser un objeto datetime al persistir
+            date=dto.date, 
             current_set=dto.current_set,
             is_active=dto.is_active,
             status=dto.status

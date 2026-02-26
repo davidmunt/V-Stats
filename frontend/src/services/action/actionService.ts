@@ -23,7 +23,7 @@ export const createAction = async ({
   start_x,
   start_y,
 }: CreateActionParam): Promise<Action> => {
-  const response = await apiClient.post<SingleActionResponse>("express", `/set/${slug_set}/action`, {
+  const response = await apiClient.post<SingleActionResponse>("fastapi", `/api/actions/set/${slug_set}`, {
     slug_point_for_team,
     action_type,
     slug_player,

@@ -1,5 +1,5 @@
 import abc
-from typing import List, Optional
+from typing import Any, List, Optional
 from app.domain.dtos.match import MatchDTO
 
 class IMatchService(abc.ABC):
@@ -8,12 +8,20 @@ class IMatchService(abc.ABC):
     @abc.abstractmethod
     async def get_user_next_match(self, session: any, email: str, role: str) -> Optional[MatchDTO]:
         """
-        Lógica para obtener el próximo partido programado ('scheduled') 
-        del equipo asociado al usuario (coach o analyst).
+        Lógica para obtener el próximo partido del equipo asociado al usuario.
+        Decidirá internamente si usa la lógica de Coach o Analyst.
         """
         ...
 
     @abc.abstractmethod
     async def get_league_matches(self, session: any, league_slug: str) -> List[MatchDTO]:
         """Lógica para obtener todos los partidos pertenecientes a una liga."""
+        ...
+
+    @abc.abstractmethod
+    async def start_match(self, session: Any, match_slug: str, role: str) -> str:
+        """
+        Lógica para validar el rol y el estado del partido/set, 
+        y cambiar ambos a 'live'. Devuelve un mensaje de éxito.
+        """
         ...

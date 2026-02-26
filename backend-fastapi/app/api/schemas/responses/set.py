@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import List, Optional
 from datetime import datetime
 
 class SetResponse(BaseModel):
@@ -30,3 +30,6 @@ class SetResponse(BaseModel):
 # Este envuelve al objeto para cumplir con SingleSetResponse del front
 class SingleSetResponse(BaseModel):
     set: SetResponse
+
+class SetsListResponse(BaseModel):
+    sets: List[SetResponse]
