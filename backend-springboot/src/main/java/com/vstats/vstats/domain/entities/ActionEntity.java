@@ -36,7 +36,7 @@ public class ActionEntity {
     private TeamEntity team;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_player", nullable = false)
+    @JoinColumn(name = "id_player", nullable = true)
     private PlayerEntity player;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -50,6 +50,18 @@ class ActionRepository(IActionRepository):
         )
         result = await session.execute(query)
         return result.scalar_one_or_none()
+    
+    async def get_previous_point_action(self, session: AsyncSession, id_set: int) -> Optional[Action]:
+        """Obtiene el penúltimo punto para comparar posesión de saque."""
+        query = (
+            select(Action)
+            .where(and_(Action.id_set == id_set, Action.id_point_for_team != None))
+            .order_by(Action.id_action.desc())
+            .offset(1) 
+            .limit(1)
+        )
+        result = await session.execute(query)
+        return result.scalar_one_or_none()
 
     async def delete(self, session: AsyncSession, action_model: Action) -> None:
         """Elimina la acción de la base de datos."""

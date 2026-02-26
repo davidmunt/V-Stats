@@ -27,7 +27,6 @@ class MatchService(IMatchService):
         id_team = None
         role_lower = role.lower()
 
-        # 1. Obtenemos el usuario según el rol para extraer su id_team
         if role_lower == "coach":
             user = await self._coach_repository.get_by_email(session, email)
             id_team = user.id_team if user else None
@@ -57,34 +56,28 @@ class MatchService(IMatchService):
         4. Verificar existencia del Set actual.
         5. Actualizar ambos a 'live'.
         """
-        # 1. Verificar que es tipo analyst
         if role.lower() != "analyst":
             raise PermissionError("Solo los analistas pueden iniciar el partido")
 
-        # 2. Verificar si existe el match
         match_model = await self._match_repository.get_model_by_slug(session, match_slug)
         if not match_model:
-            return "MATCH_NOT_FOUND" # El service devuelve un código que el router traduce a 404
+            return "MATCH_NOT_FOUND"
 
-        # 3. Validaciones de estado del match
         if match_model.status == "live":
             return "Partido ya iniciado"
         if match_model.status == "finished":
             return "El partido ya ha finalizado y no se puede reabrir"
 
-        # 4. Verificar si existe el set actual del match
         set_model = await self._set_repository.get_actual_set_model_by_match_slug(session, match_slug)
         if not set_model:
             return "SET_NOT_FOUND"
 
-        # 5. Modificar estados
         match_model.status = "live"
         await self._set_repository.update_set_status(session, set_model, "live")
         
-        # Como usamos el context_session, el commit se hará automáticamente al salir del bloque 'async with' del router
         return "Partido empezado correctamente"
     
     async def finalize_match(self, session: Any, match_model: Any, winner_id: int) -> None:
         match_model.status = "finished"
-        match_model.winner_team_id = winner_id # Asegúrate de que tu modelo Match tenga este campo
+        match_model.winner_team_id = winner_id
         await session.flush()

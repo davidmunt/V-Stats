@@ -13,7 +13,7 @@ class ActionModelMapper(IModelMapper[Action, ActionDTO]):
             slug_match=model.match.slug,
             slug_set=model.set.slug,
             slug_team=model.team.slug,
-            slug_player=model.player.slug,
+            slug_player=model.player.slug if model.player else "SYSTEM",
             slug_point_for_team=model.point_for_team.slug if model.point_for_team else None,
             player_position=model.player_position,
             action_type=model.action_type,

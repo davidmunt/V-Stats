@@ -8,11 +8,11 @@ class ActionResponse(BaseModel):
     slug_match: str
     slug_set: str
     slug_team: str
-    slug_player: str
+    slug_player: Optional[str]
     slug_point_for_team: Optional[str]
     action_type: str
     result: str
-    player_position: int
+    player_position: Optional[int] = None
     start_x: float
     start_y: float
     end_x: float

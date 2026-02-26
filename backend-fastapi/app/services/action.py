@@ -39,33 +39,41 @@ class ActionService(IActionService):
         if match.status == "finished": raise ValueError("MATCH_ALREADY_FINISHED")
 
         team_dto = await self._team_repo.get_by_slug(session, data['slug_team'])
-        player_dto = await self._player_repo.get_by_slug(session, data['slug_player'])
         
-        if not team_dto or not player_dto:
-            raise ValueError("TEAM_OR_PLAYER_NOT_FOUND")
+        player_id = None
+        if data.get('slug_player'):
+            player_dto = await self._player_repo.get_by_slug(session, data['slug_player'])
+            if player_dto:
+                player_id = player_dto.id_player
 
         point_team_id = None
-        result_symbol = data.get('result')
+        result_symbol = data.get('result') 
         
-        if result_symbol == "++":
-            point_team_id = team_dto.id_team
-        elif result_symbol == "--":
-            point_team_id = match.id_visitor_team if team_dto.id_team == match.id_local_team else match.id_local_team
-        
-        if data.get('slug_point_for_team'):
-            pt_dto = await self._team_repo.get_by_slug(session, data['slug_point_for_team'])
-            point_team_id = pt_dto.id_team
+        if data['action_type'] == "POINT_ADJUSTMENT":
+            result_symbol = "++" 
+            if data.get('slug_point_for_team'):
+                pt_dto = await self._team_repo.get_by_slug(session, data['slug_point_for_team'])
+                point_team_id = pt_dto.id_team
+        else:
+            if result_symbol == "++":
+                point_team_id = team_dto.id_team
+            elif result_symbol == "--":
+                point_team_id = match.id_visitor_team if team_dto.id_team == match.id_local_team else match.id_local_team
+            
+            if data.get('slug_point_for_team'):
+                pt_dto = await self._team_repo.get_by_slug(session, data['slug_point_for_team'])
+                point_team_id = pt_dto.id_team
 
         new_action = Action(
             slug=f"act-{uuid.uuid4().hex[:8]}",
             id_match=match.id_match,
             id_set=current_set.id_set,
             id_team=team_dto.id_team,
-            id_player=player_dto.id_player,
+            id_player=player_id,
             id_point_for_team=point_team_id,
             player_position=data.get('player_position'),
             action_type=data['action_type'],
-            result=result_symbol,
+            result=result_symbol if result_symbol else "+", 
             start_x=data.get('start_x', 0),
             start_y=data.get('start_y', 0),
             end_x=data.get('end_x', 0),
@@ -83,17 +91,22 @@ class ActionService(IActionService):
         return result_payload
 
     async def _handle_rotation(self, session, current_set, point_team_id, match_id):
-        last_point = await self._action_repo.get_last_point_action(session, current_set.id_set)
+        last_point = await self._action_repo.get_previous_point_action(session, current_set.id_set)
         
-        if last_point and last_point.id_point_for_team != point_team_id:
+        should_rotate = False
+        if not last_point:
+            pass 
+        elif last_point.id_point_for_team != point_team_id:
+            should_rotate = True
+
+        if should_rotate:
             lineup = await self._lineup_repo.get_active_lineup_by_team_and_match(session, match_id, point_team_id)
             if lineup:
                 positions = await self._lineup_repo.get_court_positions(session, lineup.id_lineup)
                 rotation_map = {1: 6, 6: 5, 5: 4, 4: 3, 3: 2, 2: 1}
                 for pos in positions:
                     new_pos = rotation_map.get(pos.current_position)
-                    if new_pos: 
-                        await self._lineup_repo.update_position(session, pos, new_pos)
+                    if new_pos: await self._lineup_repo.update_position(session, pos, new_pos)
 
     async def _update_score(self, session, current_set, match, point_team_id, payload):
         if point_team_id == match.id_local_team:
