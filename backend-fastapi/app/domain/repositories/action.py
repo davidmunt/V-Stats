@@ -12,3 +12,11 @@ class IActionRepository(abc.ABC):
     async def get_last_point_action(self, session: Any, id_set: int) -> Optional[Any]:
         """Busca la última acción que generó un punto para la lógica de rotación."""
         ...
+
+    @abc.abstractmethod
+    async def get_last_point_by_team(self, session: Any, id_set: int, id_point_team: int) -> Optional[Any]:
+        ...
+
+    @abc.abstractmethod
+    async def delete(self, session: Any, action_model: Any) -> None:
+        ...

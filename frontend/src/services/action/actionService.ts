@@ -67,5 +67,5 @@ export const createAction = async ({
 // };
 
 export const cancelLastAction = async (slug_set: string, team_slug: string): Promise<void> => {
-  await apiClient.delete<void>("express", `/api/actions/set${slug_set}/${team_slug}`);
+  await apiClient.delete<void>("fastapi", `/api/actions/set/${slug_set}/${team_slug}`);
 };

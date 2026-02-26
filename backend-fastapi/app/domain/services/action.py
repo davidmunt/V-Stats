@@ -21,3 +21,25 @@ class IActionService(abc.ABC):
         4. Actualiza marcador y gestiona cierre de sets/partido.
         """
         ...
+
+    @abc.abstractmethod
+    async def delete_last_team_point(self, session: Any, set_slug: str, team_slug: str, role: str) -> bool:
+        """
+        Lógica para eliminar la última acción de punto de un equipo 
+        y restar el punto del marcador del set.
+        """
+        ...
+
+    @abc.abstractmethod
+    async def make_substitution(
+        self, 
+        session: Any, 
+        slug_lineup: str, 
+        slug_player_out: str, 
+        slug_player_in: str, 
+        role: str
+    ) -> bool:
+        """
+        Lógica para validar e intercambiar jugadores en pista.
+        """
+        ...

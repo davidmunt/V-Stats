@@ -81,30 +81,17 @@ export const MatchAnalysisManager = ({ analystSlug }: { analystSlug: string }) =
     return <StartAnalysing match={match} analystSlug={analystSlug} />;
   }
 
-  // 1. Modifica la función para que reciba el slug del equipo
   const formatLineup = (positions: LineupPosition[], teamSlug: string) => {
     const map: Record<number, LineupPosition> = {};
     positions.forEach((pos) => {
       map[pos.current_position] = {
         ...pos,
-        slug_team: teamSlug, // <--- Forzamos que el objeto tenga el slug_team
+        slug_team: teamSlug,
       };
     });
     return map;
   };
 
-  // const formatLineup = (positions: LineupPosition[]) => {
-  //   const map: Record<number, LineupPosition> = {};
-  //   positions.forEach((pos) => {
-  //     map[pos.current_position] = pos;
-  //   });
-  //   return map;
-  // };
-
-  // const homeLineupMap = lineups ? formatLineup(lineups.home.positions) : {};
-  // const awayLineupMap = lineups ? formatLineup(lineups.away.positions) : {};
-
-  // 2. Úsala así:
   const homeLineupMap = lineups ? formatLineup(lineups.home.positions, lineups.home.slug_team) : {};
 
   const awayLineupMap = lineups ? formatLineup(lineups.away.positions, lineups.away.slug_team) : {};
@@ -127,7 +114,8 @@ export const MatchAnalysisManager = ({ analystSlug }: { analystSlug: string }) =
                   lineups?.home?.slug_team === selectedPosition.slug_team ? lineups.home.slug_lineup : lineups?.away?.slug_lineup || ""
                 }
                 selectedPosition={selectedPosition}
-                allPositions={[...(lineups?.home?.positions || []), ...(lineups?.away?.positions || [])]}
+                // USAMOS LOS MAPAS YA FORMATEADOS
+                allPositions={[...Object.values(homeLineupMap), ...Object.values(awayLineupMap)]}
                 onSuccess={() => setSelectedPosition(null)}
               />
 

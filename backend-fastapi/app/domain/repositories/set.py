@@ -34,3 +34,7 @@ class ISetRepository(abc.ABC):
     async def create_next_set(self, session: Any, match_id: int, next_number: int) -> Optional[SetDTO]:
         """Crea un nuevo set y devuelve su DTO."""
         ...
+
+    @abc.abstractmethod
+    async def subtract_point(self, session: Any, set_model: Any, is_local: bool) -> None:
+        ...

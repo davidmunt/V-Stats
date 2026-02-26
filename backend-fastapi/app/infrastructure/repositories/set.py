@@ -98,7 +98,19 @@ class SetRepository(ISetRepository):
         
         session.add(new_set)
         await session.flush()
-        # Refrescamos para asegurarnos de tener todos los datos cargados por defecto
         await session.refresh(new_set)
         
         return self.mapper.to_dto(new_set)
+    
+    async def subtract_point(self, session: AsyncSession, set_model: Set, is_local: bool) -> None:
+        """
+        Resta un punto al equipo local o visitante asegurando que no baje de 0.
+        """
+        if is_local:
+            if set_model.local_points > 0:
+                set_model.local_points -= 1
+        else:
+            if set_model.visitor_points > 0:
+                set_model.visitor_points -= 1
+        
+        await session.flush()

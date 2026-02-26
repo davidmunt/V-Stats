@@ -37,7 +37,6 @@ class SetService(ISetService):
         Crea un nuevo set para el partido. 
         Este método es llamado por el ActionService cuando un set termina.
         """
-        # Generamos un slug único para el nuevo set
         new_set_slug = f"set-{next_number}-{uuid.uuid4().hex[:6]}"
         
         new_set = Set(
@@ -46,7 +45,7 @@ class SetService(ISetService):
             set_number=next_number,
             local_points=0,
             visitor_points=0,
-            status="active", # O "live" si quieres que empiece directo
+            status="active", 
             is_active=True
         )
         
