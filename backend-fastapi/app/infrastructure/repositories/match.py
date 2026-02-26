@@ -140,3 +140,8 @@ class MatchRepository(IMatchRepository):
             await session.flush() 
             return self.mapper.to_dto(match)
         return None
+    
+    async def get_by_slug_model(self, session: AsyncSession, slug: str) -> Optional[Match]:
+        query = select(Match).where(Match.slug == slug)
+        result = await session.execute(query)
+        return result.scalar_one_or_none()

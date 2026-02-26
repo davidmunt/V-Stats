@@ -25,3 +25,8 @@ class IMatchService(abc.ABC):
         y cambiar ambos a 'live'. Devuelve un mensaje de éxito.
         """
         ...
+
+    @abc.abstractmethod
+    async def finalize_match(self, session: Any, match_model: Any, winner_id: int) -> None:
+        """Marca el partido como finalizado y asigna al ganador."""
+        ...

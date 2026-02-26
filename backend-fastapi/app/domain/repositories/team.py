@@ -11,3 +11,8 @@ class ITeamRepository(abc.ABC):
     async def get_teams_by_match_slug(self, session: Any, match_slug: str) -> List[TeamDTO]:
         """Nueva funcionalidad para obtener los equipos de un partido específico."""
         ...
+
+    @abc.abstractmethod
+    async def get_by_slug(self, session: Any, slug: str) -> Optional[TeamDTO]:
+        """Obtiene un equipo por su slug para obtener su ID."""
+        ...

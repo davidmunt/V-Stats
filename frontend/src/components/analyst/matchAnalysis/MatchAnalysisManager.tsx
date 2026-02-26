@@ -18,11 +18,11 @@ export const MatchAnalysisManager = ({ analystSlug }: { analystSlug: string }) =
   const { data: actualSet, isLoading: isLoadingSet } = useActualSetQuery(match?.slug_match || "");
   const { data: lineups, isLoading: isLoadingMatchLineups } = useMatchLineupsQuery(match?.slug_match || "");
   const { data: finishedSetsData } = useFinishedSetsQuery(match?.slug_match || "");
-  const previousMatchId = useRef<string | null>(null);
+  const previousMatchSlug = useRef<string | null>(null);
   const lastScore = useRef({ local: 0, visitor: 0 });
 
   useEffect(() => {
-    if (previousMatchId.current && (!match || match.slug_match !== previousMatchId.current)) {
+    if (previousMatchSlug.current && (!match || match.slug_match !== previousMatchSlug.current)) {
       const { local, visitor } = lastScore.current;
 
       Swal.fire({
@@ -56,7 +56,7 @@ export const MatchAnalysisManager = ({ analystSlug }: { analystSlug: string }) =
       });
     }
     if (match) {
-      previousMatchId.current = match.slug_match;
+      previousMatchSlug.current = match.slug_match;
       if (finishedSetsData && finishedSetsData.length > 0) {
         const score = finishedSetsData.reduce(
           (acc, set) => {
@@ -81,16 +81,33 @@ export const MatchAnalysisManager = ({ analystSlug }: { analystSlug: string }) =
     return <StartAnalysing match={match} analystSlug={analystSlug} />;
   }
 
-  const formatLineup = (positions: LineupPosition[]) => {
+  // 1. Modifica la función para que reciba el slug del equipo
+  const formatLineup = (positions: LineupPosition[], teamSlug: string) => {
     const map: Record<number, LineupPosition> = {};
     positions.forEach((pos) => {
-      map[pos.current_position] = pos;
+      map[pos.current_position] = {
+        ...pos,
+        slug_team: teamSlug, // <--- Forzamos que el objeto tenga el slug_team
+      };
     });
     return map;
   };
 
-  const homeLineupMap = lineups ? formatLineup(lineups.home.positions) : {};
-  const awayLineupMap = lineups ? formatLineup(lineups.away.positions) : {};
+  // const formatLineup = (positions: LineupPosition[]) => {
+  //   const map: Record<number, LineupPosition> = {};
+  //   positions.forEach((pos) => {
+  //     map[pos.current_position] = pos;
+  //   });
+  //   return map;
+  // };
+
+  // const homeLineupMap = lineups ? formatLineup(lineups.home.positions) : {};
+  // const awayLineupMap = lineups ? formatLineup(lineups.away.positions) : {};
+
+  // 2. Úsala así:
+  const homeLineupMap = lineups ? formatLineup(lineups.home.positions, lineups.home.slug_team) : {};
+
+  const awayLineupMap = lineups ? formatLineup(lineups.away.positions, lineups.away.slug_team) : {};
 
   if (isLoadingMatch || isLoadingSet || isLoadingMatchLineups) return <LoadingFallback />;
   if (!match) return <div className="p-8 text-center text-gray-500">No se encontró el partido.</div>;
@@ -106,7 +123,7 @@ export const MatchAnalysisManager = ({ analystSlug }: { analystSlug: string }) =
           {selectedPosition ? (
             <>
               <SubstitutionPanel
-                idLineup={
+                slugLineup={
                   lineups?.home?.slug_team === selectedPosition.slug_team ? lineups.home.slug_lineup : lineups?.away?.slug_lineup || ""
                 }
                 selectedPosition={selectedPosition}
@@ -117,8 +134,8 @@ export const MatchAnalysisManager = ({ analystSlug }: { analystSlug: string }) =
               <ActionPanel
                 setSlug={actualSet.slug_set}
                 selectedPosition={selectedPosition}
-                teamLocalId={match.slug_team_local}
-                teamVisitorId={match.slug_team_visitor}
+                teamLocalSlug={match.slug_team_local}
+                teamVisitorSlug={match.slug_team_visitor}
                 onSuccess={() => setSelectedPosition(null)}
               />
             </>

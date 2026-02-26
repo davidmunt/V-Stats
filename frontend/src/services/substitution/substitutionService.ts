@@ -1,10 +1,10 @@
 import apiClient from "@/services/apiClient";
 import type { CreateSubstitutionParam } from "./substitutionService.param";
 
-export const createSubstitution = async ({ id_lineup, id_player_out, id_player_in }: CreateSubstitutionParam) => {
+export const createSubstitution = async ({ slug_lineup, slug_player_out, slug_player_in }: CreateSubstitutionParam) => {
   await apiClient.post<unknown>("express", `/lineup/substitute`, {
-    id_lineup,
-    id_player_out,
-    id_player_in,
+    slug_lineup,
+    slug_player_out,
+    slug_player_in,
   });
 };

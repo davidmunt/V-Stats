@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Any, List, Optional
 from app.domain.services.match import IMatchService
 from app.domain.repositories.match import IMatchRepository
 from app.domain.repositories.coach import ICoachRepository
@@ -83,3 +83,8 @@ class MatchService(IMatchService):
         
         # Como usamos el context_session, el commit se hará automáticamente al salir del bloque 'async with' del router
         return "Partido empezado correctamente"
+    
+    async def finalize_match(self, session: Any, match_model: Any, winner_id: int) -> None:
+        match_model.status = "finished"
+        match_model.winner_team_id = winner_id # Asegúrate de que tu modelo Match tenga este campo
+        await session.flush()

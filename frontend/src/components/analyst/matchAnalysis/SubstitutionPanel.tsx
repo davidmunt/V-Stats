@@ -3,13 +3,13 @@ import type { LineupPosition } from "@/interfaces/lineupPosition.interface";
 import Swal from "sweetalert2";
 
 interface SubstitutionPanelProps {
-  idLineup: string;
+  slugLineup: string;
   selectedPosition: LineupPosition;
   allPositions: LineupPosition[];
   onSuccess: () => void;
 }
 
-export const SubstitutionPanel = ({ idLineup, selectedPosition, allPositions, onSuccess }: SubstitutionPanelProps) => {
+export const SubstitutionPanel = ({ slugLineup, selectedPosition, allPositions, onSuccess }: SubstitutionPanelProps) => {
   const substitutionMutation = useCreateSubstitutionMutation();
   const substitutePlayer = allPositions.find((p) => p.slug_team === selectedPosition.slug_team && p.current_position === 7);
 
@@ -28,9 +28,9 @@ export const SubstitutionPanel = ({ idLineup, selectedPosition, allPositions, on
     if (result.isConfirmed) {
       try {
         await substitutionMutation.mutateAsync({
-          id_lineup: idLineup,
-          id_player_in: substitutePlayer.slug_player,
-          id_player_out: selectedPosition.slug_player,
+          slug_lineup: slugLineup,
+          slug_player_in: substitutePlayer.slug_player,
+          slug_player_out: selectedPosition.slug_player,
         });
         onSuccess();
       } catch (error: unknown) {

@@ -1,5 +1,5 @@
 export interface CreateSubstitutionParam {
-  id_lineup: string;
-  id_player_out: string;
-  id_player_in: string;
+  slug_lineup: string;
+  slug_player_out: string;
+  slug_player_in: string;
 }

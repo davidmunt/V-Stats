@@ -24,12 +24,12 @@ export const Scoreboard = ({ matchSlug }: ScoreboardProps) => {
   const teamHome = teams[0];
   const teamAway = teams[1];
 
-  const handleAddPoint = async (teamId: string) => {
+  const handleAddPoint = async (teamSlug: string) => {
     try {
       await addPoint.mutateAsync({
         setSlug: actualSet.slug_set,
-        id_team: teamId,
-        id_point_for_team: teamId,
+        slug_team: teamSlug,
+        slug_point_for_team: teamSlug,
         action_type: "POINT_ADJUSTMENT",
       });
     } catch (error: unknown) {

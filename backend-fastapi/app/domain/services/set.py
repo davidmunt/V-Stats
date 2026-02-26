@@ -19,3 +19,8 @@ class ISetService(abc.ABC):
     async def update_actual_set_status(self, session: Any, match_slug: str, new_status: str) -> None:
         """Lógica para forzar un cambio de estado en el set actual."""
         ...
+
+    @abc.abstractmethod
+    async def create_next_set(self, session: Any, match_id: int, next_number: int) -> Optional[Any]:
+        """Lógica para generar el siguiente set de un partido."""
+        ...

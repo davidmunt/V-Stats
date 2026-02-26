@@ -66,3 +66,15 @@ class TeamRepository(ITeamRepository):
         id_league = st_result.scalar_one_or_none()
 
         return self.mapper.to_dto(team_model, id_league=id_league)
+    
+    async def get_by_slug(self, session: AsyncSession, slug: str) -> Optional[TeamDTO]:
+        """
+        Busca un equipo por su slug. 
+        Este método es obligatorio por la interfaz ITeamRepository.
+        """
+        query = select(Team).where(Team.slug == slug)
+        result = await session.execute(query)
+        team_model = result.scalar_one_or_none()
+        
+        # El mapper se encargará de convertir el modelo Team a TeamDTO
+        return self.mapper.to_dto(team_model)

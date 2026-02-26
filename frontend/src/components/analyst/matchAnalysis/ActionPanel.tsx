@@ -10,12 +10,12 @@ type ActionResult = "++" | "+" | "-" | "--";
 interface ActionPanelProps {
   setSlug: string;
   selectedPosition: LineupPosition;
-  teamLocalId: string;
-  teamVisitorId: string;
+  teamLocalSlug: string;
+  teamVisitorSlug: string;
   onSuccess: () => void;
 }
 
-export const ActionPanel = ({ setSlug, selectedPosition, teamLocalId, teamVisitorId, onSuccess }: ActionPanelProps) => {
+export const ActionPanel = ({ setSlug, selectedPosition, teamLocalSlug, teamVisitorSlug, onSuccess }: ActionPanelProps) => {
   const [selectedType, setSelectedType] = useState<ActionType | null>(null);
   const [showPicker, setShowPicker] = useState(false);
   const [tempResult, setTempResult] = useState<ActionResult | null>(null);
@@ -30,24 +30,29 @@ export const ActionPanel = ({ setSlug, selectedPosition, teamLocalId, teamVisito
   const handleSaveWithCoords = async (coords: { start_x: number; start_y: number; end_x: number; end_y: number }) => {
     if (!selectedType || !tempResult) return;
 
-    let pointForTeamId: string | null = null;
+    let pointForTeamSlug: string | null = null;
     if (tempResult === "++") {
-      pointForTeamId = selectedPosition.slug_team;
+      pointForTeamSlug = selectedPosition.slug_team;
     } else if (tempResult === "--") {
-      pointForTeamId = selectedPosition.slug_team === teamLocalId ? teamVisitorId : teamLocalId;
+      pointForTeamSlug = selectedPosition.slug_team === teamLocalSlug ? teamVisitorSlug : teamLocalSlug;
     }
 
     try {
       await addActionMutation.mutateAsync({
         setSlug: setSlug,
-        id_team: selectedPosition.slug_team,
-        id_player: selectedPosition.slug_player,
+        slug_team: selectedPosition.slug_team,
+        slug_player: selectedPosition.slug_player,
         action_type: selectedType,
         result: tempResult,
         player_position: selectedPosition.current_position,
-        id_point_for_team: pointForTeamId,
+        slug_point_for_team: pointForTeamSlug,
         ...coords,
       });
+
+      console.log("verificamos que si que le llega pointForTeamSlug" + pointForTeamSlug);
+      console.log("verificamos que si que le llega slug_team" + selectedPosition.slug_team);
+      console.log("verificamos que si que le llega selectedType" + selectedType);
+      console.log("verificamos que si que le llega current_position" + selectedPosition.current_position);
 
       setSelectedType(null);
       setTempResult(null);

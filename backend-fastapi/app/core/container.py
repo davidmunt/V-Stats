@@ -22,6 +22,12 @@ from app.services.set import SetService
 from app.infrastructure.mappers.team import TeamModelMapper
 from app.infrastructure.repositories.team import TeamRepository
 from app.services.team import TeamService
+from app.infrastructure.mappers.player import PlayerModelMapper
+from app.infrastructure.repositories.player import PlayerRepository
+from app.infrastructure.mappers.action import ActionModelMapper
+from app.infrastructure.repositories.action import ActionRepository
+from app.services.action import ActionService
+from app.infrastructure.repositories.lineup import LineupRepository
 
 class Container:
     """Dependency injector project container for V-Stats."""
@@ -120,5 +126,36 @@ class Container:
     
     def team_service(self):
         return TeamService(team_repository=self.team_repository())
+    
+    # --- PLAYER ---
+    @staticmethod
+    def player_model_mapper():
+        return PlayerModelMapper()
+
+    def player_repository(self):
+        return PlayerRepository(player_mapper=self.player_model_mapper())
+
+    # --- LINEUP ---
+    def lineup_repository(self):
+        # LineupRepository no usa mapper según nuestra implementación
+        return LineupRepository()
+
+    # --- ACTION ---
+    @staticmethod
+    def action_model_mapper():
+        return ActionModelMapper()
+
+    def action_repository(self):
+        return ActionRepository(action_mapper=self.action_model_mapper())
+
+    def action_service(self):
+        return ActionService(
+            action_repo=self.action_repository(),
+            set_repo=self.set_repository(),
+            match_repo=self.match_repository(),
+            team_repo=self.team_repository(),
+            player_repo=self.player_repository(),
+            lineup_repo=self.lineup_repository()
+        )
 
 container_instance = Container(settings=get_app_settings())

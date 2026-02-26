@@ -24,3 +24,13 @@ class ISetRepository(abc.ABC):
     async def update_set_status(self, session: Any, set_model: Any, new_status: str) -> None:
         """Actualiza el estado de un modelo de set específico."""
         ...
+
+    @abc.abstractmethod
+    async def create_set(self, session: Any, set_model: Any) -> Any:
+        """Crea un nuevo set en la base de datos."""
+        ...
+
+    @abc.abstractmethod
+    async def create_next_set(self, session: Any, match_id: int, next_number: int) -> Optional[SetDTO]:
+        """Crea un nuevo set y devuelve su DTO."""
+        ...
