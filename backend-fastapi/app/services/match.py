@@ -23,9 +23,6 @@ class MatchService(IMatchService):
         id_team = None
         role_lower = role.lower()
 
-        print(f"-1: DEBUG: Email: {email} | Equipo encontrado: {id_team}")
-
-
         # 1. Obtenemos el usuario según el rol para extraer su id_team
         if role_lower == "coach":
             user = await self._coach_repository.get_by_email(session, email)
@@ -40,7 +37,6 @@ class MatchService(IMatchService):
             return None
 
         # 3. Buscamos en el repositorio de partidos el más cercano
-        print(f"-2: DEBUG: Email: {email} | Equipo encontrado: {id_team}")
         return await self._match_repository.get_next_match_by_team_id(session, id_team)
 
     async def get_league_matches(self, session, league_slug: str) -> List[MatchDTO]:

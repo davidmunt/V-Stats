@@ -42,6 +42,6 @@ export const getLineupByTeam = async (slug_match: string, slug_team: string): Pr
 };
 
 export const getMatchLineups = async (slug_match: string): Promise<MatchLineupsResponse> => {
-  const response = await apiClient.get<{ lineups: MatchLineupsResponse }>("express", `/lineups/${slug_match}`);
+  const response = await apiClient.get<{ lineups: MatchLineupsResponse }>("spring", `/api/lineups/${slug_match}`);
   return response.data.lineups;
 };

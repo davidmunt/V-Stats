@@ -14,7 +14,7 @@ import { useFinishedSetsQuery } from "@/queries/set/useSetsFromMatch";
 
 export const MatchAnalysisManager = ({ analystSlug }: { analystSlug: string }) => {
   const [selectedPosition, setSelectedPosition] = useState<LineupPosition | null>(null);
-  const { data: match, isLoading: isLoadingMatch } = useNextMatchForAnalystQuery(analystSlug);
+  const { data: match, isLoading: isLoadingMatch } = useNextMatchForAnalystQuery();
   const { data: actualSet, isLoading: isLoadingSet } = useActualSetQuery(match?.slug_match || "");
   const { data: lineups, isLoading: isLoadingMatchLineups } = useMatchLineupsQuery(match?.slug_match || "");
   const { data: finishedSetsData } = useFinishedSetsQuery(match?.slug_match || "");

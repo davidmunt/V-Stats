@@ -9,7 +9,7 @@ const AnalystDashboardPage = () => {
   const { data: analyst, isLoading } = useCurrentUserQuery();
 
   if (isLoading) return <LoadingFallback />;
-  const hasTeam = !!analyst?.id_team;
+  const hasTeam = !!analyst?.slug_team;
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -26,7 +26,7 @@ const AnalystDashboardPage = () => {
         ) : (
           /* Contenido normal si tiene equipo */
           <>
-            {currentView === "match" && <MatchAnalysisManager analystSlug={analyst?.slug || "slug"} />}
+            {currentView === "match" && <MatchAnalysisManager analystSlug={analyst?.slug_user || "slug"} />}
             {/* Aquí irán los demás componentes cuando los habilites */}
           </>
         )}

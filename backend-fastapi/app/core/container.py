@@ -24,6 +24,10 @@ from app.infrastructure.mappers.match import MatchModelMapper
 from app.infrastructure.repositories.match import MatchRepository
 from app.services.match import MatchService
 
+from app.infrastructure.mappers.set import SetModelMapper
+from app.infrastructure.repositories.set import SetRepository
+from app.services.set import SetService
+
 class Container:
     """Dependency injector project container for V-Stats."""
 
@@ -106,5 +110,16 @@ class Container:
             coach_repository=self.coach_repository(),
             analyst_repository=self.analyst_repository()
         )
+    
+    # --- SET ---
+    @staticmethod    
+    def set_model_mapper():
+        return SetModelMapper()
+
+    def set_repository(self):
+        return SetRepository(set_mapper=self.set_model_mapper())
+
+    def set_service(self):
+        return SetService(set_repository=self.set_repository())
 
 container_instance = Container(settings=get_app_settings())

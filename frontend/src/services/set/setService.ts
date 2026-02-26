@@ -10,7 +10,7 @@ interface SingleSetResponse {
 }
 
 export const getActualSetFromMath = async (slug: string): Promise<Set> => {
-  const response = await apiClient.get<SingleSetResponse>("express", `/set-match/${slug}`);
+  const response = await apiClient.get<SingleSetResponse>("fastapi", `/api/sets/set-match/${slug}`);
   return response.data.set;
 };
 

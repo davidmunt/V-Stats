@@ -33,27 +33,31 @@ public class UserController {
         return ResponseEntity.ok(userService.updateUser(request));
     }
 
-    @GetMapping("/free/coaches")
-    @CheckSecurity.Protected.CanManage
-    public ResponseEntity<Map<String, List<CoachResponse>>> getFreeCoaches() {
-        return ResponseEntity.ok(Map.of("coaches", userService.getFreeCoaches()));
-    }
+    // @GetMapping("/free/coaches")
+    // @CheckSecurity.Protected.CanManage
+    // public ResponseEntity<Map<String, List<CoachResponse>>> getFreeCoaches() {
+    // return ResponseEntity.ok(Map.of("coaches", userService.getFreeCoaches()));
+    // }
 
-    @GetMapping("/free/analysts")
-    @CheckSecurity.Protected.CanManage
-    public ResponseEntity<Map<String, List<AnalystResponse>>> getFreeAnalysts() {
-        return ResponseEntity.ok(Map.of("analysts", userService.getFreeAnalysts()));
-    }
+    // @GetMapping("/free/analysts")
+    // @CheckSecurity.Protected.CanManage
+    // public ResponseEntity<Map<String, List<AnalystResponse>>> getFreeAnalysts() {
+    // return ResponseEntity.ok(Map.of("analysts", userService.getFreeAnalysts()));
+    // }
 
-    @GetMapping("/assigned/coaches")
-    @CheckSecurity.Protected.CanManage
-    public ResponseEntity<Map<String, List<CoachResponse>>> getAssignedCoaches() {
-        return ResponseEntity.ok(Map.of("coaches", userService.getAssignedCoaches()));
-    }
+    // @GetMapping("/assigned/coaches")
+    // @CheckSecurity.Protected.CanManage
+    // public ResponseEntity<Map<String, List<CoachResponse>>> getAssignedCoaches()
+    // {
+    // return ResponseEntity.ok(Map.of("coaches",
+    // userService.getAssignedCoaches()));
+    // }
 
-    @GetMapping("/assigned/analysts")
-    @CheckSecurity.Protected.CanManage
-    public ResponseEntity<Map<String, List<AnalystResponse>>> getAssignedAnalysts() {
-        return ResponseEntity.ok(Map.of("analysts", userService.getAssignedAnalysts()));
-    }
+    // @GetMapping("/assigned/analysts")
+    // @CheckSecurity.Protected.CanManage
+    // public ResponseEntity<Map<String, List<AnalystResponse>>>
+    // getAssignedAnalysts() {
+    // return ResponseEntity.ok(Map.of("analysts",
+    // userService.getAssignedAnalysts()));
+    // }
 }
