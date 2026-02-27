@@ -41,6 +41,19 @@ async def get_league_calendar(
             matches=[MatchResponse.from_dto(m) for m in matches_dtos]
         )
     
+@router.get("/team/{slug}", response_model=MatchListResponse)
+async def get_league_calendar(
+    slug: str,
+    user_data: dict = Depends(auth_any),
+    service = Depends(get_match_service)
+):
+    """Cualquier usuario autenticado puede ver el calendario de una liga."""
+    async with container_instance.context_session() as session:
+        matches_dtos = await service.get_matches_by_team(session, slug)
+        return MatchListResponse(
+            matches=[MatchResponse.from_dto(m) for m in matches_dtos]
+        )
+    
 @router.patch("/{match_slug}/start")
 async def start_match(
     match_slug: str,
@@ -53,7 +66,6 @@ async def start_match(
         try:
             result = await service.start_match(session, match_slug, user_role)
             
-            # Manejo de errores de negocio devueltos por el service
             if result == "MATCH_NOT_FOUND":
                 raise HTTPException(status_code=404, detail="Partido no encontrado")
             

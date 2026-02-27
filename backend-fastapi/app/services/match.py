@@ -47,6 +47,10 @@ class MatchService(IMatchService):
         """Obtiene todos los partidos de una liga mediante su slug."""
         return await self._match_repository.get_matches_by_league_slug(session, league_slug)
     
+    async def get_matches_by_team(self, session, team_slug: str) -> List[MatchDTO]:
+        """Obtiene todos los partidos de un equipo mediante su slug."""
+        return await self._match_repository.get_matches_by_team(session, team_slug)
+    
     async def start_match(self, session, match_slug: str, role: str) -> str:
         """
         Lógica para iniciar un partido:

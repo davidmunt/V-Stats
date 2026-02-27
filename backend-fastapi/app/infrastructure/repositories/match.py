@@ -1,13 +1,14 @@
 from typing import List, Optional
 from datetime import datetime, time
 from sqlalchemy import select, or_, and_
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import aliased, selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.repositories.match import IMatchRepository
 from app.domain.dtos.match import MatchDTO
 from app.infrastructure.models.match import Match
 from app.infrastructure.models.league import League
+from app.infrastructure.models.team import Team
 from app.domain.mapper import IModelMapper
 
 class MatchRepository(IMatchRepository):
@@ -119,6 +120,39 @@ class MatchRepository(IMatchRepository):
         )
         result = await session.execute(query)
         matches = result.scalars().all()
+        return [self.mapper.to_dto(m) for m in matches]
+    
+    async def get_matches_by_team(self, session: AsyncSession, team_slug: str) -> List[MatchDTO]:
+        """
+        Obtiene todos los partidos donde el equipo (local o visitante) coincida con el slug.
+        """
+        # Creamos alias para la tabla Team para unirla dos veces
+        LocalTeam = aliased(Team)
+        VisitorTeam = aliased(Team)
+
+        query = (
+            select(Match)
+            .join(LocalTeam, Match.id_local_team == LocalTeam.id_team)
+            .join(VisitorTeam, Match.id_visitor_team == VisitorTeam.id_team)
+            .where(
+                or_(
+                    LocalTeam.slug == team_slug,
+                    VisitorTeam.slug == team_slug
+                )
+            )
+            .options(
+                selectinload(Match.league),
+                selectinload(Match.local_team),
+                selectinload(Match.visitor_team),
+                selectinload(Match.venue)
+            )
+            .order_by(Match.date.desc())
+        )
+        
+        result = await session.execute(query)
+        matches = result.scalars().all()
+        
+        # IMPORTANTE: Mapear a DTO antes de devolver, para mantener consistencia
         return [self.mapper.to_dto(m) for m in matches]
     
     async def get_model_by_slug(self, session: AsyncSession, slug: str) -> Optional[Match]:

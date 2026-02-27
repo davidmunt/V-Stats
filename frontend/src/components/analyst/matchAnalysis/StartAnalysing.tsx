@@ -41,24 +41,40 @@ export const StartAnalysing = ({ match, analystSlug }: StartAnalysingProps) => {
   const isToday = new Date(match.date).toDateString() === new Date().toDateString();
 
   return (
-    <div className="flex flex-col items-center justify-center p-12 bg-white rounded-2xl border border-gray-200 shadow-sm">
-      <div className="text-6xl mb-4">🏐</div>
-      <h2 className="text-2xl font-bold text-gray-800 mb-2">{match.name}</h2>
-      <p className="text-gray-500 mb-6">{new Date(match.date).toLocaleString("es-ES", { dateStyle: "long", timeStyle: "short" })}</p>
+    <div className="max-w-3xl mx-auto mt-20 animate-in fade-in zoom-in-95 duration-700">
+      <div className="flex flex-col items-center justify-center p-16 bg-white rounded-[3rem] border border-slate-100 shadow-2xl text-center relative overflow-hidden">
+        <div className="absolute -top-24 -left-24 w-64 h-64 bg-blue-50 rounded-full opacity-50"></div>
 
-      {!isToday ? (
-        <div className="bg-amber-50 text-amber-700 px-4 py-2 rounded-lg text-sm font-medium">
-          El partido no está programado para hoy. Espera a la fecha correspondiente.
+        <div className="relative z-10">
+          <div className="w-24 h-24 bg-blue-50 rounded-3xl flex items-center justify-center text-5xl mb-8 mx-auto shadow-inner border border-blue-100">
+            🏐
+          </div>
+
+          <h2 className="text-4xl font-black text-slate-900 tracking-tight mb-3 italic">{match.name}</h2>
+
+          <p className="text-[11px] font-black uppercase tracking-[0.25em] text-slate-400 mb-10">
+            {new Date(match.date).toLocaleString("es-ES", { dateStyle: "full", timeStyle: "short" })}
+          </p>
+
+          {!isToday ? (
+            <div className="flex flex-col items-center gap-3 bg-amber-50 p-6 rounded-[2rem] border border-amber-100 max-w-sm">
+              <span className="text-2xl">⏳</span>
+              <p className="text-xs text-amber-700 font-bold uppercase tracking-widest leading-relaxed">
+                Acceso restringido: El partido está programado para otra fecha.
+              </p>
+            </div>
+          ) : (
+            <button
+              onClick={handleStart}
+              disabled={startMutation.isPending}
+              className="group relative bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-black py-5 px-16 rounded-[2rem] text-xs uppercase tracking-[0.3em] transition-all shadow-2xl shadow-blue-200 active:scale-95 disabled:opacity-50"
+            >
+              <span className="relative z-10">{startMutation.isPending ? "Configurando sesión..." : "Iniciar Análisis"}</span>
+              <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 rounded-[2rem]"></div>
+            </button>
+          )}
         </div>
-      ) : (
-        <button
-          onClick={handleStart}
-          disabled={startMutation.isPending}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-lg active:scale-95 disabled:opacity-50"
-        >
-          {startMutation.isPending ? "Iniciando..." : "Empezar"}
-        </button>
-      )}
+      </div>
     </div>
   );
 };

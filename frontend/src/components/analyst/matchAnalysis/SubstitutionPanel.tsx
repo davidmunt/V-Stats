@@ -48,23 +48,27 @@ export const SubstitutionPanel = ({ slugLineup, selectedPosition, allPositions, 
   if (!substitutePlayer) return null;
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 mb-4">
-      <label className="text-xs font-black text-gray-400 uppercase mb-3 block">Sustitución rápida</label>
+    <div className="bg-white rounded-[1.5rem] shadow-lg border border-slate-200 p-4 mb-4 animate-in fade-in duration-500">
+      <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3 block">Sustitución rápida</label>
       <button
         onClick={handleSubstitute}
         disabled={substitutionMutation.isPending}
-        className="w-full flex items-center justify-between p-3 rounded-xl border-2 border-blue-100 bg-blue-50 hover:bg-blue-100 transition-colors group"
+        className="w-full flex items-center justify-between p-3 rounded-xl border-2 border-blue-50 bg-blue-50/30 hover:bg-blue-50 hover:border-blue-100 transition-all group active:scale-[0.98]"
       >
         <div className="flex items-center gap-3">
-          <div className="bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">
+          <div className="bg-blue-600 text-white w-8 h-8 rounded-lg flex items-center justify-center font-black text-xs shadow-md">
             {substitutePlayer.dorsal}
           </div>
           <div className="text-left">
-            <p className="text-[10px] text-blue-600 font-bold uppercase leading-none">Entra por #{selectedPosition.dorsal}</p>
-            <p className="text-sm font-bold text-slate-700">{substitutePlayer.dorsal || "Reserva"}</p>
+            <p className="text-[8px] text-blue-600 font-black uppercase tracking-widest leading-none mb-0.5">
+              Entra por #{selectedPosition.dorsal}
+            </p>
+            <p className="text-xs font-bold text-slate-700 tracking-tight">{`Dorsal ${substitutePlayer.dorsal}`}</p>
           </div>
         </div>
-        <span className="text-blue-600 group-hover:translate-x-1 transition-transform">⇄</span>
+        <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center shadow-sm text-blue-600 text-xs">
+          <span className="font-bold">⇄</span>
+        </div>
       </button>
     </div>
   );

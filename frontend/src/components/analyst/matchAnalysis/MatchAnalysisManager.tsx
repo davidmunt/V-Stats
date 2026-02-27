@@ -114,7 +114,6 @@ export const MatchAnalysisManager = ({ analystSlug }: { analystSlug: string }) =
                   lineups?.home?.slug_team === selectedPosition.slug_team ? lineups.home.slug_lineup : lineups?.away?.slug_lineup || ""
                 }
                 selectedPosition={selectedPosition}
-                // USAMOS LOS MAPAS YA FORMATEADOS
                 allPositions={[...Object.values(homeLineupMap), ...Object.values(awayLineupMap)]}
                 onSuccess={() => setSelectedPosition(null)}
               />

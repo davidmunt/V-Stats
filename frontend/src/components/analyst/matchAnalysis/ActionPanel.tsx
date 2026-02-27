@@ -49,11 +49,6 @@ export const ActionPanel = ({ setSlug, selectedPosition, teamLocalSlug, teamVisi
         ...coords,
       });
 
-      console.log("verificamos que si que le llega pointForTeamSlug" + pointForTeamSlug);
-      console.log("verificamos que si que le llega slug_team" + selectedPosition.slug_team);
-      console.log("verificamos que si que le llega selectedType" + selectedType);
-      console.log("verificamos que si que le llega current_position" + selectedPosition.current_position);
-
       setSelectedType(null);
       setTempResult(null);
       setShowPicker(false);
@@ -70,91 +65,69 @@ export const ActionPanel = ({ setSlug, selectedPosition, teamLocalSlug, teamVisi
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden flex flex-col h-full">
-      <div className="bg-blue-600 p-4 text-white flex justify-between items-center">
-        <div>
-          <p className="text-[10px] uppercase font-bold opacity-80">Jugador Seleccionado</p>
-          <h3 className="font-bold text-lg">#{selectedPosition.dorsal}</h3>
+    <div className="bg-white rounded-[2rem] shadow-xl border border-slate-200 overflow-hidden flex flex-col h-full animate-in slide-in-from-right-4">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-500 px-6 py-4 text-white">
+        <p className="text-[9px] uppercase font-black tracking-widest opacity-70">Control de Acción</p>
+        <div className="flex items-center gap-2 mt-1">
+          <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center font-black text-base border border-white/10 italic">
+            #{selectedPosition.dorsal}
+          </div>
+          <h3 className="font-bold text-lg tracking-tight">{selectedPosition.dorsal}</h3>
         </div>
       </div>
-      <div className="p-4 flex-1 flex flex-col gap-6">
-        {showPicker && <CoordinatePicker onComplete={handleSaveWithCoords} onCancel={() => setShowPicker(false)} />}
-        <div>
-          <label className="text-xs font-black text-gray-400 uppercase mb-3 block">1. Tipo Accion</label>
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              onClick={() => setSelectedType("SERVE")}
-              className={`flex items-center gap-2 p-3 rounded-xl border-2 transition-all font-bold text-sm ${selectedType === "SERVE" ? "border-blue-600 bg-blue-50 text-blue-700" : "border-gray-100 bg-gray-50 text-gray-600"}`}
-            >
-              Saque
-            </button>
-            <button
-              onClick={() => setSelectedType("RECEPTION")}
-              className={`flex items-center gap-2 p-3 rounded-xl border-2 transition-all font-bold text-sm ${selectedType === "RECEPTION" ? "border-blue-600 bg-blue-50 text-blue-700" : "border-gray-100 bg-gray-50 text-gray-600"}`}
-            >
-              Recepcion
-            </button>
-            <button
-              onClick={() => setSelectedType("SET")}
-              className={`flex items-center gap-2 p-3 rounded-xl border-2 transition-all font-bold text-sm ${selectedType === "SET" ? "border-blue-600 bg-blue-50 text-blue-700" : "border-gray-100 bg-gray-50 text-gray-600"}`}
-            >
-              Colocacion
-            </button>
-            <button
-              onClick={() => setSelectedType("ATTACK")}
-              className={`flex items-center gap-2 p-3 rounded-xl border-2 transition-all font-bold text-sm ${selectedType === "ATTACK" ? "border-blue-600 bg-blue-50 text-blue-700" : "border-gray-100 bg-gray-50 text-gray-600"}`}
-            >
-              Ataque
-            </button>
-            <button
-              onClick={() => setSelectedType("BLOCK")}
-              className={`flex items-center gap-2 p-3 rounded-xl border-2 transition-all font-bold text-sm ${selectedType === "BLOCK" ? "border-blue-600 bg-blue-50 text-blue-700" : "border-gray-100 bg-gray-50 text-gray-600"}`}
-            >
-              Bloqueo
-            </button>
-            <button
-              onClick={() => setSelectedType("DIG")}
-              className={`flex items-center gap-2 p-3 rounded-xl border-2 transition-all font-bold text-sm ${selectedType === "DIG" ? "border-blue-600 bg-blue-50 text-blue-700" : "border-gray-100 bg-gray-50 text-gray-600"}`}
-            >
-              Defensa
-            </button>
-          </div>
-        </div>
 
-        <div className={`transition-opacity ${!selectedType ? "opacity-30 pointer-events-none" : "opacity-100"}`}>
-          <label className="text-xs font-black text-gray-400 uppercase mb-3 block">2. Calidad Accion</label>
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={() => handleResultButtonClick("++")}
-              className="bg-green-600 text-white p-4 rounded-xl shadow-md flex flex-col items-center"
-            >
-              <span className="text-2xl font-black">++</span>
-              <span className="text-[10px] font-medium opacity-90">Punto</span>
-            </button>
-            <button
-              onClick={() => handleResultButtonClick("+")}
-              className="bg-green-400 text-white p-4 rounded-xl shadow-md flex flex-col items-center"
-            >
-              <span className="text-2xl font-black">+</span>
-              <span className="text-[10px] font-medium opacity-90">Bueno</span>
-            </button>
-            <button
-              onClick={() => handleResultButtonClick("-")}
-              className="bg-orange-400 text-white p-4 rounded-xl shadow-md flex flex-col items-center"
-            >
-              <span className="text-2xl font-black">-</span>
-              <span className="text-[10px] font-medium opacity-90">Malo</span>
-            </button>
-            <button
-              onClick={() => handleResultButtonClick("--")}
-              className="bg-red-600 text-white p-4 rounded-xl shadow-md flex flex-col items-center"
-            >
-              <span className="text-2xl font-black">--</span>
-              <span className="text-[10px] font-medium opacity-90">Punto Rival</span>
-            </button>
+      <div className="p-6 flex-1 flex flex-col gap-6">
+        {showPicker && <CoordinatePicker onComplete={handleSaveWithCoords} onCancel={() => setShowPicker(false)} />}
+
+        <section>
+          <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3 block">1. Categoría Técnica</label>
+          <div className="grid grid-cols-3 gap-2">
+            {["SERVE", "RECEPTION", "SET", "ATTACK", "BLOCK", "DIG"].map((type) => (
+              <button
+                key={type}
+                onClick={() => setSelectedType(type as ActionType)}
+                className={`py-3 px-1 rounded-xl border-2 transition-all font-bold text-[10px] uppercase tracking-tighter ${
+                  selectedType === type
+                    ? "border-blue-600 bg-blue-50 text-blue-700 shadow-inner"
+                    : "border-slate-50 bg-slate-50/50 text-slate-500 hover:bg-slate-100"
+                }`}
+              >
+                {type === "RECEPTION"
+                  ? "RECP"
+                  : type === "ATTACK"
+                    ? "ATAQ"
+                    : type === "SET"
+                      ? "COLOC"
+                      : type === "BLOCK"
+                        ? "BLOQ"
+                        : type === "SERVE"
+                          ? "SAQUE"
+                          : "DEF"}
+              </button>
+            ))}
           </div>
-        </div>
-      </div>{" "}
+        </section>
+
+        <section className={`transition-all duration-300 ${!selectedType ? "opacity-20 pointer-events-none grayscale" : "opacity-100"}`}>
+          <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3 block">2. Evaluación de Calidad</label>
+          <div className="flex gap-2">
+            {[
+              { val: "++" as ActionResult, color: "bg-emerald-500 hover:bg-emerald-600 shadow-emerald-200" },
+              { val: "+" as ActionResult, color: "bg-blue-500 hover:bg-blue-600 shadow-blue-200" },
+              { val: "-" as ActionResult, color: "bg-amber-500 hover:bg-amber-600 shadow-amber-200" },
+              { val: "--" as ActionResult, color: "bg-rose-500 hover:bg-rose-600 shadow-rose-200" },
+            ].map((res) => (
+              <button
+                key={res.val}
+                onClick={() => handleResultButtonClick(res.val)}
+                className={`${res.color} text-white flex-1 py-4 rounded-xl shadow-lg transition-all active:scale-90 flex items-center justify-center`}
+              >
+                <span className="text-2xl font-black italic">{res.val}</span>
+              </button>
+            ))}
+          </div>
+        </section>
+      </div>
     </div>
   );
 };

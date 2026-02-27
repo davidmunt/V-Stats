@@ -21,6 +21,11 @@ class IMatchRepository(abc.ABC):
         ...
 
     @abc.abstractmethod
+    async def get_matches_by_team(self, session, team_slug: str) -> List[MatchDTO]:
+        """Busca partidos donde el equipo sea local o visitante."""
+        pass
+
+    @abc.abstractmethod
     async def get_model_by_slug(self, session: Any, slug: str) -> Optional[Any]:
         """Obtiene el modelo SQLAlchemy del partido para operaciones de escritura."""
         ...

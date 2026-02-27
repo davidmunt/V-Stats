@@ -28,8 +28,6 @@ class LeagueRepository(ILeagueRepository):
         result = await session.execute(query)
         league_model = result.scalar_one_or_none()
         
-        print(f"DEBUG REPO: Buscando email {email}. Resultado: {league_model}")
-        
         if not league_model:
             return None
             

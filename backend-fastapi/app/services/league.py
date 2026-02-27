@@ -23,7 +23,6 @@ class LeagueService:
 
         if role == "coach":
             res = await self.league_repo.get_league_by_coach_email(session, email)
-            print(f"DEBUG SERVICE: Resultado Repo: {res}")
             return res
         
         elif role == "analyst":

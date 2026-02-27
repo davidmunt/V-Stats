@@ -27,73 +27,64 @@ export const CoordinatePicker = ({ onComplete, onCancel }: CoordinatePickerProps
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/90 backdrop-blur-md p-4">
-      <div className="bg-white rounded-3xl p-6 w-full max-w-5xl shadow-2xl border border-white/20">
-        <div className="flex justify-between items-center mb-6">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/95 backdrop-blur-xl p-6 animate-in fade-in duration-300">
+      <div className="bg-white rounded-[3rem] p-10 w-full max-w-6xl shadow-2xl border border-white/10 flex flex-col gap-8">
+        <div className="flex justify-between items-end border-b border-slate-100 pb-6">
+          <div>
+            <h3 className="text-2xl font-black text-slate-900 tracking-tight italic">GEOLOCALIZACIÓN DE ACCIÓN</h3>
+            <p className="text-xs text-slate-400 font-medium uppercase tracking-widest mt-1">Precisión táctica sobre el terreno de juego</p>
+          </div>
           <div className="flex gap-3">
             {start && (
               <button
                 onClick={() => setStart(null)}
-                className="px-4 py-2 bg-orange-100 text-red-600 rounded-lg font-bold text-sm hover:bg-red-200 transition-all"
+                className="px-6 py-2.5 bg-rose-50 text-rose-600 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-rose-100 transition-all"
               >
-                Reiniciar Puntos
+                Resetear Trayectoria
               </button>
             )}
             <button
               onClick={onCancel}
-              className="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg font-bold text-sm hover:bg-slate-200 transition-all"
+              className="px-6 py-2.5 bg-slate-100 text-slate-600 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-200 transition-all"
             >
-              Cerrar
+              Cerrar Analizador
             </button>
           </div>
         </div>
 
-        {/* CANCHA HORIZONTAL COMPLETA */}
         <div
           onClick={handleClick}
-          className="relative w-full aspect-[18/9] bg-orange-200 border-[6px] border-white rounded-xl cursor-crosshair overflow-hidden shadow-2xl mx-auto"
+          className="relative w-full aspect-[18/9] bg-slate-50 border-[12px] border-white rounded-[2rem] cursor-crosshair overflow-hidden shadow-2xl mx-auto ring-1 ring-slate-200"
         >
-          {/* LÍNEAS DE FONDO Y BANDAS (Decorativo) */}
-          <div className="absolute inset-2 border-2 border-white/30 pointer-events-none"></div>
-
-          {/* CAMPO PROPIO (Izquierda) */}
-          <div className="absolute left-0 w-1/2 h-full border-r-4 border-white">
-            {/* Línea de 3m Propia */}
-            <div className="absolute right-[33%] inset-y-0 w-0.5 bg-white/40"></div>
-            <span className="absolute bottom-4 left-4 text-[10px] font-black text-orange-800/40 uppercase">Mi Campo</span>
-          </div>
-
-          {/* CAMPO RIVAL (Derecha) */}
-          <div className="absolute right-0 w-1/2 h-full">
-            {/* Línea de 3m Rival */}
-            <div className="absolute left-[33%] inset-y-0 w-0.5 bg-white/40"></div>
-            <span className="absolute bottom-4 right-4 text-[10px] font-black text-orange-800/40 uppercase text-right">Campo Rival</span>
-          </div>
-
-          {/* RED CENTRAL (X = 50) */}
-          <div className="absolute left-1/2 inset-y-0 w-2 bg-slate-800 z-10 flex items-center justify-center">
+          <div className="absolute left-1/2 inset-y-0 w-3 bg-slate-900 z-10 flex items-center justify-center shadow-2xl">
             <div className="h-full w-px bg-white/20"></div>
-            <span className="absolute rotate-90 whitespace-nowrap bg-slate-800 text-[10px] text-white px-3 py-1 rounded-full font-black tracking-widest uppercase">
-              RED
+            <span className="absolute rotate-90 whitespace-nowrap bg-slate-900 text-[10px] text-white px-5 py-1.5 rounded-full font-black tracking-[0.4em] uppercase">
+              NET
             </span>
           </div>
 
-          {/* Trayectoria Visual (Línea entre puntos) */}
-          {start && (
-            <div
-              className="absolute w-6 h-6 bg-blue-600 rounded-full border-4 border-white -translate-x-1/2 -translate-y-1/2 shadow-2xl z-20"
-              style={{ left: `${start.x}%`, top: `${100 - start.y}%` }}
-            >
-              <div className="absolute inset-0 rounded-full bg-blue-600 animate-ping opacity-75"></div>
-            </div>
-          )}
-
-          {/* Rejilla Táctica de Referencia */}
-          <div className="absolute inset-0 grid grid-cols-6 grid-rows-3 opacity-5 pointer-events-none">
+          <div className="absolute inset-0 grid grid-cols-6 grid-rows-3 opacity-10 pointer-events-none">
             {[...Array(18)].map((_, i) => (
-              <div key={i} className="border border-black"></div>
+              <div key={i} className="border border-slate-400"></div>
             ))}
           </div>
+
+          <div className="absolute inset-0 flex justify-between p-8 pointer-events-none">
+            <span className="self-end text-[10px] font-black text-slate-200 uppercase tracking-[0.5em]">LADO — LOCAL</span>
+            <span className="self-end text-[10px] font-black text-slate-200 uppercase tracking-[0.5em]">LADO — RIVAL</span>
+          </div>
+
+          {start && (
+            <div
+              className="absolute w-10 h-10 -translate-x-1/2 -translate-y-1/2 z-20"
+              style={{ left: `${start.x}%`, top: `${100 - start.y}%` }}
+            >
+              <div className="absolute inset-0 rounded-full bg-blue-600/20 animate-ping"></div>
+              <div className="absolute inset-2 bg-blue-600 rounded-full border-4 border-white shadow-2xl shadow-blue-500/50 flex items-center justify-center">
+                <div className="w-1 h-1 bg-white rounded-full"></div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

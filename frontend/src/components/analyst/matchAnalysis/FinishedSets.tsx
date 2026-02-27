@@ -11,19 +11,21 @@ const FinishedSets: React.FC<Props> = ({ matchSlug }) => {
   if (isLoading || isError || !sets || sets.length === 0) return null;
 
   return (
-    <div className="flex items-center gap-2 py-1 px-2 bg-black/20 rounded-lg w-fit">
-      <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mr-1">Sets:</span>
-      <div className="flex gap-1.5">
+    <div className="flex items-center gap-3 py-2 px-4 bg-white/5 rounded-2xl backdrop-blur-sm border border-white/10 w-fit">
+      <span className="text-[9px] font-black text-slate-500 uppercase tracking-[0.3em] mr-2">Sets:</span>
+      <div className="flex gap-2">
         {sets.map((set) => {
           const localWon = set.local_points > set.visitor_points;
-
           return (
-            <div key={set.slug_set} className="flex items-center bg-slate-800 border border-slate-700 rounded px-1.5 py-0.5 shadow-sm">
-              <span className="text-[10px] text-gray-400 font-medium mr-1">S{set.set_number}</span>
-              <div className="flex items-center gap-1 text-[11px] font-mono">
-                <span className={`${localWon ? "text-yellow-400 font-bold" : "text-gray-300"}`}>{set.local_points}</span>
-                <span className="text-gray-600">-</span>
-                <span className={`${!localWon ? "text-yellow-400 font-bold" : "text-gray-300"}`}>{set.visitor_points}</span>
+            <div
+              key={set.slug_set}
+              className="flex items-center bg-slate-800/50 border border-slate-700/50 rounded-xl px-2.5 py-1 shadow-inner"
+            >
+              <span className="text-[9px] text-slate-500 font-black mr-2">S{set.set_number}</span>
+              <div className="flex items-center gap-1.5 text-xs font-mono tracking-tighter">
+                <span className={`${localWon ? "text-blue-400 font-black" : "text-slate-500"}`}>{set.local_points}</span>
+                <span className="text-slate-700 font-bold">:</span>
+                <span className={`${!localWon ? "text-blue-400 font-black" : "text-slate-500"}`}>{set.visitor_points}</span>
               </div>
             </div>
           );

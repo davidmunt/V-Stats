@@ -19,6 +19,11 @@ class IMatchService(abc.ABC):
         ...
 
     @abc.abstractmethod
+    async def get_matches_by_team(self, session: any, team_slug: str) -> List[MatchDTO]:
+        """Lógica para obtener todos los partidos de un equipo."""
+        ...
+
+    @abc.abstractmethod
     async def start_match(self, session: Any, match_slug: str, role: str) -> str:
         """
         Lógica para validar el rol y el estado del partido/set, 

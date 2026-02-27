@@ -15,21 +15,25 @@ export const PlayerNode = ({ player, position, isHome, onPlayerClick }: PlayerNo
       </div>
     );
   }
-
   return (
     <button
       type="button"
       onClick={() => isHome && onPlayerClick(player, isHome)}
       className={`
-        w-12 h-12 rounded-full border-2 flex items-center justify-center font-bold text-lg shadow-md transition-transform active:scale-95
-        ${
-          isHome
-            ? "bg-blue-600 border-blue-800 text-white hover:bg-blue-700 cursor-pointer"
-            : "bg-red-600 border-red-800 text-white opacity-80 cursor-default"
-        }
-      `}
+      group relative w-16 h-16 rounded-3xl border-2 flex items-center justify-center transition-all active:scale-95 shadow-lg
+      ${
+        isHome
+          ? "bg-white border-blue-100 text-blue-600 hover:border-blue-500 hover:shadow-blue-200/50 cursor-pointer"
+          : "bg-slate-50 border-slate-200 text-slate-400 opacity-60 cursor-default"
+      }
+    `}
     >
-      {player.dorsal}
+      <div className="flex flex-col items-center">
+        <span className="text-[10px] font-black absolute -top-3 left-1/2 -translate-x-1/2 bg-white px-2 py-0.5 rounded-full border border-inherit shadow-sm opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+          POS {position}
+        </span>
+        <span className="text-2xl font-black leading-none">{player?.dorsal || "??"}</span>
+      </div>
     </button>
   );
 };
