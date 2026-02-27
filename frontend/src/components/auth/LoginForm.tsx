@@ -24,39 +24,54 @@ const LoginForm = ({ onSwitch }: LoginFormProps) => {
 
   return (
     <>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <input
-          type="email"
-          placeholder="Email"
-          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+      <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+        <div className="space-y-1">
+          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email Oficial</label>
+          <input
+            type="email"
+            placeholder="nombre@ejemplo.com"
+            className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white outline-none transition-all text-slate-700 font-medium placeholder:text-slate-300"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </div>
+
+        <div className="space-y-1">
+          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Contraseña</label>
+          <input
+            type="password"
+            placeholder="••••••••"
+            className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white outline-none transition-all text-slate-700 font-medium placeholder:text-slate-300"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
+
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-colors disabled:opacity-50"
+          className="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-black py-4 rounded-[1.5rem] shadow-xl shadow-blue-200 transition-all active:scale-[0.97] disabled:opacity-50 mt-4 text-xs uppercase tracking-widest"
         >
-          {isLoading ? "Iniciando sesión..." : "Login"}
+          {isLoading ? "Validando credenciales..." : "Iniciar Sesión"}
         </button>
-        {error && <p className="text-red-500 text-sm font-medium text-center">{error}</p>}
+
+        {error && <p className="text-rose-500 text-[11px] font-bold text-center uppercase tracking-tighter">{error}</p>}
       </form>
 
-      <p className="text-center mt-6 text-gray-600 text-sm">
-        Need an account?{" "}
-        <button type="button" onClick={onSwitch} className="text-blue-600 font-bold hover:underline">
-          Register
-        </button>
-      </p>
+      <div className="mt-10 pt-8 border-t border-slate-50 text-center">
+        <p className="text-slate-400 text-sm font-medium">
+          ¿Aún no tienes cuenta?{" "}
+          <button
+            type="button"
+            onClick={onSwitch}
+            className="text-blue-600 font-black hover:text-blue-800 transition-colors uppercase text-xs tracking-widest ml-1"
+          >
+            Regístrate
+          </button>
+        </p>
+      </div>
     </>
   );
 };

@@ -44,71 +44,85 @@ const RegisterForm = ({ onSwitch }: RegisterFormProps) => {
 
   return (
     <>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <input
-          type="text"
-          placeholder="Username"
-          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+      <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+        {/* Campos de texto con el mismo estilo refinado */}
+        <div className="space-y-4">
+          <input
+            type="text"
+            placeholder="Nombre de Usuario"
+            className="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-100 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-700 font-medium"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            className="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-100 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-700 font-medium"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Contraseña"
+            className="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-100 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-700 font-medium"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
 
-        <h3 className="text-sm font-black text-gray-500 uppercase tracking-wider mt-2">Selecciona Tipo de Usuario:</h3>
-
-        <div className="user_type_div flex gap-4 flex-wrap p-2 bg-gray-50 rounded-xl">
-          {options.map((option) => (
-            <label key={option.id} className="user_type flex items-center gap-2 cursor-pointer group">
-              <input
-                type="radio"
-                name="userType"
-                value={option.id}
-                checked={user_type === option.id}
-                onChange={handleChange}
-                className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500 cursor-pointer"
-              />
-              <span
-                className={`text-sm font-medium capitalize transition-colors ${user_type === option.id ? "text-blue-600 font-bold" : "text-gray-600 group-hover:text-gray-800"}`}
-              >
-                {option.label}
-              </span>
-            </label>
-          ))}
+        <div className="mt-4">
+          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block ml-1">Tipo de Cuenta</label>
+          <div className="grid grid-cols-2 gap-3 p-1.5 bg-slate-50 rounded-[1.5rem] border border-slate-100">
+            {options.map((option) => (
+              <label key={option.id} className="relative flex items-center justify-center cursor-pointer group">
+                <input
+                  type="radio"
+                  name="userType"
+                  value={option.id}
+                  checked={user_type === option.id}
+                  onChange={handleChange}
+                  className="sr-only" // Ocultamos el radio nativo para usar el estilo táctico
+                />
+                <div
+                  className={`w-full text-center py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                    user_type === option.id
+                      ? "bg-white text-blue-600 shadow-sm border border-slate-100 scale-[1.02]"
+                      : "text-slate-400 hover:text-slate-600"
+                  }`}
+                >
+                  {option.label}
+                </div>
+              </label>
+            ))}
+          </div>
         </div>
 
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-blue-100 transition-all active:scale-[0.98] disabled:opacity-50 mt-2"
+          className="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-black py-4 rounded-[1.5rem] shadow-xl shadow-blue-200 transition-all active:scale-[0.97] disabled:opacity-50 mt-4 text-xs uppercase tracking-widest"
         >
-          {isLoading ? "Creando cuenta..." : "Register"}
+          {isLoading ? "Creando perfil..." : "Completar Registro"}
         </button>
 
-        {error && <p className="text-red-500 text-sm font-medium text-center">{error}</p>}
+        {error && <p className="text-rose-500 text-[11px] font-bold text-center uppercase tracking-tighter">{error}</p>}
       </form>
 
-      <p className="text-center mt-6 text-gray-600 text-sm">
-        Already have an account?{" "}
-        <button type="button" onClick={onSwitch} className="text-blue-600 font-bold hover:underline">
-          Login
-        </button>
-      </p>
+      <div className="mt-8 pt-6 border-t border-slate-50 text-center">
+        <p className="text-slate-400 text-sm font-medium">
+          ¿Ya tienes cuenta?{" "}
+          <button
+            type="button"
+            onClick={onSwitch}
+            className="text-blue-600 font-black hover:text-blue-800 transition-colors uppercase text-xs tracking-widest ml-1"
+          >
+            Acceder
+          </button>
+        </p>
+      </div>
     </>
   );
 };
