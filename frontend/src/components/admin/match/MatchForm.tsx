@@ -78,38 +78,47 @@ export const MatchForm = ({ leagueSlug, initialData, onCancel, onSuccess }: Matc
   if (isLoadingTeams) return <LoadingFallback />;
 
   return (
-    <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-lg max-w-2xl mx-auto">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-4">
-        {isEditing ? "Modificar Programación" : "Programar Nuevo Partido"}
-      </h2>
+    <div className="p-8 bg-white rounded-3xl animate-in slide-in-from-bottom-4 duration-500">
+      <div className="mb-8">
+        <h2 className="text-2xl font-semibold text-slate-800 tracking-tight">
+          {isEditing ? "Modificar Programación" : "Programar Nuevo Partido"}
+        </h2>
+        <p className="text-sm text-slate-400 font-normal">Define los equipos, la fecha y los detalles visuales del encuentro.</p>
+      </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="col-span-2">
-            <label className="block text-sm font-semibold text-gray-700">Nombre del Encuentro</label>
+      <form onSubmit={handleSubmit} className="space-y-8">
+        <fieldset className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 rounded-2xl bg-white">
+          <div className="md:col-span-2">
+            <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Nombre del Encuentro</label>
             <input
               name="name"
               value={formData.name}
               onChange={handleChange}
               placeholder="Ej: Barca : Valencia"
               required
-              className="w-full border p-2 rounded mt-1 outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-slate-700 font-medium placeholder:text-slate-300"
             />
           </div>
 
-          <div className="col-span-2">
-            <label className="block text-sm font-semibold text-gray-700">URL Imagen del Partido (Opcional)</label>
-            <input name="image" value={formData.image} onChange={handleChange} className="w-full border p-2 rounded mt-1" />
+          <div className="md:col-span-2">
+            <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">URL Imagen del Partido (Opcional)</label>
+            <input
+              name="image"
+              value={formData.image}
+              onChange={handleChange}
+              placeholder="https://..."
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-slate-700 font-medium placeholder:text-slate-300"
+            />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700">Equipo Local</label>
+            <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Equipo Local</label>
             <select
               name="slug_team_local"
               value={formData.slug_team_local}
               onChange={handleChange}
               required
-              className="w-full border p-2 rounded mt-1 bg-white"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-slate-700 font-medium appearance-none cursor-pointer"
             >
               <option value="">Seleccionar...</option>
               {teams?.map((t) => (
@@ -121,13 +130,13 @@ export const MatchForm = ({ leagueSlug, initialData, onCancel, onSuccess }: Matc
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700">Equipo Visitante</label>
+            <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Equipo Visitante</label>
             <select
               name="slug_team_visitor"
               value={formData.slug_team_visitor}
               onChange={handleChange}
               required
-              className="w-full border p-2 rounded mt-1 bg-white"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-slate-700 font-medium appearance-none cursor-pointer"
             >
               <option value="">Seleccionar...</option>
               {teams?.map((t) => (
@@ -138,73 +147,77 @@ export const MatchForm = ({ leagueSlug, initialData, onCancel, onSuccess }: Matc
             </select>
           </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-gray-700">Fecha y Hora</label>
+          <div className="md:col-span-2">
+            <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Fecha y Hora</label>
             <input
               type="datetime-local"
               name="date"
               value={formData.date}
               onChange={handleChange}
               required
-              className="w-full border p-2 rounded mt-1"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-slate-700 font-medium"
             />
           </div>
+        </fieldset>
 
-          {isEditing && (
-            <>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700">Estado</label>
-                <select
-                  name="status"
-                  value={formData.status}
-                  onChange={handleChange}
-                  className="w-full border p-2 rounded mt-1 bg-white capitalize"
-                >
-                  <option value="scheduled">Programado</option>
-                  <option value="live">En Vivo</option>
-                  <option value="finished">Finalizado</option>
-                  <option value="cancelled">Cancelado</option>
-                </select>
-              </div>
-              <div className="flex items-center pt-8">
-                <input
-                  type="checkbox"
-                  name="is_active"
-                  id="is_active"
-                  checked={formData.is_active}
-                  onChange={handleChange}
-                  className="mr-2 h-4 w-4"
-                />
-                <label htmlFor="is_active" className="text-sm font-medium">
-                  Partido Activo
-                </label>
-              </div>
-            </>
-          )}
-        </div>
+        {isEditing && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-6">
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-bold text-slate-500 uppercase ml-1">Estado del Encuentro</label>
+              <select
+                name="status"
+                value={formData.status}
+                onChange={handleChange}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 text-slate-700 font-bold appearance-none cursor-pointer capitalize"
+              >
+                <option value="scheduled">Programado</option>
+                <option value="live">En Vivo</option>
+                <option value="finished">Finalizado</option>
+                <option value="cancelled">Cancelado</option>
+              </select>
+            </div>
 
-        <div className="flex flex-col sm:flex-row justify-between gap-3 pt-6 border-t">
+            <div className="flex items-center gap-3 p-4 rounded-2xl border border-slate-100 bg-slate-50/30 self-end">
+              <input
+                type="checkbox"
+                name="is_active"
+                id="is_active"
+                checked={formData.is_active}
+                onChange={handleChange}
+                className="w-5 h-5 text-blue-600 border-slate-300 rounded focus:ring-0"
+              />
+              <label htmlFor="is_active" className="text-sm font-bold text-slate-600 cursor-pointer select-none">
+                Partido Visible
+              </label>
+            </div>
+          </div>
+        )}
+
+        <div className="flex flex-col sm:flex-row justify-between gap-4 pt-8 mt-10 border-t border-slate-100">
           <div className="flex gap-3 order-2 sm:order-1">
-            <button type="button" onClick={onCancel} className="px-5 py-2 border rounded-lg hover:bg-gray-50">
+            <button
+              type="button"
+              onClick={onCancel}
+              className="px-6 py-3.5 text-slate-500 bg-slate-50 hover:bg-slate-100 rounded-2xl text-sm font-bold transition-all active:scale-95"
+            >
               Cancelar
             </button>
             {isEditing && (
               <button
                 type="button"
                 onClick={handleDelete}
-                className="px-5 py-2 bg-red-50 text-red-600 border border-red-200 rounded-lg hover:bg-red-100 font-medium"
+                className="px-6 py-3.5 bg-rose-50 text-rose-600 border border-rose-100 rounded-2xl hover:bg-rose-100 text-sm font-bold transition-all active:scale-95"
               >
-                Eliminar Partido
+                Eliminar
               </button>
             )}
           </div>
 
           <button
             type="submit"
-            disabled={createMutation.isPending || updateMutation.isPending}
-            className="order-1 sm:order-2 flex-1 sm:flex-none px-8 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 disabled:opacity-50"
+            className="order-1 sm:order-2 flex-1 sm:flex-none px-10 py-3.5 text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 rounded-2xl text-sm font-bold shadow-lg shadow-blue-200 transition-all active:scale-95 disabled:opacity-50"
           >
-            {createMutation.isPending || updateMutation.isPending ? "Guardando..." : isEditing ? "Actualizar" : "Programar Partido"}
+            {isEditing ? "Actualizar" : "Programar Partido"}
           </button>
         </div>
       </form>

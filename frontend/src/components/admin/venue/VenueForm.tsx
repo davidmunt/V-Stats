@@ -66,39 +66,44 @@ export const VenueForm = ({ initialData, onCancel, onSuccess }: VenueFormProps) 
   const isLoading = createMutation.isPending || updateMutation.isPending;
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-      <h2 className="text-xl font-bold text-gray-800 mb-6">{isEditing ? `Editar Sede: ${initialData.name}` : "Registrar Nueva Sede"}</h2>
+    <div className="p-8 bg-white">
+      <div className="mb-8">
+        <h2 className="text-2xl font-semibold text-slate-800 tracking-tight">
+          {isEditing ? `Editar Sede: ${initialData.name}` : "Registrar Nueva Sede"}
+        </h2>
+        <p className="text-sm text-slate-400 font-normal">Complete la información técnica y de ubicación del recinto.</p>
+      </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Nombre de la Sede</label>
+      <form onSubmit={handleSubmit} className="space-y-8">
+        <fieldset className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 rounded-2xl">
+          <div className="md:col-span-2">
+            <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Nombre de la Sede</label>
             <input
               type="text"
               name="name"
               value={formData.name}
               onChange={handleChange}
               required
-              className="w-full border border-gray-300 rounded-md px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-slate-700 font-medium placeholder:text-slate-300"
               placeholder="Ej: Estadio Olímpico"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Ciudad</label>
+            <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Ciudad</label>
             <input
               type="text"
               name="city"
               value={formData.city}
               onChange={handleChange}
               required
-              className="w-full border border-gray-300 rounded-md px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-slate-700 font-medium placeholder:text-slate-300"
               placeholder="Ej: Madrid"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Capacidad</label>
+            <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Capacidad Total</label>
             <input
               type="number"
               name="capacity"
@@ -106,62 +111,62 @@ export const VenueForm = ({ initialData, onCancel, onSuccess }: VenueFormProps) 
               onChange={handleChange}
               required
               min="0"
-              className="w-full border border-gray-300 rounded-md px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-slate-700 font-medium"
             />
           </div>
 
-          <div className="col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Dirección Exacta</label>
+          <div className="md:col-span-2">
+            <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Dirección Postal</label>
             <input
               type="text"
               name="address"
               value={formData.address}
               onChange={handleChange}
               required
-              className="w-full border border-gray-300 rounded-md px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-slate-700 font-medium placeholder:text-slate-300"
               placeholder="Ej: Calle Deporte 123"
             />
           </div>
+        </fieldset>
 
-          <div className="flex items-center gap-2 py-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="flex items-center gap-3 p-4 rounded-2xl border border-slate-100 bg-white shadow-sm hover:border-blue-200 transition-colors cursor-pointer group">
             <input
               type="checkbox"
               name="indoor"
               id="indoor"
               checked={formData.indoor}
               onChange={handleChange}
-              className="w-4 h-4 text-blue-600 border-gray-300 rounded"
+              className="w-5 h-5 text-blue-600 border-slate-300 rounded-lg focus:ring-blue-500"
             />
-            <label htmlFor="indoor" className="text-sm font-medium text-gray-700 cursor-pointer">
-              ¿Es un recinto interior (Indoor)?
+            <label htmlFor="indoor" className="text-sm font-semibold text-slate-600 cursor-pointer select-none flex-1">
+              Recinto cubierto (Indoor)
+              <span className="block text-[10px] font-normal text-slate-400 uppercase">Habilitar climatización y luces</span>
             </label>
           </div>
-        </div>
 
-        {isEditing && (
-          <div className="p-4 bg-gray-50 rounded-md border border-gray-100 space-y-3">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Estado Operativo</label>
+          {isEditing && (
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-bold text-slate-500 uppercase ml-1">Estado del Recinto</label>
               <select
                 name="status"
                 value={formData.status}
                 onChange={handleChange}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 bg-white"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 text-slate-700 font-bold appearance-none cursor-pointer"
               >
-                <option value="active">Activo</option>
+                <option value="active">Activo / Disponible</option>
                 <option value="inactive">Inactivo</option>
-                <option value="maintenance">En Mantenimiento</option>
+                <option value="maintenance">Mantenimiento</option>
               </select>
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
-        <div className="flex gap-3 pt-4 border-t border-gray-100 mt-6">
+        <div className="flex gap-4 pt-8 mt-10 border-t border-slate-100">
           <button
             type="button"
             onClick={onCancel}
-            disabled={isLoading}
-            className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+            className="px-8 py-3.5 text-slate-500 bg-slate-50 hover:bg-slate-100 rounded-2xl text-sm font-bold transition-all active:scale-95"
           >
             Cancelar
           </button>
@@ -169,9 +174,9 @@ export const VenueForm = ({ initialData, onCancel, onSuccess }: VenueFormProps) 
           <button
             type="submit"
             disabled={isLoading}
-            className="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors flex-1 font-medium disabled:opacity-70"
+            className="flex-1 px-8 py-3.5 text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 rounded-2xl text-sm font-bold shadow-lg shadow-blue-200 transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
           >
-            {isLoading ? "Guardando..." : isEditing ? "Actualizar Sede" : "Registrar Sede"}
+            {isLoading ? "Procesando..." : isEditing ? "Actualizar Registro" : "Confirmar Alta de Sede"}
           </button>
         </div>
       </form>

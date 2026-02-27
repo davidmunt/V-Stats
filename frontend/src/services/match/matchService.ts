@@ -67,7 +67,7 @@ export const getMatchesFromLeague = async (slug: string): Promise<Match[]> => {
 };
 
 export const getMatchesForCoach = async (slug: string): Promise<Match[]> => {
-  const response = await apiClient.get<MatchesResponse>("express", `/matches/coach/${slug}`);
+  const response = await apiClient.get<MatchesResponse>("fastapi", `/api/matches/team/${slug}`);
   return response.data.matches;
 };
 

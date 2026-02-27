@@ -40,54 +40,56 @@ export const LeagueDetail = ({ slug, onBack }: LeagueDetailProps) => {
   if (!league) return <div className="p-10 text-center">No se encontró la liga.</div>;
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
-      <div className="bg-white border-b p-6 shadow-sm">
+    <div className="flex flex-col min-h-screen">
+      <div className="p-8 mb-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-5">
+          <div className="flex items-center gap-6">
             <button
               onClick={onBack}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-500"
+              className="p-2 hover:bg-white hover:shadow-sm rounded-full transition-all text-slate-400 hover:text-blue-600"
               title="Volver al listado"
             >
               ←
             </button>
-            <div className="w-12 h-12 rounded-lg bg-gray-100 border p-1">
+
+            <div className="w-16 h-16 rounded-[1.2rem] bg-white border border-slate-200 p-2 shadow-sm flex items-center justify-center overflow-hidden">
               <img src={league.image} alt={league.name} className="w-full h-full object-contain" />
             </div>
+
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">{league.name}</h1>
-              <p className="text-xs text-gray-500">
-                {league.country} - {league.season}
+              <h1 className="text-3xl font-bold text-slate-900 tracking-tight">{league.name}</h1>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mt-1">
+                {league.country} — {league.season}
               </p>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="bg-white border-b px-6">
-        <div className="max-w-7xl mx-auto flex gap-1">
+      <div className="bg-white border-b border-slate-100 px-8">
+        <div className="max-w-7xl mx-auto flex gap-4">
           <button
             onClick={() => setView("teams_list")}
-            className={`px-6 py-4 text-sm font-bold border-b-2 transition-all ${
+            className={`px-4 py-5 text-[11px] font-black uppercase tracking-widest border-b-2 transition-all ${
               view === "teams_list" || view === "teams_form"
                 ? "border-blue-600 text-blue-600"
-                : "border-transparent text-gray-500 hover:text-gray-700"
+                : "border-transparent text-slate-400 hover:text-slate-600"
             }`}
           >
             Equipos
           </button>
           <button
             onClick={() => setView("matches")}
-            className={`px-6 py-4 text-sm font-bold border-b-2 transition-all ${
-              view === "matches" ? "border-blue-600 text-blue-600" : "border-transparent text-gray-500 hover:text-gray-700"
+            className={`px-4 py-5 text-[11px] font-black uppercase tracking-widest border-b-2 transition-all ${
+              view === "matches" ? "border-blue-600 text-blue-600" : "border-transparent text-slate-400 hover:text-slate-600"
             }`}
           >
             Fechas Partidos
           </button>
           <button
             onClick={() => setView("table")}
-            className={`px-6 py-4 text-sm font-bold border-b-2 transition-all ${
-              view === "table" ? "border-blue-600 text-blue-600" : "border-transparent text-gray-500 hover:text-gray-700"
+            className={`px-4 py-5 text-[11px] font-black uppercase tracking-widest border-b-2 transition-all ${
+              view === "table" ? "border-blue-600 text-blue-600" : "border-transparent text-slate-400 hover:text-slate-600"
             }`}
           >
             Tabla de Posiciones
@@ -95,14 +97,16 @@ export const LeagueDetail = ({ slug, onBack }: LeagueDetailProps) => {
         </div>
       </div>
 
-      <div className="flex-1 p-6">
-        <div className="max-w-7xl mx-auto">
-          {view === "teams_list" && <TeamsList leagueSlug={slug} onCreate={handleCreateTeam} onEdit={handleEditTeam} />}
-          {view === "teams_form" && (
-            <TeamForm leagueSlug={slug} initialData={selectedTeam} onCancel={handleBackToTeamsList} onSuccess={handleBackToTeamsList} />
-          )}
-          {view === "matches" && <LeagueMatchesManager leagueSlug={slug} />}
-          {view === "table" && <LeagueTable leagueSlug={slug} />}
+      <div className="flex-1 p-8">
+        <div className="max-w-7xl mx-auto rounded-[2rem] ">
+          <div className="p-4">
+            {view === "teams_list" && <TeamsList leagueSlug={slug} onCreate={handleCreateTeam} onEdit={handleEditTeam} />}
+            {view === "teams_form" && (
+              <TeamForm leagueSlug={slug} initialData={selectedTeam} onCancel={handleBackToTeamsList} onSuccess={handleBackToTeamsList} />
+            )}
+            {view === "matches" && <LeagueMatchesManager leagueSlug={slug} />}
+            {view === "table" && <LeagueTable leagueSlug={slug} />}
+          </div>
         </div>
       </div>
     </div>

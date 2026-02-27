@@ -42,50 +42,75 @@ export const MatchesCalendar = ({ leagueSlug, onCreate, onEdit }: MatchesCalenda
   if (isError) return <div className="p-4 text-red-500">Error cargando el calendario de partidos.</div>;
 
   return (
-    <div className="p-6 space-y-4 bg-white rounded-xl border border-gray-200 shadow-sm">
-      <div className="flex justify-between items-center mb-4">
+    <div className="p-8 rounded-3xl animate-in fade-in duration-500">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
-          <h2 className="text-xl font-bold text-gray-800">Calendario de Partidos</h2>
+          <h2 className="text-3xl font-bold text-slate-900 tracking-tight">Calendario de Partidos</h2>
+          <p className="text-sm text-slate-500 font-medium mt-1">Visualización mensual y agenda de los próximos encuentros.</p>
         </div>
-        <button onClick={onCreate} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-          + Programar Partido
+        <button
+          onClick={onCreate}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl text-sm font-bold transition-all flex items-center gap-2 shadow-lg shadow-blue-200/50 active:scale-95"
+        >
+          <span className="text-xl leading-none">+</span> Programar Partido
         </button>
       </div>
 
-      <div className="h-[600px] border rounded-lg p-2">
-        <Calendar
-          localizer={localizer}
-          events={events}
-          startAccessor="start"
-          endAccessor="end"
-          views={[Views.MONTH, Views.AGENDA]}
-          culture="es"
-          messages={{
-            next: "Sig.",
-            previous: "Ant.",
-            today: "Hoy",
-            month: "Mes",
-            agenda: "Agenda",
-            noEventsInRange: "No hay partidos en este rango.",
-          }}
-          onSelectEvent={(event) => onEdit(event.resource)}
-          eventPropGetter={(event) => {
-            const status = event.resource.status;
-            let bgColor = "#3b82f6";
-            if (status === "LIVE") bgColor = "#ef4444";
-            if (status === "FINISHED") bgColor = "#10b981";
-            if (status === "CANCELLED") bgColor = "#6b7280";
+      <div className="bg-white border border-slate-200 rounded-[2rem] shadow-xl shadow-slate-200/60 overflow-hidden p-6">
+        <div className="h-[650px] calendar-fine-text">
+          <Calendar
+            localizer={localizer}
+            events={events}
+            startAccessor="start"
+            endAccessor="end"
+            views={[Views.MONTH, Views.AGENDA]}
+            culture="es"
+            messages={{
+              next: "Sig.",
+              previous: "Ant.",
+              today: "Hoy",
+              month: "Mes",
+              agenda: "Agenda",
+              noEventsInRange: "No hay partidos en este rango.",
+            }}
+            onSelectEvent={(event) => onEdit(event.resource)}
+            eventPropGetter={(event) => {
+              const status = event.resource.status;
+              let bgColor = "#3b82f6";
+              if (status === "LIVE") bgColor = "#ef4444";
+              if (status === "FINISHED") bgColor = "#10b981";
+              if (status === "CANCELLED") bgColor = "#94a3b8";
 
-            return {
-              style: {
-                backgroundColor: bgColor,
-                borderRadius: "4px",
-                fontSize: "12px",
-                border: "none",
-              },
-            };
-          }}
-        />
+              return {
+                className: "shadow-sm border-none",
+                style: {
+                  backgroundColor: bgColor,
+                  borderRadius: "8px",
+                  fontSize: "11px",
+                  fontWeight: "bold",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.05em",
+                  padding: "2px 6px",
+                },
+              };
+            }}
+          />
+        </div>
+      </div>
+
+      <div className="mt-6 flex flex-wrap gap-6 px-4">
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+          <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Programado</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-red-500"></span>
+          <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">En Vivo</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Finalizado</span>
+        </div>
       </div>
     </div>
   );

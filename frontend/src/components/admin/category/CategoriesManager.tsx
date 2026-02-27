@@ -24,9 +24,14 @@ export const CategoriesManager = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm min-h-[500px]">
+    <div className="min-h-[600px] transition-all duration-300">
       {view === "list" && <CategoriesList onCreate={handleCreate} onEdit={handleEdit} />}
-      {view === "form" && <CategoryForm initialData={selectedCategory} onCancel={handleBackToList} onSuccess={handleBackToList} />}
+
+      {view === "form" && (
+        <div className="w-full">
+          <CategoryForm initialData={selectedCategory} onCancel={handleBackToList} onSuccess={handleBackToList} />
+        </div>
+      )}
     </div>
   );
 };

@@ -24,10 +24,14 @@ export const VenuesManager = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm min-h-[500px]">
+    <div className="min-h-[600px] transition-all duration-300">
       {view === "list" && <VenuesList onCreate={handleCreate} onEdit={handleEdit} />}
 
-      {view === "form" && <VenueForm initialData={selectedVenue} onCancel={handleBackToList} onSuccess={handleBackToList} />}
+      {view === "form" && (
+        <div className="bg-white rounded-2xl">
+          <VenueForm initialData={selectedVenue} onCancel={handleBackToList} onSuccess={handleBackToList} />
+        </div>
+      )}
     </div>
   );
 };

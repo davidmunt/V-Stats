@@ -78,34 +78,39 @@ export const TeamForm = ({ leagueSlug, initialData, onCancel, onSuccess }: TeamF
   const isLoading = createMutation.isPending || updateMutation.isPending;
 
   return (
-    <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-      <h2 className="text-xl font-bold mb-6 text-gray-800">
-        {isEditing ? `Modificar Equipo: ${initialData.name}` : "Añadir Equipo a la Liga"}
-      </h2>
+    <div className="p-8 bg-white animate-in slide-in-from-bottom-4 duration-500">
+      <div className="mb-10">
+        <h2 className="text-3xl font-bold text-slate-900 tracking-tight">{isEditing ? `Modificar Equipo` : "Añadir Equipo"}</h2>
+        <p className="text-sm text-slate-400 font-normal mt-1">
+          {isEditing ? initialData.name : "Registra un nuevo participante en la liga."}
+        </p>
+      </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="col-span-2">
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Nombre del Equipo</label>
+      <form onSubmit={handleSubmit} className="space-y-10">
+        <fieldset className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 rounded-2xl bg-white">
+          <div className="md:col-span-2">
+            <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Nombre del Equipo</label>
             <input
               name="name"
               value={formData.name}
               onChange={handleChange}
               required
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-slate-700 font-medium placeholder:text-slate-300"
+              placeholder="Ej: Valencia C.V."
             />
           </div>
 
+          {/* Sede */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Sede</label>
+            <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Sede Principal</label>
             <select
               name="slug_venue"
               value={formData.slug_venue}
               onChange={handleChange}
               required
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-slate-700 font-medium appearance-none cursor-pointer"
             >
-              <option value="">Selecciona una sede</option>
+              <option value="">Selecciona sede...</option>
               {(venues || []).map((v) => (
                 <option key={v.slug_venue} value={v.slug_venue}>
                   {v.name}
@@ -114,28 +119,30 @@ export const TeamForm = ({ leagueSlug, initialData, onCancel, onSuccess }: TeamF
             </select>
           </div>
 
+          {/* Escudo */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">URL Escudo</label>
+            <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">URL Escudo</label>
             <input
               name="image"
               value={formData.image}
               onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-slate-700 font-medium placeholder:text-slate-300"
               placeholder="https://..."
             />
           </div>
 
           {isEditing && (
             <>
-              <div className="border-t col-span-2 my-2"></div>
+              <div className="md:col-span-2 border-t border-slate-100 my-4"></div>
 
+              {/* Entrenador */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Entrenador</label>
+                <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Entrenador</label>
                 <select
                   name="slug_coach"
                   value={formData.slug_coach || ""}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 text-slate-700 font-medium appearance-none cursor-pointer"
                 >
                   <option value="">Sin entrenador asignado</option>
                   {allCoaches.map((c) => (
@@ -147,12 +154,12 @@ export const TeamForm = ({ leagueSlug, initialData, onCancel, onSuccess }: TeamF
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Analista</label>
+                <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Analista</label>
                 <select
                   name="slug_analyst"
                   value={formData.slug_analyst || ""}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 text-slate-700 font-medium appearance-none cursor-pointer"
                 >
                   <option value="">Sin analista asignado</option>
                   {allAnalysts.map((a) => (
@@ -163,13 +170,13 @@ export const TeamForm = ({ leagueSlug, initialData, onCancel, onSuccess }: TeamF
                 </select>
               </div>
 
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Estado del Equipo</label>
+              <div className="flex flex-col gap-2">
+                <label className="text-xs font-bold text-slate-500 uppercase ml-1">Estado</label>
                 <select
                   name="status"
                   value={formData.status}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-500/10 text-slate-700 font-bold appearance-none cursor-pointer"
                 >
                   <option value="active">Activo</option>
                   <option value="inactive">Inactivo</option>
@@ -177,37 +184,37 @@ export const TeamForm = ({ leagueSlug, initialData, onCancel, onSuccess }: TeamF
                 </select>
               </div>
 
-              <div className="flex items-center gap-2 pt-6">
+              <div className="flex items-center gap-3 p-4 rounded-2xl border border-slate-100 bg-slate-50/30 self-end">
                 <input
                   type="checkbox"
                   name="is_active"
                   id="is_active"
                   checked={formData.is_active}
                   onChange={handleChange}
-                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  className="w-5 h-5 text-blue-600 border-slate-300 rounded focus:ring-0"
                 />
-                <label htmlFor="is_active" className="text-sm font-medium text-gray-700 cursor-pointer">
-                  Equipo habilitado públicamente
+                <label htmlFor="is_active" className="text-sm font-bold text-slate-600 cursor-pointer select-none">
+                  Habilitado públicamente
                 </label>
               </div>
             </>
           )}
-        </div>
+        </fieldset>
 
-        <div className="flex gap-3 pt-4 border-t">
+        <div className="flex gap-4 pt-8 mt-10 border-t border-slate-100">
           <button
             type="button"
             onClick={onCancel}
-            className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+            className="px-8 py-3.5 text-slate-500 bg-slate-50 hover:bg-slate-100 rounded-2xl text-sm font-bold transition-all active:scale-95"
           >
             Cancelar
           </button>
           <button
             type="submit"
             disabled={isLoading}
-            className="flex-1 bg-blue-600 text-white font-bold py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            className="flex-1 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white py-4 rounded-2xl text-sm font-bold uppercase tracking-widest shadow-lg shadow-blue-200 transition-all active:scale-95 disabled:opacity-50"
           >
-            {isLoading ? "Guardando..." : isEditing ? "Actualizar Equipo" : "Crear Equipo"}
+            {isLoading ? "Guardando..." : isEditing ? "Actualizar Registro" : "Confirmar Alta Equipo"}
           </button>
         </div>
       </form>

@@ -34,7 +34,7 @@ const CoachDashboardPage = () => {
             {currentView === "players" && <PlayersManager />}
             {currentView === "lineup" && <LineupManager coachSlug={coach?.slug_user || "slug"} />}
             {currentView === "positionTable" && <CoachStandings leagueSlug={league?.slug_league || ""} />}
-            {currentView === "calendar" && <CoachMatchesCalendar coachSlug={coach?.slug_user || ""} />}
+            {currentView === "calendar" && <CoachMatchesCalendar coachSlug={coach?.slug_team || ""} />}
             {currentView === "stats" && <StatsManager />}
           </>
         )}

@@ -46,81 +46,83 @@ export const TeamsList = ({ leagueSlug, onCreate, onEdit }: TeamsListProps) => {
   if (isError) return <div className="p-4 text-red-500">Error cargando los equipos de esta liga.</div>;
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="space-y-8 animate-in fade-in duration-500">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-800">
-            Equipos de {league?.name || "Liga"} {league?.season}
-          </h2>
+          <h2 className="text-3xl font-bold text-slate-900 tracking-tight">Equipos de {league?.name || "Liga"}</h2>
         </div>
         <button
           onClick={onCreate}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 shadow-sm"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl text-sm font-bold transition-all flex items-center gap-2 shadow-lg shadow-blue-200/50 active:scale-95"
         >
-          <span className="text-lg">+</span> Nuevo Equipo
+          <span className="text-xl leading-none">+</span> Nuevo Equipo
         </button>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+      <div className="bg-white border border-slate-200 rounded-[2rem] shadow-xl shadow-slate-200/60 overflow-hidden">
         {!teams || teams.length === 0 ? (
-          <div className="p-12 text-center text-gray-500">No hay equipos registrados en esta liga todavía.</div>
+          <div className="p-20 text-center bg-slate-50/50">
+            <p className="text-slate-400 font-medium italic">No hay equipos registrados en esta liga todavía.</p>
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-gradient-to-r from-slate-50 to-white border-b border-slate-200">
                 <tr>
-                  <th className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Info</th>
-                  <th className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Entrenador / Analista</th>
-                  <th className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Sede</th>
-                  <th className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Estado</th>
-                  <th className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Acciones</th>
+                  <th className="py-5 px-8 text-[11px] font-black text-slate-400 uppercase tracking-widest">Info</th>
+                  <th className="py-5 px-8 text-[11px] font-black text-slate-400 uppercase tracking-widest">Cuerpo Técnico</th>
+                  <th className="py-5 px-8 text-[11px] font-black text-slate-400 uppercase tracking-widest">Sede Principal</th>
+                  <th className="py-5 px-8 text-[11px] font-black text-slate-400 uppercase tracking-widest">Estado</th>
+                  <th className="py-5 px-8 text-[11px] font-black text-slate-400 uppercase tracking-widest text-right">Acciones</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-slate-100">
                 {teams.map((team) => (
-                  <tr key={team.slug_team} className="hover:bg-gray-50 transition-colors">
-                    <td className="py-4 px-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-lg bg-gray-100 border border-gray-200 overflow-hidden flex-shrink-0">
+                  <tr key={team.slug_team} className="group hover:bg-blue-50/30 transition-all duration-300">
+                    <td className="py-6 px-8">
+                      <div className="flex items-center gap-4">
+                        <div className="w-14 h-14 rounded-2xl bg-white border border-slate-200 p-1 flex items-center justify-center overflow-hidden flex-shrink-0 group-hover:scale-105 transition-transform">
                           {team.image ? (
-                            <img src={team.image} alt={team.name} className="w-full h-full object-contain" />
+                            <img src={team.image} alt={team.name} className="w-full h-full object-contain rounded-xl" />
                           ) : (
-                            <div className="flex items-center justify-center h-full text-[10px] text-gray-400">LOGO</div>
+                            <div className="text-[10px] font-bold text-slate-300 uppercase">Logo</div>
                           )}
                         </div>
                         <div>
-                          <div className="font-bold text-gray-900">{team.name}</div>
-                          <div className="text-[10px] text-gray-400 font-mono uppercase">{team.slug_team}</div>
+                          <div className="font-bold text-slate-800 text-lg">{team.name}</div>
                         </div>
                       </div>
                     </td>
 
-                    <td className="py-4 px-4 text-sm">
-                      <div className="text-gray-700">{getCoachName(team.slug_coach)}</div>
-                      <div className="text-gray-500 text-xs mt-1">{getAnalystName(team.slug_analyst)}</div>
+                    <td className="py-6 px-8 text-sm">
+                      <div className="text-slate-700 font-bold">{getCoachName(team.slug_coach)}</div>
+                      <div className="text-slate-400 font-medium mt-0.5">{getAnalystName(team.slug_analyst)}</div>
                     </td>
 
-                    <td className="py-4 px-4 text-sm text-gray-600">{getVenueName(team.slug_venue)}</td>
+                    <td className="py-6 px-8 text-sm text-slate-600 font-medium">{getVenueName(team.slug_venue)}</td>
 
-                    <td className="py-4 px-4">
+                    <td className="py-6 px-8">
                       <span
-                        className={`px-2 py-1 rounded-full text-[10px] font-bold ${
-                          team.is_active ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                        className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-tighter border ${
+                          team.is_active ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-rose-50 text-rose-600 border-rose-100"
                         }`}
                       >
                         {team.status.toUpperCase()}
                       </span>
                     </td>
 
-                    <td className="py-4 px-4 text-right">
-                      <div className="flex justify-end gap-3">
-                        <button onClick={() => onEdit(team)} className="text-indigo-600 hover:text-indigo-900 text-sm font-semibold">
+                    <td className="py-6 px-8 text-right">
+                      <div className="flex justify-end gap-4">
+                        <button
+                          onClick={() => onEdit(team)}
+                          className="text-blue-600 hover:text-blue-800 text-xs font-black uppercase tracking-widest p-2 hover:bg-blue-50 rounded-lg transition-all"
+                        >
                           Editar
                         </button>
                         <button
                           onClick={() => handleDelete(team.slug_team)}
                           disabled={deleteMutation.isPending}
-                          className="text-red-500 hover:text-red-700 text-sm font-semibold disabled:opacity-50"
+                          className="text-slate-300 hover:text-rose-600 text-xs font-black uppercase tracking-widest p-2 hover:bg-rose-50 rounded-lg transition-all disabled:opacity-30"
                         >
                           {deleteMutation.isPending ? "..." : "Eliminar"}
                         </button>

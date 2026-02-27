@@ -62,70 +62,76 @@ export const CategoryForm = ({ initialData, onCancel, onSuccess }: CategoryFormP
   const isLoading = createMutation.isPending || updateMutation.isPending;
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-      <h2 className="text-xl font-bold text-gray-800 mb-6">
-        {isEditing ? `Editar Categoría: ${initialData.name}` : "Crear Nueva Categoría"}
-      </h2>
+    <div className="p-8 bg-white">
+      <div className="mb-8">
+        <h2 className="text-2xl font-semibold text-slate-800 tracking-tight">
+          {isEditing ? `Editar Categoría: ${initialData.name}` : "Crear Nueva Categoría"}
+        </h2>
+        <p className="text-sm text-slate-400 font-normal">Define el nombre, descripción y la identidad visual de la categoría de liga.</p>
+      </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
-            placeholder="Ej: Primera División"
-          />
-        </div>
+      <form onSubmit={handleSubmit} className="space-y-8">
+        <fieldset className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 rounded-2xl">
+          <div className="md:col-span-2">
+            <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Nombre de la Categoría</label>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-slate-700 font-medium placeholder:text-slate-300"
+              placeholder="Ej: Primera División"
+            />
+          </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
-          <textarea
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            rows={3}
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
-            placeholder="Breve descripción de la categoría..."
-          />
-        </div>
+          <div className="md:col-span-2">
+            <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Descripción</label>
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              rows={3}
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-slate-700 font-medium placeholder:text-slate-300 resize-none"
+              placeholder="Breve descripción del nivel o edad..."
+            />
+          </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">URL de Imagen</label>
-          <input
-            type="text"
-            name="image"
-            value={formData.image}
-            onChange={handleChange}
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
-            placeholder="https://..."
-          />
-        </div>
+          <div className="md:col-span-2">
+            <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">URL de Imagen / Icono</label>
+            <input
+              type="text"
+              name="image"
+              value={formData.image}
+              onChange={handleChange}
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-slate-700 font-medium placeholder:text-slate-300"
+              placeholder="https://ejemplo.com/imagen.png"
+            />
+          </div>
+        </fieldset>
 
         {isEditing && (
-          <div className="p-4 bg-gray-50 rounded-md border border-gray-100">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Estado</label>
-            <select
-              name="status"
-              value={formData.is_active ? "active" : "inactive"}
-              onChange={handleChange}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none bg-white"
-            >
-              <option value="active">Activo</option>
-              <option value="inactive">Inactivo</option>
-            </select>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-bold text-slate-500 uppercase ml-1">Estado de la Categoría</label>
+              <select
+                name="is_active"
+                value={formData.is_active ? "active" : "inactive"}
+                onChange={handleChange}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 text-slate-700 font-bold appearance-none cursor-pointer"
+              >
+                <option value="active">Activo</option>
+                <option value="inactive">Inactivo</option>
+              </select>
+            </div>
           </div>
         )}
 
-        <div className="flex gap-3 pt-4 border-t border-gray-100 mt-6">
+        <div className="flex gap-4 pt-8 mt-10 border-t border-slate-100">
           <button
             type="button"
             onClick={onCancel}
-            disabled={isLoading}
-            className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+            className="px-8 py-3.5 text-slate-500 bg-slate-50 hover:bg-slate-100 rounded-2xl text-sm font-bold transition-all active:scale-95"
           >
             Cancelar
           </button>
@@ -133,9 +139,9 @@ export const CategoryForm = ({ initialData, onCancel, onSuccess }: CategoryFormP
           <button
             type="submit"
             disabled={isLoading}
-            className="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors flex-1 font-medium disabled:opacity-70 disabled:cursor-not-allowed"
+            className="flex-1 px-8 py-3.5 text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 rounded-2xl text-sm font-bold shadow-lg shadow-blue-200 transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
           >
-            {isLoading ? "Guardando..." : isEditing ? "Actualizar Categoría" : "Crear Categoría"}
+            {isLoading ? "Procesando..." : isEditing ? "Actualizar Categoría" : "Confirmar Alta"}
           </button>
         </div>
       </form>

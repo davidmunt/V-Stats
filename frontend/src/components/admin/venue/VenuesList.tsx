@@ -18,79 +18,89 @@ export const VenuesList = ({ onCreate, onEdit }: VenuesListProps) => {
   };
 
   if (isLoading) return <LoadingFallback />;
-  if (isError) return <div className="p-4 text-red-500">Error cargando las sedes.</div>;
+  if (isError)
+    return (
+      <div className="p-10 text-center">
+        <p className="text-red-500 font-medium">Error al cargar las sedes. Por favor, inténtalo de nuevo.</p>
+      </div>
+    );
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
+    <div className="p-8 rounded-3xl">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
-          <h2 className="text-2xl font-bold text-gray-800">Sedes</h2>
+          <h2 className="text-3xl font-bold text-slate-900 tracking-tight">Sedes y Estadios</h2>
+          <p className="text-sm text-slate-500 font-medium mt-1">Gestión centralizada de instalaciones deportivas.</p>
         </div>
         <button
           onClick={onCreate}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 shadow-sm"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl text-sm font-bold transition-all flex items-center gap-2 shadow-lg shadow-blue-200/50 active:scale-95"
         >
-          <span>+</span> Crear Sede
+          <span className="text-xl leading-none">+</span> Nueva Sede
         </button>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+      <div className="bg-white border border-slate-200 rounded-[2rem] shadow-xl shadow-slate-200/60 overflow-hidden">
         {!venues || venues.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">No hay sedes registradas todavía.</div>
+          <div className="p-20 text-center bg-slate-50/50">
+            <p className="text-slate-400 font-medium italic">Esperando registros...</p>
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-slate-50 border-b border-slate-200">
                 <tr>
-                  <th className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Nombre</th>
-                  <th className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Localización</th>
-                  <th className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Capacidad</th>
-                  <th className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Estado</th>
-                  <th className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Acciones</th>
+                  <th className="py-5 px-8 text-[11px] font-black text-slate-400 uppercase tracking-widest">Nombre</th>
+                  <th className="py-5 px-8 text-[11px] font-black text-slate-400 uppercase tracking-widest">Localización</th>
+                  <th className="py-5 px-8 text-[11px] font-black text-slate-400 uppercase tracking-widest">Capacidad</th>
+                  <th className="py-5 px-8 text-[11px] font-black text-slate-400 uppercase tracking-widest">Estado</th>
+                  <th className="py-5 px-8 text-[11px] font-black text-slate-400 uppercase tracking-widest text-right">Acciones</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-slate-100">
                 {venues.map((venue) => (
-                  <tr key={venue.slug_venue} className="hover:bg-gray-50 transition-colors">
-                    <td className="py-4 px-4">
-                      <div className="font-bold text-gray-800">{venue.name}</div>
+                  <tr key={venue.slug_venue} className="group hover:bg-blue-50/30 transition-all duration-300">
+                    <td className="py-6 px-8">
+                      <div className="font-bold text-slate-800 text-lg">{venue.name}</div>
                     </td>
 
-                    <td className="py-4 px-4 text-sm text-gray-600">
-                      <div>{venue.city}</div>
-                      <div className="text-xs text-gray-400">{venue.address}</div>
+                    <td className="py-6 px-8 text-sm">
+                      <div className="text-slate-700 font-bold">{venue.city}</div>
+                      <div className="text-slate-400 font-medium mt-0.5">{venue.address}</div>
                     </td>
 
-                    <td className="py-4 px-4 text-sm text-gray-700">{venue.capacity} </td>
+                    <td className="py-6 px-8 text-sm">
+                      <span className="text-slate-700 font-bold">{new Intl.NumberFormat().format(venue.capacity)}</span>
+                    </td>
 
-                    <td className="py-4 px-4">
+                    <td className="py-6 px-8">
                       <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-tighter border ${
                           venue.status === "available"
-                            ? "bg-green-100 text-green-800"
+                            ? "bg-emerald-50 text-emerald-600 border-emerald-100"
                             : venue.status === "maintenance"
-                              ? "bg-yellow-100 text-yellow-800"
-                              : "bg-red-100 text-red-800"
+                              ? "bg-amber-50 text-amber-600 border-amber-100"
+                              : "bg-rose-50 text-rose-600 border-rose-100"
                         }`}
                       >
                         {venue.status}
                       </span>
                     </td>
 
-                    <td className="py-4 px-4 text-right">
-                      <div className="flex justify-end gap-2">
+                    <td className="py-6 px-8 text-right">
+                      <div className="flex justify-end gap-4">
                         <button
                           onClick={() => onEdit(venue)}
-                          className="text-blue-600 hover:text-blue-800 text-sm font-medium px-2 py-1 rounded hover:bg-blue-50 transition-colors"
+                          className="text-blue-600 hover:text-blue-800 text-xs font-black uppercase tracking-widest p-2 hover:bg-blue-50 rounded-lg transition-all"
                         >
                           Editar
                         </button>
                         <button
                           onClick={() => handleDelete(venue.slug_venue)}
                           disabled={deleteMutation.isPending}
-                          className="text-red-600 hover:text-red-800 text-sm font-medium px-2 py-1 rounded hover:bg-red-50 disabled:opacity-50 transition-colors"
+                          className="text-slate-300 hover:text-rose-600 text-xs font-black uppercase tracking-widest p-2 hover:bg-rose-50 rounded-lg transition-all"
                         >
-                          {deleteMutation.isPending ? "..." : "Borrar"}
+                          {deleteMutation.isPending ? "..." : "Eliminar"}
                         </button>
                       </div>
                     </td>

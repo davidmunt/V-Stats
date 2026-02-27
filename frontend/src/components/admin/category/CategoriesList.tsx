@@ -18,73 +18,83 @@ export const CategoriesList = ({ onCreate, onEdit }: CategoriesListProps) => {
   };
 
   if (isLoading) return <LoadingFallback />;
-  if (isError) return <div className="p-4 text-red-500">Error cargando las categorías.</div>;
+  if (isError) return <div className="p-10 text-center text-red-500 font-medium">Error al cargar categorías.</div>;
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
+    <div className="p-8 rounded-3xl">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
-          <h2 className="text-2xl font-bold text-gray-800">Category Leagues</h2>
+          <h2 className="text-3xl font-bold text-slate-900 tracking-tight">Categorías de Liga</h2>
+          <p className="text-sm text-slate-500 font-medium mt-1">Clasifica las ligas por niveles o edades.</p>
         </div>
         <button
           onClick={onCreate}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl text-sm font-bold transition-all flex items-center gap-2 shadow-lg shadow-blue-200/50 active:scale-95"
         >
-          <span>+</span> Crear Categoría
+          <span className="text-xl leading-none">+</span> Nueva Categoría
         </button>
       </div>
-      <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+
+      <div className="bg-white border border-slate-200 rounded-[2rem] shadow-xl shadow-slate-200/60 overflow-hidden">
         {!categories || categories.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">No hay categorías creadas</div>
+          <div className="p-20 text-center bg-slate-50/50">
+            <p className="text-slate-400 font-medium italic">No hay categorías configuradas.</p>
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-gradient-to-r from-slate-50 to-white border-b border-slate-200">
                 <tr>
-                  <th className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Imagen</th>
-                  <th className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Nombre</th>
-                  <th className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Descripción</th>
-                  <th className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Estado</th>
-                  <th className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Acciones</th>
+                  <th className="py-5 px-8 text-[11px] font-black text-slate-400 uppercase tracking-widest">Icono</th>
+                  <th className="py-5 px-8 text-[11px] font-black text-slate-400 uppercase tracking-widest">Nombre</th>
+                  <th className="py-5 px-8 text-[11px] font-black text-slate-400 uppercase tracking-widest">Descripción</th>
+                  <th className="py-5 px-8 text-[11px] font-black text-slate-400 uppercase tracking-widest">Estado</th>
+                  <th className="py-5 px-8 text-[11px] font-black text-slate-400 uppercase tracking-widest text-right">Acciones</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-slate-100">
                 {categories.map((category) => (
-                  <tr key={category.slug_category} className="hover:bg-gray-50 transition-colors">
-                    <td className="py-3 px-4">
-                      <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-200 border border-gray-300">
+                  <tr key={category.slug_category} className="group hover:bg-blue-50/30 transition-all duration-300">
+                    <td className="py-6 px-8">
+                      <div className="w-12 h-12 rounded-full overflow-hidden bg-slate-100 border border-slate-200 p-1">
                         {category.image ? (
-                          <img src={category.image} alt={category.name} className="w-full h-full object-cover" />
+                          <img src={category.image} alt={category.name} className="w-full h-full object-cover rounded-full" />
                         ) : (
-                          <span className="flex items-center justify-center h-full text-xs">N/A</span>
+                          <div className="flex items-center justify-center h-full text-[10px] text-slate-400 font-bold uppercase">N/A</div>
                         )}
                       </div>
                     </td>
-                    <td className="py-3 px-4 font-medium text-gray-800">{category.name}</td>
-                    <td className="py-3 px-4 text-sm text-gray-500 max-w-xs truncate">{category.description || "-"}</td>
-                    <td className="py-3 px-4">
+
+                    <td className="py-6 px-8 font-bold text-slate-800 text-lg">{category.name}</td>
+
+                    <td className="py-6 px-8 text-sm text-slate-500 font-medium max-w-xs truncate">{category.description || "-"}</td>
+
+                    <td className="py-6 px-8">
                       <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          category.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                        className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-tighter border ${
+                          category.is_active
+                            ? "bg-emerald-50 text-emerald-600 border-emerald-100"
+                            : "bg-rose-50 text-rose-600 border-rose-100"
                         }`}
                       >
-                        {category.status || (category.is_active ? "Activo" : "Inactivo")}
+                        {category.is_active ? "Activa" : "Inactiva"}
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-right">
-                      <div className="flex justify-end gap-2">
+
+                    <td className="py-6 px-8 text-right">
+                      <div className="flex justify-end gap-4">
                         <button
                           onClick={() => onEdit(category)}
-                          className="text-blue-600 hover:text-blue-800 text-sm font-medium px-2 py-1 rounded hover:bg-blue-50"
+                          className="text-blue-600 hover:text-blue-800 text-xs font-black uppercase tracking-widest p-2 hover:bg-blue-50 rounded-lg transition-all"
                         >
                           Editar
                         </button>
                         <button
                           onClick={() => handleDelete(category.slug_category)}
                           disabled={deleteMutation.isPending}
-                          className="text-red-600 hover:text-red-800 text-sm font-medium px-2 py-1 rounded hover:bg-red-50 disabled:opacity-50"
+                          className="text-slate-300 hover:text-rose-600 text-xs font-black uppercase tracking-widest p-2 hover:bg-rose-50 rounded-lg transition-all"
                         >
-                          {deleteMutation.isPending ? "..." : "Borrar"}
+                          {deleteMutation.isPending ? "..." : "Eliminar"}
                         </button>
                       </div>
                     </td>

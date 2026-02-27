@@ -16,7 +16,7 @@ export const LeagueForm = ({ initialData, onCancel, onSuccess }: LeagueFormProps
   const createMutation = useCreateLeagueMutation();
   const updateMutation = useUpdateLeagueMutation();
 
-  const { data: categories, isLoading: isLoadingCats } = useCategoryLeaguesQuery();
+  const { data: categories } = useCategoryLeaguesQuery();
 
   const [formData, setFormData] = useState({
     name: initialData?.name || "",
@@ -64,34 +64,39 @@ export const LeagueForm = ({ initialData, onCancel, onSuccess }: LeagueFormProps
   const isLoading = createMutation.isPending || updateMutation.isPending;
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-      <h2 className="text-xl font-bold text-gray-800 mb-6">{isEditing ? `Editar Liga: ${initialData.name}` : "Crear Nueva Liga"}</h2>
+    <div className="p-8 bg-white rounded-3xl">
+      <div className="mb-8">
+        <h2 className="text-2xl font-semibold text-slate-800 tracking-tight">
+          {isEditing ? `Editar Liga: ${initialData.name}` : "Crear Nueva Liga"}
+        </h2>
+        <p className="text-sm text-slate-400 font-normal">Define los parámetros de la competición, categoría y visibilidad.</p>
+      </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-1 gap-4">
-          <div className="col-span-2 md:col-span-1">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Nombre de la Liga</label>
+      <form onSubmit={handleSubmit} className="space-y-8">
+        <fieldset className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 rounded-2xl">
+          <div className="md:col-span-2">
+            <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Nombre de la Liga</label>
             <input
               type="text"
               name="name"
               value={formData.name}
               onChange={handleChange}
               required
-              className="w-full border border-gray-300 rounded-md px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-slate-700 font-medium placeholder:text-slate-300"
               placeholder="Ej: Premier League"
             />
           </div>
 
-          <div className="col-span-2 md:col-span-1">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
+          <div>
+            <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Categoría</label>
             <select
               name="slug_category"
               value={formData.slug_category}
               onChange={handleChange}
               required
-              className="w-full border border-gray-300 rounded-md px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-slate-700 font-medium appearance-none cursor-pointer"
             >
-              <option value="">Selecciona una categoría</option>
+              <option value="">Selecciona categoria...</option>
               {categories?.map((cat) => (
                 <option key={cat.slug_category} value={cat.slug_category}>
                   {cat.name}
@@ -101,73 +106,75 @@ export const LeagueForm = ({ initialData, onCancel, onSuccess }: LeagueFormProps
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">País</label>
+            <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">País / Región</label>
             <input
               type="text"
               name="country"
               value={formData.country}
               onChange={handleChange}
               required
-              className="w-full border border-gray-300 rounded-md px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Ej: Inglaterra"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-slate-700 font-medium placeholder:text-slate-300"
+              placeholder="Ej: España"
             />
           </div>
-        </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">URL del Logo/Imagen</label>
-          <input
-            type="text"
-            name="image"
-            value={formData.image}
-            onChange={handleChange}
-            className="w-full border border-gray-300 rounded-md px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="https://..."
-          />
-        </div>
+          <div className="md:col-span-2">
+            <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">URL del Logo / Imagen</label>
+            <input
+              type="text"
+              name="image"
+              value={formData.image}
+              onChange={handleChange}
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-slate-700 font-medium placeholder:text-slate-300"
+              placeholder="https://..."
+            />
+          </div>
+        </fieldset>
 
         {isEditing && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-blue-50 rounded-md border border-blue-100">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Estado Visual</label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-6">
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-bold text-slate-500 uppercase ml-1">Estado Visual</label>
               <select
                 name="status"
                 value={formData.status}
                 onChange={handleChange}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 bg-white"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 text-slate-700 font-bold appearance-none cursor-pointer"
               >
                 <option value="active">Activo</option>
                 <option value="inactive">Inactivo</option>
+                <option value="completed">Finalizada</option>
               </select>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Visibilidad Pública</label>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-bold text-slate-500 uppercase ml-1">Visibilidad</label>
               <select
                 name="is_active"
                 value={formData.is_active ? "true" : "false"}
                 onChange={(e) => setFormData((p) => ({ ...p, is_active: e.target.value === "true" }))}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 bg-white"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 text-slate-700 font-bold appearance-none cursor-pointer"
               >
-                <option value="true">Visible</option>
-                <option value="false">Oculto</option>
+                <option value="true">Pública (Visible)</option>
+                <option value="false">Privada (Oculta)</option>
               </select>
             </div>
           </div>
         )}
 
-        <div className="flex gap-3 pt-4 border-t border-gray-100">
+        <div className="flex gap-4 pt-8 mt-10 border-t border-slate-100">
           <button
             type="button"
             onClick={onCancel}
-            disabled={isLoading}
-            className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+            className="px-8 py-3.5 text-slate-500 bg-slate-50 hover:bg-slate-100 rounded-2xl text-sm font-bold transition-all active:scale-95"
           >
             Cancelar
           </button>
+
           <button
             type="submit"
-            disabled={isLoading || isLoadingCats}
-            className="flex-1 px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 font-medium"
+            disabled={isLoading}
+            className="flex-1 px-8 py-3.5 text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 rounded-2xl text-sm font-bold shadow-lg shadow-blue-200 transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
           >
             {isLoading ? "Procesando..." : isEditing ? "Guardar Cambios" : "Crear Liga"}
           </button>

@@ -29,12 +29,20 @@ export const LeaguesManager = () => {
   };
 
   return (
-    <div className="bg-gray-50 rounded-lg shadow-sm min-h-[500px]">
+    <div className="min-h-[600px] transition-all duration-300">
       {view === "list" && <LeaguesList onCreate={handleCreate} onEdit={handleEdit} onViewDetail={handleSelectLeague} />}
 
-      {view === "form" && <LeagueForm initialData={selectedLeague} onCancel={handleBackToList} onSuccess={handleBackToList} />}
+      {view === "form" && (
+        <div className="bg-white rounded-2xl">
+          <LeagueForm initialData={selectedLeague} onCancel={handleBackToList} onSuccess={handleBackToList} />
+        </div>
+      )}
 
-      {view === "detail" && selectedLeague && <LeagueDetail slug={selectedLeague.slug_league} onBack={handleBackToList} />}
+      {view === "detail" && selectedLeague && (
+        <div className="bg-white rounded-2xl p-2">
+          <LeagueDetail slug={selectedLeague.slug_league} onBack={handleBackToList} />
+        </div>
+      )}
     </div>
   );
 };
