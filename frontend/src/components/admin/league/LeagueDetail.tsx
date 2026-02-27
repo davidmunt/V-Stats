@@ -58,9 +58,6 @@ export const LeagueDetail = ({ slug, onBack }: LeagueDetailProps) => {
 
             <div>
               <h1 className="text-3xl font-bold text-slate-900 tracking-tight">{league.name}</h1>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mt-1">
-                {league.country} — {league.season}
-              </p>
             </div>
           </div>
         </div>

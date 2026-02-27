@@ -4,13 +4,13 @@ import type { Player, PlayerRole } from "@/interfaces/player.interface";
 
 const getRoleColor = (role: PlayerRole) => {
   const colors = {
-    SETTER: "bg-purple-100 text-purple-700 border-purple-200",
-    MIDDLE: "bg-orange-100 text-orange-700 border-orange-200",
-    OUTSIDE: "bg-blue-100 text-blue-700 border-blue-200",
-    OPPOSITE: "bg-green-100 text-green-700 border-green-200",
-    LIBERO: "bg-yellow-100 text-yellow-700 border-yellow-200",
+    SETTER: "border-l-purple-400 text-purple-700",
+    MIDDLE: "border-l-orange-400 text-orange-700",
+    OUTSIDE: "border-l-blue-400 text-blue-700",
+    OPPOSITE: "border-l-green-400 text-green-700",
+    LIBERO: "border-l-amber-400 text-amber-700",
   };
-  return colors[role] || "bg-gray-100 text-gray-700";
+  return colors[role] || "border-l-slate-400 text-slate-700";
 };
 
 interface DraggablePlayerProps {
@@ -34,19 +34,31 @@ const DraggablePlayer = ({ player }: DraggablePlayerProps) => {
       {...listeners}
       {...attributes}
       className={`
-        flex items-center gap-2 p-2 rounded-lg border shadow-sm cursor-grab active:cursor-grabbing bg-white
-        ${isDragging ? "opacity-50 scale-105 shadow-xl z-50" : "hover:bg-gray-50"}
-        ${getRoleColor(player.role)}
-      `}
+      flex items-center gap-4 p-3 rounded-2xl border border-slate-200 bg-white cursor-grab active:cursor-grabbing transition-all border-l-4
+      ${isDragging ? "opacity-0 scale-95 shadow-none" : "hover:shadow-md hover:-translate-y-0.5 shadow-sm"}
+      ${getRoleColor(player.role)}
+    `}
     >
-      <div className="w-8 h-8 rounded-full bg-white border border-gray-300 overflow-hidden flex-shrink-0 flex items-center justify-center font-bold text-gray-500 text-xs">
-        {player.image ? <img src={player.image} alt={player.name} className="w-full h-full object-cover" /> : `#${player.dorsal}`}
+      <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 overflow-hidden flex-shrink-0 flex items-center justify-center shadow-inner">
+        {player.image ? (
+          <img src={player.image} alt={player.name} className="w-full h-full object-cover" />
+        ) : (
+          <span className="text-xs font-black text-slate-300">#{player.dorsal}</span>
+        )}
       </div>
+
       <div className="flex-1 min-w-0">
-        <div className="text-sm font-bold text-gray-900 truncate">{player.name}</div>
-        <div className="text-[10px] uppercase font-bold text-gray-500">{player.role}</div>
+        <div className="text-sm font-bold text-slate-800 truncate">{player.name}</div>
+        <div className="text-[9px] uppercase font-black tracking-widest opacity-60">
+          #{player.dorsal} — {player.role}
+        </div>
       </div>
-      <div className="font-black text-lg px-2 text-gray-400">⋮⋮</div>
+
+      <div className="flex flex-col gap-0.5 opacity-20 group-hover:opacity-40">
+        <div className="w-1 h-1 bg-slate-900 rounded-full"></div>
+        <div className="w-1 h-1 bg-slate-900 rounded-full"></div>
+        <div className="w-1 h-1 bg-slate-900 rounded-full"></div>
+      </div>
     </div>
   );
 };
@@ -61,9 +73,8 @@ export const PlayerBench = ({ allPlayers, lineupState }: PlayerBenchProps) => {
     id: "bench",
   });
 
-  // Dentro de PlayerBench.tsx
   const playerIdsOnCourt = Object.values(lineupState)
-    .filter((p): p is Player => Boolean(p && p.slug_player)) // Doble comprobación
+    .filter((p): p is Player => Boolean(p && p.slug_player))
     .map((p) => p.slug_player);
 
   const benchPlayers = (allPlayers || []).filter((p) => {
@@ -75,31 +86,38 @@ export const PlayerBench = ({ allPlayers, lineupState }: PlayerBenchProps) => {
     <div
       ref={setNodeRef}
       className={`
-        bg-gray-50 p-6 rounded-2xl border-2 transition-colors min-h-[300px] relative
-        ${isOver ? "border-red-400 bg-red-50" : "border-gray-200"}
-      `}
+      bg-slate-100/50 p-8 rounded-[2rem] border border-slate-200 transition-all min-h-[500px] relative
+      ${isOver ? "bg-rose-50/50 border-rose-200" : ""}
+    `}
     >
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="font-bold text-gray-800 flex items-center gap-2">JUGADORES DISPONIBLES</h3>
-        <span className="text-xs bg-gray-200 px-2 py-1 rounded-full font-bold">{benchPlayers.length} jugadores</span>
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Disponibles</h3>
+          <p className="text-lg font-bold text-slate-800 tracking-tight">Banquillo</p>
+        </div>
+        <span className="text-[10px] font-black bg-white border border-slate-200 text-slate-500 px-3 py-1 rounded-xl shadow-sm">
+          {benchPlayers.length} REGISTROS
+        </span>
       </div>
 
       {benchPlayers.length === 0 ? (
-        <div className="text-center text-gray-400 text-sm mt-10">Toda la plantilla está en la pista.</div>
+        <div className="flex flex-col items-center justify-center h-64 text-center">
+          <p className="text-slate-400 text-sm font-medium italic px-4">Toda la plantilla está posicionada en la pista.</p>
+        </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 gap-3 overflow-y-auto max-h-[600px] pr-2 custom-scrollbar">
           {benchPlayers
             .sort((a, b) => (a.dorsal || 0) - (b.dorsal || 0))
-            .map((player) =>
-              // Verificación final antes de renderizar el Draggable
-              player?.slug_player ? <DraggablePlayer key={player.slug_player} player={player} /> : null,
-            )}
+            .map((player) => (player?.slug_player ? <DraggablePlayer key={player.slug_player} player={player} /> : null))}
         </div>
       )}
 
       {isOver && (
-        <div className="absolute inset-0 bg-red-100/80 backdrop-blur-sm flex items-center justify-center rounded-2xl border-2 border-red-500 z-10">
-          <span className="font-bold text-red-700 text-lg">Quitar de la pista</span>
+        <div className="absolute inset-0 bg-rose-50/90 backdrop-blur-[2px] flex items-center justify-center rounded-[2rem] border-2 border-dashed border-rose-400 z-50 animate-in fade-in duration-300">
+          <div className="bg-white px-6 py-3 rounded-2xl shadow-xl shadow-rose-200/50 flex items-center gap-3">
+            <span className="text-2xl">↩</span>
+            <span className="font-black text-rose-600 text-xs uppercase tracking-widest">Quitar de la pista</span>
+          </div>
         </div>
       )}
     </div>

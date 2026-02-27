@@ -16,29 +16,33 @@ const CourtZone = ({ id, label, player }: CourtZoneProps) => {
     <div
       ref={setNodeRef}
       className={`
-        relative flex flex-col items-center justify-center p-2 rounded-xl border-2 transition-all h-24 w-full
-        ${isOver ? "bg-blue-100 border-blue-500 shadow-lg" : "bg-white/90 border-dashed border-gray-300"}
-        ${player ? "border-solid border-green-500 bg-green-50" : ""}
-      `}
+      relative flex flex-col items-center justify-center p-4 rounded-3xl border-2 transition-all h-32 w-full
+      ${isOver ? "bg-blue-50 border-blue-400 shadow-inner" : "bg-white border-dashed border-slate-200"}
+      ${player ? "border-solid border-slate-100 shadow-md" : ""}
+    `}
     >
-      <span className="absolute top-1 left-2 text-xs font-bold text-gray-400">
-        P{id} - {label}
+      <span className="absolute top-2 left-3 text-[9px] font-black text-slate-300 uppercase tracking-tighter">
+        Pos {id} — {label}
       </span>
 
       {player ? (
-        <div className="flex flex-col items-center mt-2 animate-fade-in">
-          <div className="w-10 h-10 rounded-full border-2 border-white shadow-sm overflow-hidden bg-gray-200">
+        <div className="flex flex-col items-center animate-in zoom-in-95 duration-300">
+          <div className="w-12 h-12 rounded-full border-2 border-white shadow-sm overflow-hidden bg-slate-100 ring-1 ring-slate-100">
             {player.image ? (
               <img src={player.image} alt={player.name} className="w-full h-full object-cover" />
             ) : (
-              <span className="flex items-center justify-center h-full text-xs font-bold text-gray-500">#{player.dorsal}</span>
+              <span className="flex items-center justify-center h-full text-xs font-black text-slate-400">#{player.dorsal}</span>
             )}
           </div>
-          <span className="text-xs font-bold text-gray-800 mt-1 truncate max-w-[80px]">{player.name}</span>
-          <span className="text-[9px] text-gray-500 font-mono">#{player.dorsal}</span>
+          <span className="text-xs font-bold text-slate-800 mt-2 truncate max-w-[90px]">{player.name}</span>
+          <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest leading-none">#{player.dorsal}</span>
         </div>
       ) : (
-        <span className="text-gray-300 text-sm font-medium mt-2">Vacío</span>
+        <div className="flex flex-col items-center opacity-20">
+          <div className="w-10 h-10 rounded-full border-2 border-slate-200 bg-slate-50 flex items-center justify-center">
+            <span className="text-xl text-slate-300 font-light">+</span>
+          </div>
+        </div>
       )}
     </div>
   );
@@ -49,23 +53,26 @@ interface VolleyballCourtProps {
 }
 
 export const VolleyballCourt = ({ lineupState }: VolleyballCourtProps) => {
-  console.log("VolleyballCourt lineupState:", lineupState);
   return (
-    <div className="bg-orange-100 p-6 rounded-2xl border-4 border-white shadow-inner relative overflow-hidden">
-      <div className="absolute inset-x-0 top-0 h-4 bg-gray-300 flex items-center justify-center text-xs font-bold text-gray-500 tracking-widest">
-        PLANTILLA TITULAR
+    <div className="bg-slate-50 p-10 rounded-[2.5rem] border border-slate-200 shadow-xl shadow-slate-200/60 relative overflow-hidden">
+      <div className="absolute inset-x-0 top-0 h-10 bg-slate-100 flex items-center justify-center border-b border-slate-200">
+        <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Plantilla Titular en Pista</span>
       </div>
-      <div className="absolute top-1/3 inset-x-0 h-0.5 bg-white opacity-60"></div>
-      <div className="grid grid-cols-3 gap-4 mt-6 max-w-lg mx-auto">
-        <CourtZone id={4} label="Del. Izquierdo" player={lineupState[4] || null} />
-        <CourtZone id={3} label="Central" player={lineupState[3] || null} />
-        <CourtZone id={2} label="Del. Derecho" player={lineupState[2] || null} />
-        <CourtZone id={5} label="Zaguero Izq." player={lineupState[5] || null} />
-        <CourtZone id={6} label="Zaguero C." player={lineupState[6] || null} />
-        <CourtZone id={1} label="Saque/Zaguero D." player={lineupState[1] || null} />
+
+      <div className="grid grid-cols-3 gap-6 mt-8 max-w-lg mx-auto">
+        <CourtZone id={4} label="DEL. IZQ" player={lineupState[4] || null} />
+        <CourtZone id={3} label="CENTRAL" player={lineupState[3] || null} />
+        <CourtZone id={2} label="DEL. DER" player={lineupState[2] || null} />
+
+        <div className="col-span-3 h-px bg-slate-200 my-2 opacity-50"></div>
+
+        <CourtZone id={5} label="ZAG. IZQ" player={lineupState[5] || null} />
+        <CourtZone id={6} label="CENTRAL" player={lineupState[6] || null} />
+        <CourtZone id={1} label="SAQUE" player={lineupState[1] || null} />
       </div>
-      <div className="mt-8 pt-4 border-t-2 border-orange-200/50 flex justify-center">
-        <div className="w-1/3">
+
+      <div className="mt-10 pt-6 border-t border-slate-200 flex justify-center">
+        <div className="w-1/2">
           <CourtZone id={7} label="LÍBERO" player={lineupState[7] || null} />
         </div>
       </div>

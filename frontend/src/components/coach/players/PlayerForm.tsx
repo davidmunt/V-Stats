@@ -79,27 +79,29 @@ export const PlayerForm = ({ initialData, onCancel, onSuccess }: PlayerFormProps
   const isLoading = createMutation.isPending || updateMutation.isPending;
 
   return (
-    <div className="p-6 bg-white rounded-xl border border-gray-200 shadow-sm">
-      <h2 className="text-xl font-bold mb-6 text-gray-800">
-        {isEditing ? `Editar Jugador: ${initialData.name}` : "Registrar Nuevo Jugador"}
-      </h2>
+    <div className="p-8 bg-white rounded-3xl animate-in slide-in-from-bottom-4 duration-500">
+      <div className="mb-8">
+        <h2 className="text-2xl font-semibold text-slate-800 tracking-tight">
+          {isEditing ? `Editar Jugador: ${initialData.name}` : "Registrar Nuevo Jugador"}
+        </h2>
+      </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="col-span-2 md:col-span-1">
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Nombre Completo</label>
+      <form onSubmit={handleSubmit} className="space-y-8">
+        <fieldset className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 rounded-2xl bg-white">
+          <div className="md:col-span-2">
+            <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Nombre Completo</label>
             <input
               name="name"
               value={formData.name}
               onChange={handleChange}
               required
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-slate-700 font-medium placeholder:text-slate-300"
               placeholder="Ej: Ivan Zaytsev"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Dorsal (#)</label>
+            <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Dorsal (#)</label>
             <input
               type="number"
               name="dorsal"
@@ -108,17 +110,17 @@ export const PlayerForm = ({ initialData, onCancel, onSuccess }: PlayerFormProps
               required
               min="0"
               max="99"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-slate-700 font-medium"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Posición en Campo</label>
+            <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Posición Técnica</label>
             <select
               name="role"
               value={formData.role}
               onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-slate-700 font-medium appearance-none cursor-pointer"
             >
               <option value="SETTER">Colocador (Setter)</option>
               <option value="OUTSIDE">Punta (Outside Hitter)</option>
@@ -128,65 +130,66 @@ export const PlayerForm = ({ initialData, onCancel, onSuccess }: PlayerFormProps
             </select>
           </div>
 
-          <div className="col-span-2">
-            <label className="block text-sm font-semibold text-gray-700 mb-1">URL de la Foto</label>
+          <div className="md:col-span-2">
+            <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">URL de la Foto / Avatar</label>
             <input
               name="image"
               value={formData.image}
               onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-slate-700 font-medium placeholder:text-slate-300"
               placeholder="https://..."
             />
           </div>
+        </fieldset>
 
-          {isEditing && (
-            <>
-              <div className="col-span-2 md:col-span-1">
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Estado de Disponibilidad</label>
-                <select
-                  name="status"
-                  value={formData.status}
-                  onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="ACTIVE">Activo</option>
-                  <option value="INJURED">Lesionado</option>
-                  <option value="INACTIVE">Inactivo</option>
-                  <option value="SUSPENDED">Sancionado</option>
-                </select>
-              </div>
+        {isEditing && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-6">
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-bold text-slate-500 uppercase ml-1">Disponibilidad</label>
+              <select
+                name="status"
+                value={formData.status}
+                onChange={handleChange}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 text-slate-700 font-bold appearance-none cursor-pointer"
+              >
+                <option value="ACTIVE">Activo</option>
+                <option value="INJURED">Lesionado</option>
+                <option value="INACTIVE">Inactivo</option>
+                <option value="SUSPENDED">Sancionado</option>
+              </select>
+            </div>
 
-              <div className="flex items-center gap-2 pt-6">
-                <input
-                  type="checkbox"
-                  name="is_active"
-                  id="is_active"
-                  checked={formData.is_active}
-                  onChange={handleChange}
-                  className="w-4 h-4 text-blue-600 border-gray-300 rounded"
-                />
-                <label htmlFor="is_active" className="text-sm font-medium text-gray-700 cursor-pointer">
-                  Jugador habilitado en sistema
-                </label>
-              </div>
-            </>
-          )}
-        </div>
+            <div className="flex items-center gap-3 p-4 rounded-2xl border border-slate-100 bg-slate-50/30 self-end">
+              <input
+                type="checkbox"
+                name="is_active"
+                id="is_active"
+                checked={formData.is_active}
+                onChange={handleChange}
+                className="w-5 h-5 text-blue-600 border-slate-300 rounded focus:ring-0"
+              />
+              <label htmlFor="is_active" className="text-sm font-bold text-slate-600 cursor-pointer select-none">
+                Habilitado en el sistema
+              </label>
+            </div>
+          </div>
+        )}
 
-        <div className="flex gap-3 pt-6 border-t border-gray-100 mt-4">
+        <div className="flex gap-4 pt-8 mt-10 border-t border-slate-100">
           <button
             type="button"
             onClick={onCancel}
-            className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+            className="px-8 py-3.5 text-slate-500 bg-slate-50 hover:bg-slate-100 rounded-2xl text-sm font-bold transition-all active:scale-95"
           >
             Cancelar
           </button>
+
           <button
             type="submit"
             disabled={isLoading}
-            className="flex-1 bg-blue-600 text-white font-bold py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors shadow-md"
+            className="flex-1 px-8 py-3.5 text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 rounded-2xl text-sm font-bold uppercase tracking-widest shadow-lg shadow-blue-200 transition-all active:scale-95 disabled:opacity-50"
           >
-            {isLoading ? "Guardando..." : isEditing ? "Actualizar Jugador" : "Registrar Jugador"}
+            {isLoading ? "Procesando..." : isEditing ? "Actualizar Registro" : "Confirmar Alta Jugador"}
           </button>
         </div>
       </form>

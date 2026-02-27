@@ -23,9 +23,14 @@ export const PlayersManager = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm min-h-[500px]">
+    <div className="min-h-[600px] transition-all duration-300">
       {view === "list" && <PlayersList onCreate={handleCreate} onEdit={handleEdit} />}
-      {view === "form" && <PlayerForm initialData={selectedPlayer} onCancel={handleBackToList} onSuccess={handleBackToList} />}
+
+      {view === "form" && (
+        <div className="bg-white rounded-2xl">
+          <PlayerForm initialData={selectedPlayer} onCancel={handleBackToList} onSuccess={handleBackToList} />
+        </div>
+      )}
     </div>
   );
 };
