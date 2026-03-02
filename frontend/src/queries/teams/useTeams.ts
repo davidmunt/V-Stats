@@ -9,5 +9,6 @@ export const useTeamsQuery = (slug: string) => {
     queryKey: TEAMS_LIST_QUERY_KEY(slug),
     queryFn: () => getTeamsFromLeague(slug),
     enabled: !!slug,
+    staleTime: 1000 * 60 * 5,
   });
 };

@@ -8,5 +8,6 @@ export const useCoachByIdQuery = (slug: string | null) => {
     queryKey: COACH_DETAIL_KEY(slug || ""),
     queryFn: () => getCoachBySlug(slug!),
     enabled: !!slug,
+    staleTime: 1000 * 60 * 5,
   });
 };

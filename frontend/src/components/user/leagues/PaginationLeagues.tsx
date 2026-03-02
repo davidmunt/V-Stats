@@ -4,11 +4,8 @@ export const PaginationLeagues = () => {
   const { data, actions, isLoading } = useLeaguesExplorerQuery();
 
   if (isLoading || !data) return null;
-
   const { total_pages, page: currentPage } = data;
-
   if (total_pages <= 1) return null;
-
   const isFirstPage = currentPage === 0;
   const isLastPage = currentPage >= total_pages - 1;
 

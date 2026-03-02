@@ -9,5 +9,6 @@ export const useMatchTeamsQuery = (matchSlug: string) => {
     queryKey: MATCH_TEAMS_QUERY_KEY(matchSlug),
     queryFn: () => getTeamsFromMatch(matchSlug),
     enabled: !!matchSlug,
+    staleTime: 1000 * 60 * 5,
   });
 };

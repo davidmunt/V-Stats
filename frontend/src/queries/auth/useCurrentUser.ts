@@ -8,6 +8,7 @@ export const useCurrentUserQuery = (options?: Omit<UseQueryOptions<User>, "query
   return useQuery<User>({
     queryKey: CURRENT_USER_QUERY_KEY,
     queryFn: getCurrentUser,
+    staleTime: 1000 * 60 * 5,
     retry: false,
     ...options,
   });

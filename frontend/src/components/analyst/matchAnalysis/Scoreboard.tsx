@@ -65,7 +65,6 @@ export const Scoreboard = ({ matchSlug }: ScoreboardProps) => {
       <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent pointer-events-none"></div>
 
       <div className="flex justify-between items-center max-w-6xl mx-auto relative z-10">
-        {/* Equipo Local - Imagen maximizada */}
         <div className="flex flex-col items-start gap-2 flex-1">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-xl bg-white/10 border border-white/20 overflow-hidden shadow-inner flex items-center justify-center">
@@ -78,14 +77,32 @@ export const Scoreboard = ({ matchSlug }: ScoreboardProps) => {
               onClick={() => handleRemovePoint(teamHome.slug_team)}
               className="w-7 h-7 flex items-center justify-center rounded-lg bg-white/5 hover:bg-red-500/40 text-red-400 border border-white/10 transition-all"
             >
-              <span className="text-md">−</span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="2.5"
+                stroke="currentColor"
+                className="w-4 h-4"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14" />
+              </svg>
             </button>
             <span className="text-5xl font-black tabular-nums tracking-tighter leading-none">{actualSet.local_points}</span>
             <button
               onClick={() => handleAddPoint(teamHome.slug_team)}
-              className="w-9 h-9 flex items-center justify-center rounded-lg bg-blue-600 hover:bg-blue-500 shadow-lg active:scale-90 transition-all text-xl"
+              className="w-9 h-9 flex items-center justify-center rounded-lg bg-blue-600 hover:bg-blue-500 shadow-lg active:scale-90 transition-all"
             >
-              +
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="2.5"
+                stroke="currentColor"
+                className="w-5 h-5"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
             </button>
           </div>
         </div>
@@ -107,14 +124,32 @@ export const Scoreboard = ({ matchSlug }: ScoreboardProps) => {
               onClick={() => handleRemovePoint(teamAway.slug_team)}
               className="w-7 h-7 flex items-center justify-center rounded-lg bg-white/5 hover:bg-red-500/40 text-red-400 border border-white/10 transition-all"
             >
-              <span className="text-md">−</span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="2.5"
+                stroke="currentColor"
+                className="w-4 h-4"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14" />
+              </svg>
             </button>
             <span className="text-5xl font-black tabular-nums tracking-tighter leading-none">{actualSet.visitor_points}</span>
             <button
               onClick={() => handleAddPoint(teamAway.slug_team)}
-              className="w-9 h-9 flex items-center justify-center rounded-lg bg-blue-600 hover:bg-blue-500 shadow-lg active:scale-90 transition-all text-xl"
+              className="w-9 h-9 flex items-center justify-center rounded-lg bg-blue-600 hover:bg-blue-500 shadow-lg active:scale-90 transition-all"
             >
-              +
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="2.5"
+                stroke="currentColor"
+                className="w-5 h-5"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
             </button>
           </div>
         </div>

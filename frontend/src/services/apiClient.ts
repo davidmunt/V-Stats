@@ -8,7 +8,7 @@ const API_URLS: Record<string, string> = {
   fastapi: import.meta.env.VITE_FASTAPI_API_URL,
 };
 
-const axiosInstance = axios.create();
+const axiosInstance = axios.create({ withCredentials: true });
 
 axiosInstance.interceptors.request.use((config) => {
   const jwtToken = token.getToken(ACCESS_TOKEN_KEY);

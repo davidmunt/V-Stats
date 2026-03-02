@@ -8,11 +8,11 @@ const AdminDashboardPage = () => {
   const [currentView, setCurrentView] = useState<string>("leagues");
 
   return (
-    <div className="flex w-full">
+    <div className="flex w-full min-h-screen bg-slate-50">
       <Sidebar currentView={currentView} onViewChange={setCurrentView} />
 
-      <main className="flex-1 p-8 overflow-y-auto">
-        <div className="max-w-7xl mx-auto">
+      <main className="flex-1 w-full overflow-x-hidden">
+        <div className="p-4 md:p-8 max-w-7xl mx-auto animate-in fade-in duration-500">
           {currentView === "leagues" && <LeaguesManager />}
           {currentView === "categories" && <CategoriesManager />}
           {currentView === "venues" && <VenuesManager />}

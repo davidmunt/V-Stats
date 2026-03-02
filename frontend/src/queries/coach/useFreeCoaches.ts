@@ -7,5 +7,6 @@ export const useFreeCoachesQuery = () => {
   return useQuery({
     queryKey: FREE_COACHES_KEY,
     queryFn: getFreeCoaches,
+    staleTime: 1000 * 60 * 5,
   });
 };

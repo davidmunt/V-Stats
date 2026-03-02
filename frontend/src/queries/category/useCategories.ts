@@ -8,5 +8,6 @@ export const useCategoryLeaguesQuery = () => {
   return useQuery<CategoryLeague[]>({
     queryKey: CATEGORY_LEAGUES_QUERY_KEY,
     queryFn: getMyCategoryLeagues,
+    staleTime: 1000 * 60 * 5,
   });
 };

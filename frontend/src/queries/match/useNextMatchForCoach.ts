@@ -8,5 +8,6 @@ export const useNextMatchForCoachQuery = () => {
   return useQuery<Match>({
     queryKey: NEXT_MATCH_COACH_QUERY_KEY(),
     queryFn: () => getNextMatchForCoach(),
+    staleTime: 1000 * 60 * 5,
   });
 };

@@ -9,5 +9,6 @@ export const useVenueBySlugQuery = (slug: string) => {
     queryKey: VENUE_DETAIL_QUERY_KEY(slug),
     queryFn: () => getVenueBySlug(slug),
     enabled: !!slug,
+    staleTime: 1000 * 60 * 5,
   });
 };

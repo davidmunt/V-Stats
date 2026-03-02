@@ -24,11 +24,15 @@ export const CategoriesManager = () => {
   };
 
   return (
-    <div className="min-h-[600px] transition-all duration-300">
-      {view === "list" && <CategoriesList onCreate={handleCreate} onEdit={handleEdit} />}
+    <div className="w-full min-h-[600px] transition-all duration-300 ease-in-out">
+      {view === "list" && (
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <CategoriesList onCreate={handleCreate} onEdit={handleEdit} />
+        </div>
+      )}
 
       {view === "form" && (
-        <div className="w-full">
+        <div className="w-full max-w-4xl mx-auto bg-white rounded-[2.5rem] shadow-xl p-4 md:p-8 animate-in zoom-in-95 duration-300">
           <CategoryForm initialData={selectedCategory} onCancel={handleBackToList} onSuccess={handleBackToList} />
         </div>
       )}

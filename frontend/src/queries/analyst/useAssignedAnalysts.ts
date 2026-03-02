@@ -7,5 +7,6 @@ export const useAssignedAnalystsQuery = () => {
   return useQuery({
     queryKey: ASSIGNED_ANALYSTS_KEY,
     queryFn: getAssignedAnalysts,
+    staleTime: 1000 * 60 * 5,
   });
 };

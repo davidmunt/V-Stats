@@ -9,5 +9,6 @@ export const useActualSetQuery = (slug: string) => {
     queryKey: SET_DETAIL_QUERY_KEY(slug),
     queryFn: () => getActualSetFromMath(slug),
     enabled: !!slug,
+    staleTime: 1000 * 60 * 5,
   });
 };

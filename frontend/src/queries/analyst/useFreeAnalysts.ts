@@ -7,5 +7,6 @@ export const useFreeAnalystsQuery = () => {
   return useQuery({
     queryKey: FREE_ANALYSTS_KEY,
     queryFn: getFreeAnalysts,
+    staleTime: 1000 * 60 * 5,
   });
 };

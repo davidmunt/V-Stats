@@ -8,5 +8,6 @@ export const useNextMatchForAnalystQuery = () => {
   return useQuery<Match>({
     queryKey: NEXT_MATCH_ANALYST_QUERY_KEY(),
     queryFn: () => getNextMatchForAnalyst(),
+    staleTime: 1000 * 60 * 5,
   });
 };

@@ -13,7 +13,7 @@ const Header = () => {
 
         <div className="flex items-center gap-4 sm:gap-8">
           {isAuthenticated && user ? (
-            <div className="flex items-center gap-3 sm:gap-6">
+            <div className="flex items-center gap-3 sm:gap-4">
               <Link to={`/profile/${user.slug_user}`} className="flex items-center gap-3 group pl-4 border-l border-gray-100">
                 <div className="text-right hidden md:block">
                   <p className="text-sm font-bold text-gray-900 leading-none group-hover:text-blue-600 transition-colors">{user.name}</p>
@@ -27,17 +27,45 @@ const Header = () => {
 
               <button
                 onClick={logoutDevice}
-                className="text-xs font-black uppercase tracking-widest text-gray-500 hover:text-red-600 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-500 hover:text-red-600 hover:bg-red-50 hover:border-red-100 transition-all shadow-sm group"
               >
-                Logout
+                <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">Logout</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="1.5"
+                  stroke="currentColor"
+                  className="w-5 h-5"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15"
+                  />
+                </svg>
               </button>
             </div>
           ) : (
             <Link
               to="/auth"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl text-sm font-bold transition-all shadow-md shadow-blue-100 active:scale-95"
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold transition-all shadow-lg shadow-blue-100 active:scale-95 group"
             >
-              Iniciar Sesión
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="2"
+                stroke="currentColor"
+                className="w-5 h-5"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75"
+                />
+              </svg>
+              <span>Iniciar Sesión</span>
             </Link>
           )}
         </div>

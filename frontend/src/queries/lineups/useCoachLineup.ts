@@ -9,5 +9,6 @@ export const useCoachLineupQuery = (matchSlug: string, teamSlug: string) => {
     queryKey: COACH_LINEUP_QUERY_KEY(matchSlug, teamSlug),
     queryFn: () => getLineupByTeam(matchSlug, teamSlug),
     enabled: !!matchSlug && !!teamSlug,
+    staleTime: 1000 * 60 * 5,
   });
 };

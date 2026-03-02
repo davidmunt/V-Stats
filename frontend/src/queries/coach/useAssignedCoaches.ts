@@ -7,5 +7,6 @@ export const useAssignedCoachesQuery = () => {
   return useQuery({
     queryKey: ASSIGNED_COACHES_KEY,
     queryFn: getAssignedCoaches,
+    staleTime: 1000 * 60 * 5,
   });
 };

@@ -7,5 +7,6 @@ export const useStatsQuery = () => {
   return useQuery({
     queryKey: ["stats"],
     queryFn: getStatsFromTeam,
+    staleTime: 1000 * 60 * 5,
   });
 };

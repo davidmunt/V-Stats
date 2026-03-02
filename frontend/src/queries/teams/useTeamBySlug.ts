@@ -9,5 +9,6 @@ export const useTeamBySlugQuery = (slug: string) => {
     queryKey: TEAMS_DETAIL_QUERY_KEY(slug),
     queryFn: () => getTeamBySlug(slug),
     enabled: !!slug,
+    staleTime: 1000 * 60 * 5,
   });
 };

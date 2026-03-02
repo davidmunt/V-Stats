@@ -9,5 +9,6 @@ export const usePlayersCoachQuery = (coachSlug: string) => {
     queryKey: PLAYERS_COACH_LIST_KEY(coachSlug),
     queryFn: () => getPlayersFromCoach(coachSlug),
     enabled: !!coachSlug,
+    staleTime: 1000 * 60 * 5,
   });
 };

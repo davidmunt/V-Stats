@@ -9,5 +9,6 @@ export const usePlayerBySlugQuery = (slug: string) => {
     queryKey: PLAYER_DETAIL_QUERY_KEY(slug),
     queryFn: () => getPlayerBySlug(slug),
     enabled: !!slug,
+    staleTime: 1000 * 60 * 5,
   });
 };

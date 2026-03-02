@@ -9,5 +9,6 @@ export const useTeamsStandingsQuery = (slug: string) => {
     queryKey: TEAMS_STANDINGS_LIST_QUERY_KEY(slug),
     queryFn: () => getTeamsStandingsFromLeague(slug),
     enabled: !!slug,
+    staleTime: 1000 * 60 * 5,
   });
 };

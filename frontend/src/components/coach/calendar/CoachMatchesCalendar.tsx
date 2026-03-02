@@ -53,8 +53,8 @@ export const CoachMatchesCalendar = ({ coachSlug }: { coachSlug: string }) => {
             eventPropGetter={(event) => {
               const status = event.resource.status;
               let bgColor = "#3b82f6";
-              if (status === "LIVE") bgColor = "#ef4444";
-              if (status === "FINISHED") bgColor = "#10b981";
+              if (status === "live") bgColor = "#ef4444";
+              if (status === "finished") bgColor = "#10b981";
 
               return {
                 className: "shadow-sm border-none",

@@ -9,5 +9,6 @@ export const useLeagueBySlugQuery = (slug: string) => {
     queryKey: LEAGUE_DETAIL_QUERY_KEY(slug),
     queryFn: () => getLeagueBySlug(slug),
     enabled: !!slug,
+    staleTime: 1000 * 60 * 5,
   });
 };

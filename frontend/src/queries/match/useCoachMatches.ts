@@ -9,5 +9,6 @@ export const useCoachMatchesQuery = (teamSlug: string) => {
     queryKey: COACH_MATCHES_QUERY_KEY(teamSlug),
     queryFn: () => getMatchesForCoach(teamSlug),
     enabled: !!teamSlug,
+    staleTime: 1000 * 60 * 5,
   });
 };

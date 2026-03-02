@@ -13,7 +13,7 @@ export const useLeaguesExplorerQuery = () => {
   const status = url.get("status", "active");
   const sort = url.get("sort", "recent");
   const page = Number(url.get("page", "0"));
-  const size = Number(url.get("size", "10"));
+  const size = Number(url.get("size", "8"));
 
   const [qInput, setQInput] = useState(q);
   const debouncedQ = useDebouncedValue(qInput, 400);

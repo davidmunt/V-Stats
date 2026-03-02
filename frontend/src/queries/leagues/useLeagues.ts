@@ -8,5 +8,6 @@ export const useLeaguesQuery = () => {
   return useQuery<League[]>({
     queryKey: LEAGUES_QUERY_KEY,
     queryFn: getMyLeagues,
+    staleTime: 1000 * 60 * 5,
   });
 };

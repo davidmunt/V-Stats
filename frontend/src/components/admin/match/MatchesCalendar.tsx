@@ -52,7 +52,10 @@ export const MatchesCalendar = ({ leagueSlug, onCreate, onEdit }: MatchesCalenda
           onClick={onCreate}
           className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl text-sm font-bold transition-all flex items-center gap-2 shadow-lg shadow-blue-200/50 active:scale-95"
         >
-          <span className="text-xl leading-none">+</span> Programar Partido
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+          Programar Partido
         </button>
       </div>
 
@@ -77,9 +80,9 @@ export const MatchesCalendar = ({ leagueSlug, onCreate, onEdit }: MatchesCalenda
             eventPropGetter={(event) => {
               const status = event.resource.status;
               let bgColor = "#3b82f6";
-              if (status === "LIVE") bgColor = "#ef4444";
-              if (status === "FINISHED") bgColor = "#10b981";
-              if (status === "CANCELLED") bgColor = "#94a3b8";
+              if (status === "live") bgColor = "#ef4444";
+              if (status === "finished") bgColor = "#10b981";
+              if (status === "cancelled") bgColor = "#94a3b8";
 
               return {
                 className: "shadow-sm border-none",

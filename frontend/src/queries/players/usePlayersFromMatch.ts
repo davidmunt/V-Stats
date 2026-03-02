@@ -9,5 +9,6 @@ export const usePlayersFromMatchQuery = (slug: string) => {
     queryKey: PLAYERS_FROM_MATCH_QUERY_KEY(slug),
     queryFn: () => getPlayersFromMatch(slug),
     enabled: !!slug,
+    staleTime: 1000 * 60 * 5,
   });
 };

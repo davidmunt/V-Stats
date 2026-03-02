@@ -8,5 +8,6 @@ export const useCoachLeagueQuery = () => {
   return useQuery<League>({
     queryKey: LEAGUE_COACH_LIST_QUERY_KEY(),
     queryFn: () => getCoachLeague(),
+    staleTime: 1000 * 60 * 5,
   });
 };

@@ -8,5 +8,6 @@ export const useVenuesQuery = () => {
   return useQuery<Venue[]>({
     queryKey: VENUES_QUERY_KEY,
     queryFn: () => getMyVenues(),
+    staleTime: 1000 * 60 * 5,
   });
 };

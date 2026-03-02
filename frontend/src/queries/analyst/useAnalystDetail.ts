@@ -8,5 +8,6 @@ export const useAnalystDetailQuery = (slug: string | null) => {
     queryKey: ANALYST_DETAIL_KEY(slug || ""),
     queryFn: () => getAnalystBySlug(slug!),
     enabled: !!slug,
+    staleTime: 1000 * 60 * 5,
   });
 };

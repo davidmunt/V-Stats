@@ -9,5 +9,6 @@ export const useMatchLineupsQuery = (matchSlug: string) => {
     queryKey: MATCH_LINEUPS_QUERY_KEY(matchSlug),
     queryFn: () => getMatchLineups(matchSlug),
     enabled: !!matchSlug,
+    staleTime: 1000 * 60 * 5,
   });
 };
