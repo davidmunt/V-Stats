@@ -41,6 +41,8 @@ public class SecurityConfig {
     private static final String[] PUBLIC_WRITE_ENDPOINTS = {
             "/api/auth/register",
             "/api/auth/login",
+            "/api/auth/refresh",
+            "/api/auth/logoutDevice",
             "/error"
     };
 
@@ -51,6 +53,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/error").permitAll()
                         .requestMatchers(org.springframework.web.cors.CorsUtils::isPreFlightRequest).permitAll()
                         .requestMatchers(HttpMethod.POST, PUBLIC_WRITE_ENDPOINTS).permitAll()
                         .requestMatchers(HttpMethod.GET, PUBLIC_READ_ENDPOINTS).permitAll()

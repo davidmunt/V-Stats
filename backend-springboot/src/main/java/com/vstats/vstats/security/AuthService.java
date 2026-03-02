@@ -249,6 +249,11 @@ public class AuthService {
 
     @Transactional
     public void logoutDevice(HttpServletRequest request, HttpServletResponse response) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No se encontró la cookie de sesión");
+        }
+
         String refreshToken = recoverTokenFromCookie(request, "refreshToken");
         if (refreshToken == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No se encontró el refresh token");
@@ -280,6 +285,11 @@ public class AuthService {
 
     @Transactional
     public void logoutAll(HttpServletRequest request, HttpServletResponse response) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No se encontró la cookie de sesión");
+        }
+
         String refreshToken = recoverTokenFromCookie(request, "refreshToken");
         if (refreshToken == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No se encontró el refresh token");
