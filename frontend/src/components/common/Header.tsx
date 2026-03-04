@@ -14,7 +14,7 @@ const Header = () => {
         <div className="flex items-center gap-4 sm:gap-8">
           {isAuthenticated && user ? (
             <div className="flex items-center gap-3 sm:gap-4">
-              <Link to={`/profile/${user.slug_user}`} className="flex items-center gap-3 group pl-4 border-l border-gray-100">
+              <Link to={`/profile`} className="flex items-center gap-3 group pl-4 border-l border-gray-100">
                 <div className="text-right hidden md:block">
                   <p className="text-sm font-bold text-gray-900 leading-none group-hover:text-blue-600 transition-colors">{user.name}</p>
                 </div>

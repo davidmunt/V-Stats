@@ -1,5 +1,5 @@
 import apiClient from "@/services/apiClient";
-import type { LoginParam, RegisterParam, UpdateUserParam } from "./authService.param";
+import type { LoginParam, RegisterParam, UpdateUserParam, UpdatePasswordParam } from "./authService.param";
 import type { Auth } from "@/interfaces/auth.interface";
 import type { User } from "@/interfaces/user.interface";
 
@@ -32,6 +32,11 @@ export const logoutAll = async () => {
 };
 
 export const updateUser = async (data: UpdateUserParam): Promise<User> => {
-  const response = await apiClient.put<User>("spring", "/api/user/updateUser", data);
+  const response = await apiClient.put<User>("spring", "/api/user", data);
+  return response.data;
+};
+
+export const updatePassword = async (data: UpdatePasswordParam): Promise<User> => {
+  const response = await apiClient.patch<User>("spring", "/api/user/password", data);
   return response.data;
 };

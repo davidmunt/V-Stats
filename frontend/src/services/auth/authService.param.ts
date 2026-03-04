@@ -12,8 +12,11 @@ export interface RegisterParam {
 
 export interface UpdateUserParam {
   name: string;
-  email: string;
-  avatar?: string;
-  dark_mode?: boolean;
-  password?: string;
+  avatar: string;
+}
+
+export interface UpdatePasswordParam {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
 }

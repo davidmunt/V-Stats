@@ -6,6 +6,7 @@ import ProtectedRoute from "@/guards/ProtectedRoute";
 import RoleProtectedRoute from "@/guards/RoleProtectedRoute";
 import LoadingFallback from "@/components/LoadingFallback";
 
+const ProfilePage = lazy(() => import("@/pages/ProfilePage"));
 const HomePage = lazy(() => import("@/pages/HomePage"));
 const AuthPage = lazy(() => import("@/pages/AuthPage"));
 const AdminDashboardPage = lazy(() => import("@/pages/AdminDashboardPage"));
@@ -33,6 +34,17 @@ const Router = () => {
             element={
               <ProtectedRoute isAuth>
                 <HomePage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute isAuth>
+                <RoleProtectedRoute allowedRoles={["user", "admin", "analyst", "coach"]}>
+                  <ProfilePage />
+                </RoleProtectedRoute>
               </ProtectedRoute>
             }
           />

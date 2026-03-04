@@ -24,11 +24,7 @@ const AnalystDashboardPage = () => {
             </p>
           </div>
         ) : (
-          /* Contenido normal si tiene equipo */
-          <>
-            {currentView === "match" && <MatchAnalysisManager analystSlug={analyst?.slug_user || "slug"} />}
-            {/* Aquí irán los demás componentes cuando los habilites */}
-          </>
+          <>{currentView === "match" && <MatchAnalysisManager analystSlug={analyst?.slug_user || "slug"} />}</>
         )}
       </main>
     </div>
