@@ -32,3 +32,9 @@ class LeagueRepository(ILeagueRepository):
             return None
             
         return self.mapper.to_dto(league_model)
+    
+    async def get_league_id_by_slug(self, session: AsyncSession, slug: str) -> Optional[int]:
+        query = select(League.id_league).where(League.slug == slug)
+        result = await session.execute(query)
+        league_id = result.scalar_one_or_none()
+        return league_id

@@ -24,3 +24,8 @@ class ISetService(abc.ABC):
     async def create_next_set(self, session: Any, match_id: int, next_number: int) -> Optional[Any]:
         """Lógica para generar el siguiente set de un partido."""
         ...
+
+    @abc.abstractmethod
+    async def get_sets_by_team_id_and_league_id(self, session: Any, team_id: int, league_id: int) -> List[SetDTO]:
+        """Lógica para obtener todos los sets en los que ha participado un equipo en una liga específica."""
+        ...

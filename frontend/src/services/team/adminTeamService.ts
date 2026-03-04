@@ -58,7 +58,7 @@ export const getTeamsFromMatch = async (slug_team: string): Promise<Team[]> => {
 };
 
 export const getTeamsStandingsFromLeague = async (slug_team: string): Promise<TeamStanding[]> => {
-  const response = await apiClient.get<TeamStanding[]>("fastapi", `/api/table-positions/${slug_team}`);
+  const response = await apiClient.get<TeamStanding[]>("fastapi", `/api/league-table/${slug_team}`);
   return response.data;
 };
 

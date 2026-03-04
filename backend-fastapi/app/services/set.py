@@ -50,3 +50,7 @@ class SetService(ISetService):
         )
         
         return await self._set_repository.create_set(session, new_set)
+    
+    async def get_sets_by_team_id_and_league_id(self, session, team_id: int, league_id: int):
+        # Aquí llamas al repositorio que creaste anteriormente
+        return await self._set_repository.get_sets_by_team_id_and_league_id(session, team_id, league_id)

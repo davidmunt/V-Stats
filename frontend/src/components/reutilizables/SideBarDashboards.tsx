@@ -22,7 +22,7 @@ const Sidebar = ({ currentView, onViewChange }: SidebarProps) => {
             { id: "players", label: "Mis Jugadores" },
             { id: "lineup", label: "Plantilla Titular" },
             { id: "stats", label: "Estadísticas" },
-            { id: "positionTable", label: "Tabla de Posiciones" },
+            { id: "table", label: "Tabla de Posiciones" },
             { id: "calendar", label: "Calendario de Partidos" },
           ]
         : user?.user_type === "analyst"

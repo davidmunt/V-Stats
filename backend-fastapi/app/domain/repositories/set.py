@@ -38,3 +38,8 @@ class ISetRepository(abc.ABC):
     @abc.abstractmethod
     async def subtract_point(self, session: Any, set_model: Any, is_local: bool) -> None:
         ...
+
+    @abc.abstractmethod
+    async def get_sets_by_id_match(self, session: Any, match_id: int) -> List[SetDTO]:
+        """Obtiene todos los sets de un partido específico."""
+        ...

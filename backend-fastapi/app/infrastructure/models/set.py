@@ -14,6 +14,7 @@ class Set(Base):
     slug: Mapped[str] = mapped_column(String, nullable=False, unique=True)
     
     id_match: Mapped[int] = mapped_column(ForeignKey("matches.id_match"), nullable=False)
+    match = relationship("Match", back_populates="sets")
     
     set_number: Mapped[int] = mapped_column(Integer, nullable=False)
     local_points: Mapped[int] = mapped_column(Integer, default=0)

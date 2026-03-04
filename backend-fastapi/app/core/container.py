@@ -28,6 +28,8 @@ from app.infrastructure.mappers.action import ActionModelMapper
 from app.infrastructure.repositories.action import ActionRepository
 from app.services.action import ActionService
 from app.infrastructure.repositories.lineup import LineupRepository
+from app.services.league_table import LeagueStandingService
+from app.domain.services.league_table import ILeagueStandingService
 
 class Container:
     """Dependency injector project container for V-Stats."""
@@ -157,5 +159,14 @@ class Container:
             player_repo=self.player_repository(),
             lineup_repo=self.lineup_repository()
         )
+    
+    def league_standing_service(self):
+        return LeagueStandingService(
+            league_repo=self.league_repository(), 
+            team_repo=self.team_repository(),
+            match_repo=self.match_repository(),
+            set_repo=self.set_repository()
+        )
+
 
 container_instance = Container(settings=get_app_settings())

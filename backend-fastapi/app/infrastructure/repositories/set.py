@@ -8,6 +8,7 @@ from app.domain.repositories.set import ISetRepository
 from app.domain.dtos.set import SetDTO
 from app.infrastructure.models.set import Set
 from app.infrastructure.models.match import Match
+from app.infrastructure.models.league import League
 from app.domain.mapper import IModelMapper
 
 class SetRepository(ISetRepository):
@@ -114,3 +115,14 @@ class SetRepository(ISetRepository):
                 set_model.visitor_points -= 1
         
         await session.flush()
+
+    async def get_sets_by_id_match(self, session: AsyncSession, match_id: int) -> List[SetDTO]:
+        """
+        Obtiene todos los sets de un partido específico por su ID.
+        """
+        query = (
+            select(Set)
+            .where(Set.id_match == match_id)
+            .order_by(Set.set_number.asc())
+        )
+        return [self.mapper.to_dto(s) for s in (await session.execute(query)).scalars().all()]

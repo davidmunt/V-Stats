@@ -14,6 +14,9 @@ class MatchModelMapper(IModelMapper[Match, MatchDTO]):
             return None
             
         return MatchDTO(
+            id_match=model.id_match,
+            id_local_team=model.id_local_team,
+            id_visitor_team=model.id_visitor_team,
             slug_match=model.slug,
             slug_league=model.league.slug if model.league else "none",
             slug_team_local=model.local_team.slug if model.local_team else "none",
@@ -24,6 +27,7 @@ class MatchModelMapper(IModelMapper[Match, MatchDTO]):
             country=model.league.country if model.league else "Unknown",
             date=model.date.isoformat() if model.date else "",
             current_set=model.current_set,
+            sets=model.sets if model.sets else [],
             is_active=model.is_active,
             status=model.status,
             id_league=model.id_league

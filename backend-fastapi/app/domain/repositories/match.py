@@ -34,3 +34,8 @@ class IMatchRepository(abc.ABC):
     async def update_match_status(self, session: Any, match_slug: str, new_status: str) -> Optional[MatchDTO]:
         """Actualiza el estado de un partido y devuelve el DTO actualizado."""
         ...
+
+    @abc.abstractmethod
+    async def get_finished_matches_by_league_id(self, session: Any, id_league: int) -> List[MatchDTO]:
+        """Obtiene todos los partidos finalizados de una liga específica."""
+        ...

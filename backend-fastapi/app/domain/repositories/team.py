@@ -16,3 +16,8 @@ class ITeamRepository(abc.ABC):
     async def get_by_slug(self, session: Any, slug: str) -> Optional[TeamDTO]:
         """Obtiene un equipo por su slug para obtener su ID."""
         ...
+
+    @abc.abstractmethod
+    async def get_by_league_id(self, session: Any, id_league: int) -> List[TeamDTO]:
+        """Obtiene todos los equipos de una liga específica."""
+        ...

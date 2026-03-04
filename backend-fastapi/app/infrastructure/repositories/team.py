@@ -19,7 +19,6 @@ class TeamRepository(ITeamRepository):
         """
         Obtiene los dos equipos (local y visitante) de un partido con sus datos de temporada.
         """
-        # 1. Buscamos el partido para obtener los IDs de los equipos y la liga
         match_query = select(Match).where(Match.slug == match_slug)
         match_result = await session.execute(match_query)
         match = match_result.scalar_one_or_none()
@@ -27,7 +26,6 @@ class TeamRepository(ITeamRepository):
         if not match:
             return []
 
-        # 2. Buscamos los SeasonTeam correspondientes a esos equipos en esa liga
         query = (
             select(SeasonTeam)
             .where(
@@ -76,5 +74,15 @@ class TeamRepository(ITeamRepository):
         result = await session.execute(query)
         team_model = result.scalar_one_or_none()
         
-        # El mapper se encargará de convertir el modelo Team a TeamDTO
         return self.mapper.to_dto(team_model)
+    
+    async def get_by_league_id(self, session: AsyncSession, id_league: int) -> List[TeamDTO]:
+        query = select(SeasonTeam).where(
+            SeasonTeam.id_league == id_league,
+            SeasonTeam.is_active == True
+        ).options(selectinload(SeasonTeam.team))
+        
+        result = await session.execute(query)
+        season_teams = result.scalars().all()
+        
+        return [self.mapper.to_dto(st.team, id_league=id_league) for st in season_teams]
