@@ -13,6 +13,7 @@ import com.vstats.vstats.infrastructure.repositories.AnalystRepository;
 import com.vstats.vstats.infrastructure.repositories.CoachRepository;
 import com.vstats.vstats.infrastructure.repositories.LeagueAdminRepository;
 import com.vstats.vstats.infrastructure.repositories.UserRepository;
+import com.vstats.vstats.presentation.requests.auth.UpdatePasswordRequest;
 import com.vstats.vstats.presentation.requests.auth.UpdateUserRequest;
 import com.vstats.vstats.presentation.responses.AnalystResponse;
 import com.vstats.vstats.presentation.responses.CoachResponse;
@@ -129,6 +130,47 @@ public class UserService {
         return mapToResponse(updatedEntity, role, token);
     }
 
+    @Transactional
+    public UserResponse updatePassword(UpdatePasswordRequest request) {
+        Long id = authUtils.getCurrentUserId();
+        String role = authUtils.getCurrentUserRole();
+        String token = authUtils.getCurrentToken();
+        if (request.getCurrentPassword() == null || request.getNewPassword() == null
+                || request.getConfirmPassword() == null) {
+            throw new IllegalArgumentException("All password fields are required");
+        }
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            throw new IllegalArgumentException("New password and confirm password do not match");
+        }
+        if (request.getNewPassword().length() < 5) {
+            throw new IllegalArgumentException("New password must be at least 5 characters long");
+        }
+        Object updatedEntity = switch (role) {
+            case "admin" -> {
+                var e = adminRepo.findById(id).orElseThrow();
+                applyUpdatedPassword(e, request);
+                yield adminRepo.save(e);
+            }
+            case "coach" -> {
+                var e = coachRepo.findById(id).orElseThrow();
+                applyUpdatedPassword(e, request);
+                yield coachRepo.save(e);
+            }
+            case "analyst" -> {
+                var e = analystRepo.findById(id).orElseThrow();
+                applyUpdatedPassword(e, request);
+                yield analystRepo.save(e);
+            }
+            default -> {
+                var e = userRepo.findById(id).orElseThrow();
+                applyUpdatedPassword(e, request);
+                yield userRepo.save(e);
+            }
+        };
+
+        return mapToResponse(updatedEntity, role, token);
+    }
+
     private void applyUpdates(Object entity, UpdateUserRequest request) {
         if (request.getName() != null) {
             if (entity instanceof LeagueAdminEntity e)
@@ -140,16 +182,7 @@ public class UserService {
             if (entity instanceof UserEntity e)
                 e.setName(request.getName());
         }
-        if (request.getEmail() != null) {
-            if (entity instanceof LeagueAdminEntity e)
-                e.setEmail(request.getEmail());
-            if (entity instanceof CoachEntity e)
-                e.setEmail(request.getEmail());
-            if (entity instanceof AnalystEntity e)
-                e.setEmail(request.getEmail());
-            if (entity instanceof UserEntity e)
-                e.setEmail(request.getEmail());
-        }
+
         if (request.getAvatar() != null) {
             if (entity instanceof LeagueAdminEntity e)
                 e.setAvatar(request.getAvatar());
@@ -160,16 +193,25 @@ public class UserService {
             if (entity instanceof UserEntity e)
                 e.setAvatar(request.getAvatar());
         }
-        if (request.getPassword() != null && !request.getPassword().isBlank()) {
-            String encoded = passwordEncoder.encode(request.getPassword());
-            if (entity instanceof LeagueAdminEntity e)
-                e.setPassword(encoded);
-            if (entity instanceof CoachEntity e)
-                e.setPassword(encoded);
-            if (entity instanceof AnalystEntity e)
-                e.setPassword(encoded);
-            if (entity instanceof UserEntity e)
-                e.setPassword(encoded);
+    }
+
+    private void applyUpdatedPassword(Object entity, UpdatePasswordRequest request) {
+        if (request.getNewPassword() != null) {
+            String encodedPass = passwordEncoder.encode(request.getNewPassword());
+
+            if (entity instanceof LeagueAdminEntity e) {
+                e.setPassword(encodedPass);
+                e.setSessionVersion(e.getSessionVersion() + 1);
+            } else if (entity instanceof CoachEntity e) {
+                e.setPassword(encodedPass);
+                e.setSessionVersion(e.getSessionVersion() + 1);
+            } else if (entity instanceof AnalystEntity e) {
+                e.setPassword(encodedPass);
+                e.setSessionVersion(e.getSessionVersion() + 1);
+            } else if (entity instanceof UserEntity e) {
+                e.setPassword(encodedPass);
+                e.setSessionVersion(e.getSessionVersion() + 1);
+            }
         }
     }
 

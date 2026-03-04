@@ -33,6 +33,12 @@ public class UserController {
         return ResponseEntity.ok(userService.updateUser(request));
     }
 
+    @PatchMapping("/password")
+    @CheckSecurity.Protected.CanManage
+    public ResponseEntity<UserResponse> updatePassword(@RequestBody UpdatePasswordRequest request) {
+        return ResponseEntity.ok(userService.updatePassword(request));
+    }
+
     @GetMapping("/free/coaches")
     @CheckSecurity.Protected.CanManage
     public ResponseEntity<Map<String, List<CoachResponse>>> getFreeCoaches() {

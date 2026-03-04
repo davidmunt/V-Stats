@@ -87,19 +87,19 @@ public class AuthService {
         Object savedEntity = switch (type) {
             case "admin" -> adminRepo.save(LeagueAdminEntity.builder()
                     .name(request.getName()).email(request.getEmail())
-                    .avatar("https://static.productionready.io/images/smiley-cyrus.jpg")
+                    .avatar("https://robohash.org/" + request.getName())
                     .password(encodedPassword).slug(slug).status("active").build());
             case "coach" -> coachRepo.save(CoachEntity.builder()
                     .name(request.getName()).email(request.getEmail())
-                    .avatar("https://static.productionready.io/images/smiley-cyrus.jpg")
+                    .avatar("https://robohash.org/" + request.getName())
                     .password(encodedPassword).slug(slug).status("active").build());
             case "analyst" -> analystRepo.save(AnalystEntity.builder()
                     .name(request.getName()).email(request.getEmail())
-                    .avatar("https://static.productionready.io/images/smiley-cyrus.jpg")
+                    .avatar("https://robohash.org/" + request.getName())
                     .password(encodedPassword).slug(slug).status("active").build());
             default -> userRepo.save(UserEntity.builder()
                     .name(request.getName()).email(request.getEmail())
-                    .avatar("https://static.productionready.io/images/smiley-cyrus.jpg")
+                    .avatar("https://robohash.org/" + request.getName())
                     .password(encodedPassword).slug(slug).status("active").build());
         };
 
@@ -132,7 +132,7 @@ public class AuthService {
 
         setRefreshCookie(response, refreshToken, getRefreshExpByRole(type));
 
-        return mapToResponse(savedEntity, type, accessToken);
+        return mapToResponse(savedEntity, type, accessToken, null);
     }
 
     @Transactional
@@ -152,6 +152,19 @@ public class AuthService {
 
         AuthenticatedUser userDetails = (AuthenticatedUser) auth.getPrincipal();
         String type = userDetails.getRole().toLowerCase();
+
+        String teamSlug = null;
+        if (type.equals("coach") || type.equals("analyst")) {
+            teamSlug = switch (type) {
+                case "coach" -> coachRepo.findById(userDetails.getId())
+                        .map(coach -> coach.getTeam().getSlug())
+                        .orElse(null);
+                case "analyst" -> analystRepo.findById(userDetails.getId())
+                        .map(analyst -> analyst.getTeam().getSlug())
+                        .orElse(null);
+                default -> null;
+            };
+        }
 
         String accessToken = tokenService.generateAccessToken(userDetails);
         String refreshToken = tokenService.generateRefreshToken(userDetails.getEmail(), type);
@@ -177,7 +190,7 @@ public class AuthService {
 
         setRefreshCookie(response, refreshToken, getRefreshExpByRole(type));
 
-        return mapToResponse(userDetails.getEntity(), type, accessToken);
+        return mapToResponse(userDetails.getEntity(), type, accessToken, teamSlug);
     }
 
     @Transactional
@@ -213,6 +226,19 @@ public class AuthService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Sesión cerrada globalmente.");
         }
 
+        String teamSlug = null;
+        if (session.getUserType().equals("coach") || session.getUserType().equals("analyst")) {
+            teamSlug = switch (session.getUserType()) {
+                case "coach" -> coachRepo.findById(session.getIdUser())
+                        .map(coach -> coach.getTeam().getSlug())
+                        .orElse(null);
+                case "analyst" -> analystRepo.findById(session.getIdUser())
+                        .map(analyst -> analyst.getTeam().getSlug())
+                        .orElse(null);
+                default -> null;
+            };
+        }
+
         RefreshTokenBlacklistEntity blacklistEntry = RefreshTokenBlacklistEntity.builder()
                 .idUser(session.getIdUser())
                 .userType(session.getUserType())
@@ -244,7 +270,7 @@ public class AuthService {
         setRefreshCookie(response, newRefreshToken, getRefreshExpByRole(type));
 
         Object userEntity = findUserByIdAndType(session.getIdUser(), type);
-        return mapToResponse(userEntity, type, newAccessToken);
+        return mapToResponse(userEntity, type, newAccessToken, teamSlug);
     }
 
     @Transactional
@@ -312,7 +338,7 @@ public class AuthService {
         setRefreshCookie(response, "", 0);
     }
 
-    private UserResponse mapToResponse(Object entity, String type, String token) {
+    private UserResponse mapToResponse(Object entity, String type, String token, String slug_team) {
         String name = "";
         String email = "";
         String avatar = "";
@@ -344,6 +370,7 @@ public class AuthService {
                 .name(name)
                 .email(email)
                 .slug_user(slug)
+                .slug_team(slug_team)
                 .user_type(type)
                 .avatar(avatar)
                 .token(token)
