@@ -14,6 +14,8 @@ const CoachDashboardPage = () => {
   const { data: coach, isLoading: isLoadingCoach } = useCurrentUserQuery();
   const { data: league, isLoading: isLoadingLeague } = useCoachLeagueQuery();
 
+  console.log("CoachDashboardPage - League:", league);
+
   if (isLoadingCoach || isLoadingLeague) return <LoadingFallback />;
   const hasTeam = !!coach?.slug_team;
 
@@ -33,7 +35,7 @@ const CoachDashboardPage = () => {
           <>
             {currentView === "players" && <PlayersManager />}
             {currentView === "lineup" && <LineupManager coachSlug={coach?.slug_user || "slug"} />}
-            {currentView === "positionTable" && <CoachStandings leagueSlug={league?.slug_league || ""} />}
+            {currentView === "table" && <CoachStandings leagueSlug={league?.slug_league || ""} />}
             {currentView === "calendar" && <CoachMatchesCalendar coachSlug={coach?.slug_team || ""} />}
             {currentView === "stats" && <StatsManager />}
           </>

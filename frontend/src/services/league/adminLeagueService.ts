@@ -79,8 +79,8 @@ export const getMyLeagues = async (): Promise<League[]> => {
 };
 
 export const getCoachLeague = async (): Promise<League> => {
-  const response = await apiClient.get<SingleLeagueResponse>("fastapi", `/api/leagues/my-league`);
-  return response.data.league;
+  const response = await apiClient.get<League>("fastapi", `/api/leagues/my-league`);
+  return response.data;
 };
 
 export const getLeagueBySlug = async (slug: string): Promise<League> => {

@@ -7,6 +7,7 @@ interface LeagueTableProps {
 
 export const LeagueTable = ({ leagueSlug }: LeagueTableProps) => {
   const { data: standings, isLoading, isError } = useTeamsStandingsQuery(leagueSlug);
+  console.log("LeagueTable:", leagueSlug);
 
   if (isLoading) return <LoadingFallback />;
   if (isError) return <div className="p-4 text-red-500">Error cargando la clasificación.</div>;

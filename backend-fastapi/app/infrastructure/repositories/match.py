@@ -100,93 +100,6 @@ class MatchRepository(IMatchRepository):
         # Ahora el Mapper encontrará los sets precargados y no fallará
         return self.mapper.to_dto(match_model)
 
-    # async def get_next_match_by_team_id(self, session: AsyncSession, team_id: int) -> Optional[MatchDTO]:
-    #     """
-    #     Busca el próximo partido programado para un equipo (local o visitante)
-    #     que sea posterior a la fecha actual.
-    #     """
-    #     now = datetime.now()
-    #     query = (
-    #         select(Match)
-    #         .where(
-    #             and_(
-    #                 or_(Match.id_local_team == team_id, Match.id_visitor_team == team_id),
-    #                 Match.date >= now,
-    #                 Match.status == "scheduled",
-    #                 Match.is_active == True
-    #             )
-    #         )
-    #         .order_by(Match.date.asc())
-    #         .limit(1)
-    #         .options(
-    #             selectinload(Match.league),
-    #             selectinload(Match.local_team),
-    #             selectinload(Match.visitor_team),
-    #             selectinload(Match.venue)
-    #         )
-    #     )
-    #     result = await session.execute(query)
-    #     match_model = result.scalar_one_or_none()
-    #     return self.mapper.to_dto(match_model)
-    
-    # async def get_next_match_by_team_id_analyst(self, session: AsyncSession, team_id: int) -> Optional[MatchDTO]:
-    #     """
-    #     Busca con prioridad:
-    #     1. Partido en estado 'live'.
-    #     2. Si no hay, el próximo 'scheduled' desde el inicio de hoy (00:00).
-    #     """
-        
-    #     query_live = (
-    #         select(Match)
-    #         .where(
-    #             and_(
-    #                 or_(Match.id_local_team == team_id, Match.id_visitor_team == team_id),
-    #                 Match.status == "live",
-    #                 Match.is_active == True
-    #             )
-    #         )
-    #         .options(
-    #             selectinload(Match.league),
-    #             selectinload(Match.local_team),
-    #             selectinload(Match.visitor_team),
-    #             selectinload(Match.venue)
-    #         )
-    #         .limit(1)
-    #     )
-        
-    #     result = await session.execute(query_live)
-    #     match_model = result.scalar_one_or_none()
-
-    #     # --- 2. SI NO HAY LIVE, BUSCAMOS EL PRÓXIMO SCHEDULED ---
-    #     if not match_model:
-    #         # Calculamos el inicio de hoy (00:00:00) como en tu ejemplo de JS
-    #         today_start = datetime.combine(datetime.now().date(), time.min)
-            
-    #         query_scheduled = (
-    #             select(Match)
-    #             .where(
-    #                 and_(
-    #                     or_(Match.id_local_team == team_id, Match.id_visitor_team == team_id),
-    #                     Match.status == "scheduled",
-    #                     Match.date >= today_start, # Partidos de hoy en adelante
-    #                     Match.is_active == True
-    #                 )
-    #             )
-    #             .order_by(Match.date.asc()) # El más cercano
-    #             .options(
-    #                 selectinload(Match.league),
-    #                 selectinload(Match.local_team),
-    #                 selectinload(Match.visitor_team),
-    #                 selectinload(Match.venue)
-    #             )
-    #             .limit(1)
-    #         )
-            
-    #         result = await session.execute(query_scheduled)
-    #         match_model = result.scalar_one_or_none()
-
-    #     return self.mapper.to_dto(match_model)
-
     async def get_matches_by_league_slug(self, session: AsyncSession, league_slug: str) -> List[MatchDTO]:
         """
         Obtiene todos los partidos de una liga filtrando por el slug de la misma.
@@ -226,6 +139,7 @@ class MatchRepository(IMatchRepository):
                 )
             )
             .options(
+                selectinload(Match.sets),
                 selectinload(Match.league),
                 selectinload(Match.local_team),
                 selectinload(Match.visitor_team),
@@ -235,7 +149,7 @@ class MatchRepository(IMatchRepository):
         )
         
         result = await session.execute(query)
-        matches = result.scalars().all()
+        matches = result.scalars().unique().all()
         
         # IMPORTANTE: Mapear a DTO antes de devolver, para mantener consistencia
         return [self.mapper.to_dto(m) for m in matches]
