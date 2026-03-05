@@ -1,6 +1,6 @@
 from typing import List, Optional
 from datetime import datetime, time
-from sqlalchemy import select, or_, and_
+from sqlalchemy import func, select, or_, and_
 from sqlalchemy.orm import aliased, selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -197,3 +197,22 @@ class MatchRepository(IMatchRepository):
         # .unique() es obligatorio cuando usas selectinload/joinedload para no duplicar filas
         matches = result.scalars().unique().all() 
         return [self.mapper.to_dto(m) for m in matches]
+    
+    async def check_all_lineups_created(self, session: AsyncSession, match_id: int) -> bool:
+        """
+        Verifica que las alineaciones de ambos equipos estén creadas para un partido.
+        Retorna True si ambas alineaciones existen, False si falta alguna.
+        """
+        query = (
+            select(Team.id_team)
+            .join(Match, or_(Match.id_local_team == Team.id_team, Match.id_visitor_team == Team.id_team))
+            .join(Set, Set.id_match == Match.id_match)
+            .where(Match.id_match == match_id)
+            .group_by(Team.id_team)
+            .having(func.count(Set.id_set) > 0)  # Asegura que haya al menos un set creado para ese equipo
+        )
+        result = await session.execute(query)
+        teams_with_lineups = result.scalars().all()
+        
+        # Si el partido tiene dos equipos y ambos tienen alineación, entonces está listo para iniciar
+        return len(teams_with_lineups) == 2

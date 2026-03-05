@@ -66,6 +66,10 @@ class MatchService(IMatchService):
         match_model = await self._match_repository.get_model_by_slug(session, match_slug)
         if not match_model:
             return "MATCH_NOT_FOUND"
+        
+        match_lineups_created = await self._match_repository.check_all_lineups_created(session, match_model.id_match)
+        if not match_lineups_created:
+            return "No se han creado las alineaciones para este partido. No se puede iniciar el partido sin alineaciones."
 
         if match_model.status == "live":
             return "Partido ya iniciado"

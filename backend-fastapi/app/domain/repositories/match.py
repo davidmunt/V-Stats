@@ -39,3 +39,8 @@ class IMatchRepository(abc.ABC):
     async def get_finished_matches_by_league_id(self, session: Any, id_league: int) -> List[MatchDTO]:
         """Obtiene todos los partidos finalizados de una liga específica."""
         ...
+
+    @abc.abstractmethod
+    async def check_all_lineups_created(self, session: Any, match_id: int) -> bool:
+        """Verifica que las alineaciones de ambos equipos estén creadas para un partido."""
+        ...
