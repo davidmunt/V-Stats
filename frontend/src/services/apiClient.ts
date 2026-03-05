@@ -18,33 +18,88 @@ axiosInstance.interceptors.request.use((config) => {
   return config;
 });
 
+//////////////////
+
+interface QueuedRequest {
+  resolve: (token: string | null) => void;
+  reject: (error: unknown) => void;
+}
+
 let isRefreshing = false;
+let failedQueue: QueuedRequest[] = [];
+
+const processQueue = (error: unknown, token: string | null = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
+interface RetryableRequest extends AxiosRequestConfig {
+  _retry?: boolean;
+}
+
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
-    const originalRequest = error.config;
+    const originalRequest = error.config as RetryableRequest;
+
     if (!error.response || !originalRequest) {
       return Promise.reject(error);
     }
+
     const { status } = error.response;
-    if (status === 401 && !isRefreshing) {
+
+    // Si es 401 y no es una petición que ya intentamos refrescar
+    if (status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        // Si ya hay un refresh en curso, añadimos esta petición a la cola
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then((token) => {
+            if (originalRequest.headers) {
+              originalRequest.headers.Authorization = `Bearer ${token}`;
+            }
+            return axiosInstance(originalRequest);
+          })
+          .catch((err) => Promise.reject(err));
+      }
+
+      originalRequest._retry = true;
       isRefreshing = true;
+
       try {
-        const response = await axiosInstance.post(
+        // Realizamos el refresh call
+        const response = await axios.post(
+          // Usamos axios directamente para evitar el interceptor aquí
           `${API_URLS.spring}/api/auth/refresh`,
           {},
-          {
-            withCredentials: true,
-          },
+          { withCredentials: true },
         );
+
         const newToken = response.data.accessToken;
         token.setToken(ACCESS_TOKEN_KEY, newToken);
+
+        // Actualizamos el header de la petición original
+        axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
         if (originalRequest.headers) {
           originalRequest.headers.Authorization = `Bearer ${newToken}`;
         }
+
+        // Procesamos la cola con el nuevo token
+        processQueue(null, newToken);
         isRefreshing = false;
+
+        // Reintentamos la petición original
         return axiosInstance(originalRequest);
       } catch (refreshError) {
+        // Si el refresh falla, limpiamos todo y redirigimos
+        processQueue(refreshError, null);
         isRefreshing = false;
         token.removeToken(ACCESS_TOKEN_KEY);
         window.location.href = "/auth";
@@ -55,6 +110,8 @@ axiosInstance.interceptors.response.use(
     return Promise.reject(error);
   },
 );
+
+///////////////////
 
 const apiClient = {
   get: <T>(provider: string, url: string, config?: AxiosRequestConfig) =>
