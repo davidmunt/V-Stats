@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -244,6 +243,8 @@ public class LineupService {
                                 .slug_lineup(lineup.getSlug())
                                 .slug_match(lineup.getMatch().getSlug())
                                 .slug_team(lineup.getTeam().getSlug())
+                                .name(lineup.getTeam() != null ? lineup.getTeam().getName() : "Equipo desconocido")
+                                .image(lineup.getTeam() != null ? lineup.getTeam().getImage() : "")
                                 .status(lineup.getStatus())
                                 .is_active(lineup.getIsActive())
                                 .positions(positions)
@@ -259,6 +260,8 @@ public class LineupService {
                                 .slug_lineup(lineup.getSlug())
                                 .slug_match(lineup.getMatch().getSlug())
                                 .slug_team(lineup.getTeam() != null ? lineup.getTeam().getSlug() : "unknown")
+                                .name(lineup.getTeam() != null ? lineup.getTeam().getName() : "Equipo desconocido")
+                                .image(lineup.getTeam() != null ? lineup.getTeam().getImage() : "")
                                 .status(lineup.getStatus())
                                 .is_active(lineup.getIsActive())
                                 .positions(positions.stream().map(this::mapToPlayerPosition)

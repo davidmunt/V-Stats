@@ -12,6 +12,8 @@ export interface Lineup {
 export interface LineupWithPositions {
   slug_lineup: string;
   slug_team: string;
+  name: string;
+  image: string;
   positions: LineupPosition[];
 }
 

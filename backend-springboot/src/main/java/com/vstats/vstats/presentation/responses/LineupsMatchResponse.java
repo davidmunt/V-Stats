@@ -20,6 +20,8 @@ public class LineupsMatchResponse {
         private String slug_lineup;
         private String slug_match;
         private String slug_team;
+        private String name;
+        private String image;
         private String status;
         private boolean is_active;
         private List<PlayerPosition> positions;

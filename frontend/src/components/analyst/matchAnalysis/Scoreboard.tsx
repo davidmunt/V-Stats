@@ -12,17 +12,17 @@ interface ScoreboardProps {
 
 export const Scoreboard = ({ matchSlug }: ScoreboardProps) => {
   const { data: actualSet, isLoading: isLoadingSet } = useActualSetQuery(matchSlug);
-  const { data: teams, isLoading: isLoadingTeams } = useMatchTeamsQuery(matchSlug);
+  const { data: lineups, isLoading: isLoadingLineups } = useMatchTeamsQuery(matchSlug);
   const addPoint = useAddPointMutation();
   const deletePoint = useDeleteLastPointMutation();
 
-  if (isLoadingSet || isLoadingTeams) return <LoadingFallback />;
-  if (!actualSet || !teams || teams.length < 2) {
+  if (isLoadingSet || isLoadingLineups) return <LoadingFallback />;
+  if (!actualSet || !lineups || !lineups.home || !lineups.away) {
     return <div className="text-center p-4 bg-gray-100 rounded-lg">Cargando marcador y equipos...</div>;
   }
 
-  const teamHome = teams[0];
-  const teamAway = teams[1];
+  const teamHome = lineups.home;
+  const teamAway = lineups.away;
 
   const handleAddPoint = async (teamSlug: string) => {
     try {

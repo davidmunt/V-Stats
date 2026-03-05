@@ -1,14 +1,29 @@
 import { useQuery } from "@tanstack/react-query";
-import { getTeamsFromMatch } from "@/services/match/matchService";
-import type { Team } from "@/interfaces/team.interface";
+import { getMatchLineups } from "@/services/lineup/lineupService";
+import type { MatchLineupsResponse } from "@/interfaces/lineup.interface";
 
-export const MATCH_TEAMS_QUERY_KEY = (slug: string) => ["match", "teams", slug];
+export const MATCH_TEAMS_QUERY_KEY = (slug: string) => ["match", "lineups", slug];
 
 export const useMatchTeamsQuery = (matchSlug: string) => {
-  return useQuery<Team[]>({
+  return useQuery<MatchLineupsResponse>({
+    // Definimos que la función devuelve el objeto con home/away
     queryKey: MATCH_TEAMS_QUERY_KEY(matchSlug),
-    queryFn: () => getTeamsFromMatch(matchSlug),
+    queryFn: () => getMatchLineups(matchSlug),
     enabled: !!matchSlug,
     staleTime: 1000 * 60 * 5,
+    // Ahora 'lineups' es de tipo MatchLineupsResponse y tiene home/away
+    select: (lineups) => ({
+      home: lineups.home,
+      away: lineups.away,
+    }),
   });
 };
+
+// export const useMatchTeamsQuery = (matchSlug: string) => {
+//   return useQuery<Team[]>({
+//     queryKey: MATCH_TEAMS_QUERY_KEY(matchSlug),
+//     queryFn: () => getTeamsFromMatch(matchSlug),
+//     enabled: !!matchSlug,
+//     staleTime: 1000 * 60 * 5,
+//   });
+// };
