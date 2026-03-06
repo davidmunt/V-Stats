@@ -3,9 +3,11 @@ import { HeatMap } from "./HeatMap";
 import LoadingFallback from "@/components/LoadingFallback";
 import { HeatMapAvantages } from "./HeatMapAvantages";
 import { StatsTable } from "./StatsTable";
+import { useAuthContext } from "@/hooks/useAuthContext";
 
 export const TeamStats = () => {
-  const { data, isLoading, isError } = useStatsQuery();
+  const { user } = useAuthContext();
+  const { data, isLoading, isError } = useStatsQuery(user?.slug_team || "slug", "SERVE");
 
   if (isLoading) return <LoadingFallback />;
 
@@ -16,18 +18,18 @@ export const TeamStats = () => {
       </div>
     );
   }
-  const { team_id, actions } = data;
+  const { slug_team, actions } = data;
 
   return (
     <div className="p-6 space-y-10">
       {/* SECCIÓN 1: LOS MAPAS */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <HeatMap actions={actions} myTeamId={team_id} />
-        <HeatMapAvantages actions={actions} myTeamId={team_id} />
+        <HeatMap actions={actions} myTeamId={slug_team} />
+        <HeatMapAvantages actions={actions} myTeamId={slug_team} />
       </div>
 
       <div className="w-full">
-        <StatsTable actions={actions} myTeamId={team_id} />
+        <StatsTable actions={actions} myTeamId={slug_team} />
       </div>
     </div>
   );

@@ -24,3 +24,22 @@ class ActionDTO:
     slug_point_for_team: Optional[str] = None
     status: str = "active"
     is_active: bool = True
+
+@dataclass
+class ActionStatDTO:
+    slug_match: str
+    slug_set: str
+    set_number: int
+    slug_team: str
+    slug_player: str
+    player_name: str
+    player_dorsal: int
+    player_position: int
+    action_type: str
+    result: str
+    slug_point_for_team: Optional[str]
+    start_x: float
+    start_y: float
+    end_x: float
+    end_y: float
+    timestamp: datetime

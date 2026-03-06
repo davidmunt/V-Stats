@@ -10,6 +10,8 @@ from app.domain.repositories.team import ITeamRepository
 from app.domain.repositories.player import IPlayerRepository
 from app.domain.repositories.lineup import ILineupRepository
 from app.infrastructure.models.action import Action
+from app.infrastructure.mappers.action import ActionModelMapper
+from app.domain.dtos.action import ActionDTO, ActionStatDTO
 
 class ActionService(IActionService):
     def __init__(
@@ -200,3 +202,35 @@ class ActionService(IActionService):
         await self._action_repo.delete(session, last_action)
 
         return True
+
+    async def get_actions_type_from_team(self, session: Any, team_slug: str, action_type: str) -> list[ActionStatDTO]:
+        team = await self._team_repo.get_by_slug(session, team_slug)
+        if not team:
+            raise ValueError("TEAM_NOT_FOUND")
+        
+        actions = await self._action_repo.get_actions_type_from_team(session, team.id_team, action_type)
+        return [ActionModelMapper.to_stat_dto(a) for a in actions]
+    
+    async def get_actions_type_from_team_against_team(self, session: Any, team_slug: str, action_type: str) -> list[ActionStatDTO]:
+        team = await self._team_repo.get_by_slug(session, team_slug)
+        if not team:
+            raise ValueError("TEAM_NOT_FOUND")
+
+        actions = await self._action_repo.get_actions_type_from_team_against_team(session, team.id_team, action_type)
+        return [ActionModelMapper.to_stat_dto(a) for a in actions]
+    
+    async def get_actions_type_from_player(self, session: Any, player_slug: str, action_type: str) -> list[ActionStatDTO]:
+        player = await self._player_repo.get_by_slug(session, player_slug)
+        if not player:
+            raise ValueError("PLAYER_NOT_FOUND")
+
+        actions = await self._action_repo.get_actions_type_from_player(session, player.id_player, action_type)
+        return [ActionModelMapper.to_stat_dto(a) for a in actions]
+    
+    async def get_actions_type_from_player_against_team(self, session: Any, player_slug: str, action_type: str) -> list[ActionStatDTO]:
+        player = await self._player_repo.get_by_slug(session, player_slug)
+        if not player:
+            raise ValueError("PLAYER_NOT_FOUND")
+
+        actions = await self._action_repo.get_actions_type_from_player_against_team(session, player.id_player, action_type)
+        return [ActionModelMapper.to_stat_dto(a) for a in actions]

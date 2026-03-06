@@ -16,13 +16,9 @@ class LeagueStandingService(ILeagueStandingService):
         league_id = await self._league_repo.get_league_id_by_slug(session, league_slug)
         if league_id is None:
             raise ValueError("Liga no encontrada.")
-        print(f"Calculando tabla para liga ID: {league_id}")
 
         teams = await self._team_repo.get_by_league_id(session, league_id)
-        print(f"Equipos encontrados: {[t.name for t in teams]}")
         matches = await self._match_repo.get_finished_matches_by_league_id(session, league_id)
-        print(f"Partidos encontrados: {len(matches)}")
-        print(f"Sets encontrados: {sum(len(m.sets) for m in matches)}")
         
         standings = []
         for team in teams:

@@ -3,8 +3,11 @@ from sqlalchemy import select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.domain.repositories.action import IActionRepository
 from app.infrastructure.models.action import Action
+from app.infrastructure.models.set import Set 
+from app.infrastructure.models.player import Player
 from app.domain.dtos.action import ActionDTO
 from app.domain.mapper import IModelMapper
+from sqlalchemy.orm import joinedload
 
 class ActionRepository(IActionRepository):
     def __init__(self, action_mapper: IModelMapper):
@@ -67,3 +70,89 @@ class ActionRepository(IActionRepository):
         """Elimina la acción de la base de datos."""
         await session.delete(action_model)
         await session.flush()
+
+    async def get_actions_type_from_team(self, session: AsyncSession, id_team: int, action_type: str) -> list[Action]:
+        """Obtiene todas las acciones de un tipo específico que han generado punto para un equipo."""
+        query = (
+            select(Action)
+            .where(
+                and_(
+                    Action.id_team == id_team,
+                    Action.action_type == action_type,
+                    Action.id_point_for_team == id_team,
+                )
+            )
+            .options(
+                joinedload(Action.team),
+                joinedload(Action.player).selectinload(Player.seasons),
+                joinedload(Action.set).joinedload(Set.match),
+                joinedload(Action.point_for_team)
+            )
+        )
+        result = await session.execute(query)
+        return result.scalars().unique().all()
+    
+    async def get_actions_type_from_team_against_team(self, session: AsyncSession, id_team: int, action_type: str) -> list[Action]:
+        """Obtiene todas las acciones de un tipo específico que han hecho punto contra el equipo (errores propios)."""
+        query = (
+            select(Action)
+            .where(
+                and_(
+                    Action.id_team == id_team,
+                    Action.action_type == action_type,
+                    Action.id_point_for_team != id_team, 
+                    Action.id_point_for_team.is_not(None)
+                )
+            )
+            .options(
+                joinedload(Action.team),
+                joinedload(Action.player).selectinload(Player.seasons),
+                joinedload(Action.set).joinedload(Set.match),
+                joinedload(Action.point_for_team)
+            )
+        )
+        result = await session.execute(query)
+        return result.scalars().unique().all()
+    
+    async def get_actions_type_from_player(self, session: AsyncSession, id_player: int, action_type: str) -> list[Action]:
+        """Obtiene todas las acciones de un tipo específico que han generado punto para un jugador."""
+        query = (
+            select(Action)
+            .where(
+                and_(
+                    Action.id_player == id_player,
+                    Action.action_type == action_type,
+                    Action.id_point_for_team == Action.id_team 
+                )
+            )
+            .options(
+                joinedload(Action.team),
+                joinedload(Action.player).selectinload(Player.seasons),
+                joinedload(Action.set).joinedload(Set.match),
+                joinedload(Action.point_for_team)
+            )
+        )
+        result = await session.execute(query)
+        return result.scalars().unique().all()
+    
+    async def get_actions_type_from_player_against_team(self, session: AsyncSession, id_player: int, action_type: str) -> list[Action]:
+        """Obtiene todas las acciones de un tipo específico de un jugador que terminaron en punto rival."""
+        query = (
+            select(Action)
+            .where(
+                and_(
+                    Action.id_player == id_player,
+                    Action.action_type == action_type,
+                    Action.id_point_for_team != Action.id_team,
+                    Action.id_point_for_team.is_not(None)
+                )
+            )
+            .options(
+                joinedload(Action.team),
+                joinedload(Action.player).selectinload(Player.seasons),
+                joinedload(Action.set).joinedload(Set.match),
+                joinedload(Action.point_for_team)
+            )
+        )
+        result = await session.execute(query)
+        return result.scalars().unique().all()

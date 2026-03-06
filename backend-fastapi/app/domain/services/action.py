@@ -43,3 +43,38 @@ class IActionService(abc.ABC):
         Lógica para validar e intercambiar jugadores en pista.
         """
         ...
+
+    @abc.abstractmethod
+    async def get_actions_type_from_team(self, session: Any, team_slug: str, action_type: str) -> list[ActionDTO]:
+        """
+        Lógica para obtener todas las acciones de un tipo de un equipo específico que han generado punto.
+        """
+        ...
+
+    @abc.abstractmethod
+    async def get_actions_type_from_team_against_team(self, session: Any, team_slug: str, action_type: str) -> list[ActionDTO]:
+        """
+        Lógica para obtener todas las acciones de un tipo de un equipo especifico que han hecho punto contra otro equipod.
+        """
+        ...
+
+    @abc.abstractmethod
+    async def get_actions_type_from_player(self, session: Any, player_slug: str, action_type: str) -> list[ActionDTO]:
+        """
+        Lógica para obtener todas las acciones de un tipo de un jugador específico que han generado punto.
+        """
+        ...
+
+    @abc.abstractmethod
+    async def get_actions_type_from_player_against_team(self, session: Any, player_slug: str, action_type: str) -> list[ActionDTO]:
+        """
+        Lógica para obtener todas las acciones de un tipo de un jugador específico que han hecho punto contra otro equipo.
+        """
+        ...
+
+    # @abc.abstractmethod
+    # async def get_general_actions_from_team(self, session: Any, team_slug: str) -> list[ActionDTO]:
+    #     """
+    #     Lógica para obtener datos en general de un equipo como: total de puntos, porcentaje de acierto, etc.
+    #     """
+    #     ...
