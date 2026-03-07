@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import com.vstats.vstats.security.AuthUtils;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -35,6 +36,7 @@ public class TeamService {
     private final VenueRepository venueRepository;
     private final CoachRepository coachRepository;
     private final AnalystRepository analystRepository;
+    private final AuthUtils authUtils;
 
     @Transactional
     public TeamResponse createTeam(CreateTeamRequest request) {
@@ -115,6 +117,14 @@ public class TeamService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Liga no encontrada"));
 
         return seasonTeamRepository.findAllByLeague_IdLeagueAndSeason_IsActiveTrue(leagueId).stream()
+                .filter(ts -> !"deleted".equals(ts.getStatus()))
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    public List<TeamResponse> getTeamsFromCoach() {
+        Long currentCoachId = authUtils.getCurrentUserId();
+        return seasonTeamRepository.findRivalTeamsByCoachId(currentCoachId).stream()
                 .filter(ts -> !"deleted".equals(ts.getStatus()))
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());

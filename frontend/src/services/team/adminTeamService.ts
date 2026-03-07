@@ -66,3 +66,8 @@ export const getTeamBySlug = async (slug_team: string): Promise<Team> => {
   const response = await apiClient.get<SingleTeamResponse>("express", `/team/${slug_team}`);
   return response.data.team;
 };
+
+export const getTeamsFromCoach = async (): Promise<Team[]> => {
+  const response = await apiClient.get<TeamsResponse>("spring", "/api/teams/coach");
+  return response.data.teams;
+};

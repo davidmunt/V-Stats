@@ -4,6 +4,8 @@ import com.vstats.vstats.domain.entities.SeasonTeamEntity;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -23,6 +25,13 @@ public interface SeasonTeamRepository
     List<SeasonTeamEntity> findAllByLeague_Admin_IdAdminAndSeason_IsActiveTrue(Long idAdmin);
 
     List<SeasonTeamEntity> findAllByLeague_SlugAndSeason_IsActiveTrue(String leagueSlug);
+
+    @Query("SELECT st FROM SeasonTeamEntity st " +
+            "WHERE st.season.isActive = true " +
+            "AND st.season.idSeason = (SELECT cst.season.idSeason FROM SeasonTeamEntity cst WHERE cst.coach.idCoach = :idCoach AND cst.season.isActive = true) "
+            +
+            "AND st.coach.idCoach != :idCoach")
+    List<SeasonTeamEntity> findRivalTeamsByCoachId(@Param("idCoach") Long idCoach);
 
     Optional<SeasonTeamEntity> findByTeam_Slug(String slug);
 }

@@ -48,6 +48,13 @@ public class TeamController {
         return ResponseEntity.ok(Map.of("team", teamService.getTeamBySlug(slug)));
     }
 
+    @GetMapping("/coach")
+    @PreAuthorize("hasRole('coach')")
+    public ResponseEntity<Map<String, List<TeamResponse>>> getTeamsFromCoach() {
+        List<TeamResponse> teams = teamService.getTeamsFromCoach();
+        return ResponseEntity.ok(Map.of("teams", teams));
+    }
+
     @PutMapping("/{slug}")
     @CheckSecurity.Teams.CanManage
     public ResponseEntity<Map<String, TeamResponse>> update(@PathVariable String slug,

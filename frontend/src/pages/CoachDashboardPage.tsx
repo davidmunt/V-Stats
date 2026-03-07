@@ -6,7 +6,7 @@ import { useCurrentUserQuery } from "@/queries/auth/useCurrentUser";
 import { useCoachLeagueQuery } from "@/queries/leagues/useCoachLeague";
 import { CoachStandings } from "@/components/coach/standings/CoachStandings";
 import { CoachMatchesCalendar } from "@/components/coach/calendar/CoachMatchesCalendar";
-import { StatsManager } from "@/components/coach/stats/StatsManager";
+import StatsManager from "@/components/coach/stats/StatsManager";
 import LoadingFallback from "@/components/LoadingFallback";
 
 const CoachDashboardPage = () => {
