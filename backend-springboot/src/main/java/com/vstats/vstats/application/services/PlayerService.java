@@ -144,6 +144,17 @@ public class PlayerService {
                 .collect(Collectors.toList());
     }
 
+    public List<PlayerResponse> getPlayersByTeam(String slugTeam) {
+        if (!teamRepository.existsBySlug(slugTeam)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Equipo no encontrado");
+        }
+
+        return seasonPlayerRepository.findAllBySeasonTeam_Team_SlugAndSeason_IsActiveTrue(slugTeam).stream()
+                .filter(sp -> !"deleted".equals(sp.getStatus()))
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
     @Transactional
     public PlayerResponse updatePlayer(String slug, UpdatePlayerRequest request) {
         SeasonPlayerEntity sp = seasonPlayerRepository.findByPlayer_SlugAndSeason_IsActiveTrue(slug)

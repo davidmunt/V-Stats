@@ -9,4 +9,6 @@ import java.util.Optional;
 @Repository
 public interface TeamRepository extends JpaRepository<TeamEntity, Long> {
     Optional<TeamEntity> findBySlug(String slug);
+
+    Boolean existsBySlug(String slug);
 }

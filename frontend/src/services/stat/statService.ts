@@ -14,3 +14,13 @@ export const getStatsAgainstTeam = async (teamSlug: string, actionType: string) 
   const response = await apiClient.get<StatsResponse>("fastapi", `/api/stats/team/${teamSlug}/type/${actionType}/against`);
   return response.data;
 };
+
+export const getStatsForPlayer = async (playerSlug: string, actionType: string) => {
+  const response = await apiClient.get<StatsResponse>("fastapi", `/api/stats/player/${playerSlug}/type/${actionType}`);
+  return response.data;
+};
+
+export const getStatsAgainstPlayer = async (playerSlug: string, actionType: string) => {
+  const response = await apiClient.get<StatsResponse>("fastapi", `/api/stats/player/${playerSlug}/type/${actionType}/against`);
+  return response.data;
+};

@@ -55,6 +55,11 @@ public class PlayerController {
         return ResponseEntity.ok(Map.of("players", playerService.getPlayersByAnalyst(slugAnalyst)));
     }
 
+    @GetMapping("/team/{slugTeam}")
+    public ResponseEntity<Map<String, List<PlayerResponse>>> getByTeam(@PathVariable String slugTeam) {
+        return ResponseEntity.ok(Map.of("players", playerService.getPlayersByTeam(slugTeam)));
+    }
+
     @PutMapping("/{slug}")
     @CheckSecurity.Players.CanManage
     public ResponseEntity<Map<String, PlayerResponse>> update(
