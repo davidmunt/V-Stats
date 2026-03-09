@@ -43,3 +43,17 @@ class ActionStatDTO:
     end_x: float
     end_y: float
     timestamp: datetime
+
+@dataclass
+class ActionGeneralStatsDTO:
+    slug_team: str
+    percentage_success: float
+    percentage_error: float
+    percentage_serve_success: float
+    percentage_serve_error: float
+    percentage_reception_success: float
+    percentage_reception_error: float
+    percentage_block_success: float
+    percentage_block_error: float
+    percentage_attack_success: float
+    percentage_attack_error: float

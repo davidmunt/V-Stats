@@ -1,7 +1,7 @@
 from typing import Optional
 
 from datetime import datetime
-from app.domain.dtos.action import ActionDTO, ActionStatDTO
+from app.domain.dtos.action import ActionDTO, ActionStatDTO, ActionGeneralStatsDTO
 from app.domain.mapper import IModelMapper
 from app.infrastructure.models.action import Action
 
@@ -34,23 +34,38 @@ class ActionModelMapper(IModelMapper[Action, ActionDTO]):
         return None
     
     @staticmethod
+    def to_general_stats_dto(model: Action) -> ActionGeneralStatsDTO:
+        if model is None:
+            return None
+        
+        return ActionGeneralStatsDTO(
+            slug_team=model.team.slug if model.team else "none",
+            percentage_success=0.0,
+            percentage_error=0.0,
+            percentage_serve_success=0.0,
+            percentage_serve_error=0.0,
+            percentage_reception_success=0.0,
+            percentage_reception_error=0.0,
+            percentage_block_success=0.0,
+            percentage_block_error=0.0,
+            percentage_attack_success=0.0,
+            percentage_attack_error=0.0
+        )
+    
+    @staticmethod
     def to_stat_dto(model: Action) -> ActionStatDTO:
         if model is None:
             return None
         
-        # Lógica para recuperar el dorsal desde SeasonPlayer
         dorsal = 0
         if model.player and hasattr(model.player, 'seasons'):
-            # Buscamos el registro de temporada que coincida con el equipo de la acción
-            # Usamos model.id_team que es el ID directo en la tabla de acciones
             season_record = next(
                 (s for s in model.player.seasons if s.season_team.id_team == model.id_team), 
                 None
             )
             
-            # Si no lo encuentra por season_team, intentamos un fallback general
             if not season_record and model.player.seasons:
-                season_record = model.player.seasons[0] # El más reciente si no hay match
+                season_record = model.player.seasons[0] 
                 
             if season_record:
                 dorsal = season_record.dorsal
@@ -63,7 +78,6 @@ class ActionModelMapper(IModelMapper[Action, ActionDTO]):
             slug_player=model.player.slug if model.player else "none",
             player_name=model.player.name if model.player else "Unknown",
             player_dorsal=dorsal,
-            # Nota: Asegúrate de que id_position exista en tu modelo Player o cámbialo por el correcto
             player_position=getattr(model.player, 'id_position', 0),
             action_type=model.action_type,
             result=model.result,

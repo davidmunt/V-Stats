@@ -11,7 +11,7 @@ from app.domain.repositories.player import IPlayerRepository
 from app.domain.repositories.lineup import ILineupRepository
 from app.infrastructure.models.action import Action
 from app.infrastructure.mappers.action import ActionModelMapper
-from app.domain.dtos.action import ActionDTO, ActionStatDTO
+from app.domain.dtos.action import ActionDTO, ActionStatDTO, ActionGeneralStatsDTO
 
 class ActionService(IActionService):
     def __init__(
@@ -234,3 +234,11 @@ class ActionService(IActionService):
 
         actions = await self._action_repo.get_actions_type_from_player_against_team(session, player.id_player, action_type)
         return [ActionModelMapper.to_stat_dto(a) for a in actions]
+    
+    async def get_general_stats_by_team(self, session: Any, team_slug: str) -> ActionGeneralStatsDTO:
+        team = await self._team_repo.get_by_slug(session, team_slug)
+        if not team:
+            raise ValueError("TEAM_NOT_FOUND")
+        
+        stats_dto = await self._action_repo.get_general_stats_by_team(session, team.id_team, team_slug)
+        return stats_dto

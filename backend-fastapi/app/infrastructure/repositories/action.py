@@ -1,11 +1,11 @@
 from typing import Optional
-from sqlalchemy import select, and_
+from sqlalchemy import case, func, select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.domain.repositories.action import IActionRepository
 from app.infrastructure.models.action import Action
 from app.infrastructure.models.set import Set 
 from app.infrastructure.models.player import Player
-from app.domain.dtos.action import ActionDTO
+from app.domain.dtos.action import ActionDTO, ActionStatDTO, ActionGeneralStatsDTO
 from app.domain.mapper import IModelMapper
 from sqlalchemy.orm import joinedload
 
@@ -156,3 +156,60 @@ class ActionRepository(IActionRepository):
         )
         result = await session.execute(query)
         return result.scalars().unique().all()
+    
+    async def get_general_stats_by_team(self, session: AsyncSession, id_team: int, team_slug: str) -> ActionGeneralStatsDTO:
+        """Calcula porcentajes de éxito y error por tipo de acción para un equipo."""
+        
+        is_success = Action.id_point_for_team == id_team
+        is_error = and_(Action.id_point_for_team != id_team, Action.id_point_for_team.is_not(None))
+        
+        query = (
+            select(
+                Action.action_type,
+                func.count(Action.id_action).label("total"),
+                func.count(case((is_success, 1))).label("successes"),
+                func.count(case((is_error, 1))).label("errors")
+            )
+            .where(Action.id_team == id_team)
+            .group_by(Action.action_type)
+        )
+        
+        result = await session.execute(query)
+        rows = result.all()
+        
+        stats_map = {
+            "SERVE": {"total": 0, "ok": 0, "err": 0},
+            "RECEPTION": {"total": 0, "ok": 0, "err": 0},
+            "BLOCK": {"total": 0, "ok": 0, "err": 0},
+            "ATTACK": {"total": 0, "ok": 0, "err": 0},
+        }
+        
+        total_actions = 0
+        total_successes = 0
+        total_errors = 0
+        
+        for row in rows:
+            a_type, total, ok, err = row
+            if a_type in stats_map:
+                stats_map[a_type] = {"total": total, "ok": ok, "err": err}
+            
+            total_actions += total
+            total_successes += ok
+            total_errors += err
+
+        def calc_pct(part, total):
+            return round((part / total) * 100, 2) if total > 0 else 0.0
+
+        return ActionGeneralStatsDTO(
+            slug_team=team_slug,
+            percentage_success=calc_pct(total_successes, total_actions),
+            percentage_error=calc_pct(total_errors, total_actions),
+            percentage_serve_success=calc_pct(stats_map["SERVE"]["ok"], stats_map["SERVE"]["total"]),
+            percentage_serve_error=calc_pct(stats_map["SERVE"]["err"], stats_map["SERVE"]["total"]),
+            percentage_reception_success=calc_pct(stats_map["RECEPTION"]["ok"], stats_map["RECEPTION"]["total"]),
+            percentage_reception_error=calc_pct(stats_map["RECEPTION"]["err"], stats_map["RECEPTION"]["total"]),
+            percentage_block_success=calc_pct(stats_map["BLOCK"]["ok"], stats_map["BLOCK"]["total"]),
+            percentage_block_error=calc_pct(stats_map["BLOCK"]["err"], stats_map["BLOCK"]["total"]),
+            percentage_attack_success=calc_pct(stats_map["ATTACK"]["ok"], stats_map["ATTACK"]["total"]),
+            percentage_attack_error=calc_pct(stats_map["ATTACK"]["err"], stats_map["ATTACK"]["total"])
+        )

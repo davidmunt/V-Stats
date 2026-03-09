@@ -72,6 +72,13 @@ class IActionService(abc.ABC):
         """
         ...
 
+    @abc.abstractmethod
+    async def get_general_stats_by_team(self, session: Any, team_slug: str) -> dict[str, Any]:
+        """
+        Lógica para obtener datos en general de un equipo como: total de puntos, porcentaje de acierto, etc.
+        """
+        ...
+
     # @abc.abstractmethod
     # async def get_general_actions_from_team(self, session: Any, team_slug: str) -> list[ActionDTO]:
     #     """
