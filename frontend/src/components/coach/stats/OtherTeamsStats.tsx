@@ -7,6 +7,7 @@ import { useTypeStatsForPlayerQuery } from "@/queries/stats/useTypeStatsForPlaye
 import { useTypeStatsAgainstPlayerQuery } from "@/queries/stats/useTypeStatsAgainstPlayer";
 import LoadingFallback from "@/components/LoadingFallback";
 import HeatMap from "@/components/coach/stats/HeatMap";
+import { StatsTable } from "./StatsTable";
 
 const OtherTeamsStats = () => {
   const { data: teams, isLoading: isTeamsLoading } = useTeamsQuery();
@@ -128,6 +129,17 @@ const OtherTeamsStats = () => {
             <HeatMap stats={playerStatsAgainst || []} mode="against" title="Errores Individuales" />
           </>
         </div>
+
+        {activeTeam && (
+          <div className="bg-white p-8 rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div className="mb-6">
+              <h4 className="text-sm font-black text-slate-800 uppercase tracking-widest italic">Porcentajes de Eficacia</h4>
+              <div className="h-1 w-12 bg-blue-600 rounded-full mt-1"></div>
+            </div>
+
+            <StatsTable slug_team={activeTeam.slug} />
+          </div>
+        )}
       </section>
     </div>
   );

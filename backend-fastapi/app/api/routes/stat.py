@@ -110,17 +110,22 @@ async def get_actions_by_player_and_type_against_team(
         except PermissionError as e:
             raise HTTPException(status_code=403, detail=str(e))
 
-@router.get("/team/{team_slug}/general", response_model=StatsGeneralResponse)
+@router.get("/team/{team_slug}/general", response_model=StatGeneralResponse) # <--- Cambiado a StatGeneralResponse
 async def get_general_stats_by_team(
     team_slug: str,
     user_data: dict = Depends(auth_analyst),
     service = Depends(get_action_service)
 ):
+    """
+    Obtiene estadísticas generales de un equipo como un objeto único.
+    """
     async with container_instance.context_session() as session:
         try:
             stats_dto = await service.get_general_stats_by_team(session, team_slug)
-            stat_detail = StatGeneralResponse.from_dto(stats_dto)
-            return StatsGeneralResponse(stats=[stat_detail])
+            return StatGeneralResponse.from_dto(stats_dto)
 
         except ValueError as e:
-            raise HTTPException(status_code=404, detail=str(e))
+            error_msg = str(e)
+            if "TEAM_NOT_FOUND" in error_msg:
+                raise HTTPException(status_code=404, detail=error_msg)
+            raise HTTPException(status_code=400, detail=error_msg)
