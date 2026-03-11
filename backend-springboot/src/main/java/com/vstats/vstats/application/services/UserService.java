@@ -222,6 +222,7 @@ public class UserService {
             builder.name(e.getName()).email(e.getEmail()).avatar(e.getAvatar()).slug_user(e.getSlug());
         } else if (entity instanceof CoachEntity e) {
             builder.name(e.getName()).email(e.getEmail()).avatar(e.getAvatar()).slug_user(e.getSlug())
+                    .is_vip(e.getIsVip())
                     .slug_team(e.getTeam() != null ? e.getTeam().getSlug() : null);
         } else if (entity instanceof AnalystEntity e) {
             builder.name(e.getName()).email(e.getEmail()).avatar(e.getAvatar()).slug_user(e.getSlug())

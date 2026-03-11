@@ -8,9 +8,13 @@ import java.time.LocalDateTime;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "subscription_payments")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
-public class SubscriptionPaymentEntity {
+@Table(name = "payments")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class PaymentEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,6 +26,9 @@ public class SubscriptionPaymentEntity {
 
     @Column(name = "id_user", nullable = false)
     private String idUser;
+
+    @Column(name = "user_type", nullable = false)
+    private String userType;
 
     private BigDecimal amount;
 

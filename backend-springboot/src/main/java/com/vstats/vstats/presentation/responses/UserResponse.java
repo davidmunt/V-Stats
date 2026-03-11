@@ -14,5 +14,6 @@ public class UserResponse {
     private String email;
     private String user_type;
     private String avatar;
+    private Boolean is_vip;
     private String token;
 }

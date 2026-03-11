@@ -41,6 +41,10 @@ public class CoachEntity {
     @Column(name = "refresh_token")
     private String refreshToken;
 
+    @Column(name = "is_vip")
+    @Builder.Default
+    private Boolean isVip = false;
+
     @Builder.Default
     @Column(name = "session_version", nullable = false)
     private Integer sessionVersion = 0;
