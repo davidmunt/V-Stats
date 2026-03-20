@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createAction } from "@/services/action/actionService";
+import { saveActionToHistory } from "@/utils/saveLastAction";
 
 export const useAddPointMutation = () => {
   const queryClient = useQueryClient();
@@ -31,7 +32,8 @@ export const useAddPointMutation = () => {
         end_x: params.end_x ?? 0,
         end_y: params.end_y ?? 0,
       }),
-    onSuccess: async () => {
+    onSuccess: async (params) => {
+      saveActionToHistory(params);
       await queryClient.invalidateQueries({
         queryKey: ["set", "detail"],
         exact: false,

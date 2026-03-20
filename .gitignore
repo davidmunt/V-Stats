@@ -23,6 +23,8 @@
 /backend-springboot/*.log
 /backend-springboot/*.iml
 /backend-springboot/.idea/
+**/application.properties
+**/application.yml
 
 # ====================
 # GENERAL

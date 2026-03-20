@@ -22,57 +22,60 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
-    private final SecurityFilter securityFilter;
+        private final SecurityFilter securityFilter;
 
-    // 1. Declaramos los endpoints de lectura pública (GET)
-    private static final String[] PUBLIC_READ_ENDPOINTS = {
-            "/api/leagues/**",
-            "/api/teams/**",
-            "/api/lineups/**",
-            "/api/players/**",
-            "/api/categories/**",
-            "/api/venues/**",
-            "/v3/api-docs/**",
-            "/swagger-ui/**",
-            "/swagger-ui.html"
-    };
+        // 1. Declaramos los endpoints de lectura pública (GET)
+        private static final String[] PUBLIC_READ_ENDPOINTS = {
+                        "/api/leagues/**",
+                        "/api/teams/**",
+                        "/api/lineups/**",
+                        "/api/players/**",
+                        "/api/categories/**",
+                        "/api/venues/**",
+                        "/v3/api-docs/**",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html"
+        };
 
-    // 2. Declaramos los endpoints de escritura pública (POST para Auth)
-    private static final String[] PUBLIC_WRITE_ENDPOINTS = {
-            "/api/auth/register",
-            "/api/auth/login",
-            "/api/auth/refresh",
-            "/api/auth/logoutDevice",
-            "/error"
-    };
+        // 2. Declaramos los endpoints de escritura pública (POST para Auth)
+        private static final String[] PUBLIC_WRITE_ENDPOINTS = {
+                        "/api/auth/register",
+                        "/api/auth/login",
+                        "/api/auth/refresh",
+                        "/api/auth/logoutDevice",
+                        "/error"
+        };
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .cors(org.springframework.security.config.Customizer.withDefaults())
-                .csrf(AbstractHttpConfigurer::disable)
-                .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/api/payments/webhook"))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/error").permitAll()
-                        .requestMatchers("/api/payments/webhook").permitAll()
-                        .requestMatchers(org.springframework.web.cors.CorsUtils::isPreFlightRequest).permitAll()
-                        .requestMatchers(HttpMethod.POST, PUBLIC_WRITE_ENDPOINTS).permitAll()
-                        .requestMatchers(HttpMethod.GET, PUBLIC_READ_ENDPOINTS).permitAll()
-                        .anyRequest().authenticated())
-                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+                http
+                                .cors(org.springframework.security.config.Customizer.withDefaults())
+                                // DESACTIVAR COMPLETAMENTE AQUÍ:
+                                .csrf(AbstractHttpConfigurer::disable)
 
-        return http.build();
-    }
+                                .sessionManagement(session -> session
+                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                                .authorizeHttpRequests(authorize -> authorize
+                                                .requestMatchers("/error").permitAll()
+                                                .requestMatchers("/api/payments/webhook").permitAll()
+                                                .requestMatchers(
+                                                                org.springframework.web.cors.CorsUtils::isPreFlightRequest)
+                                                .permitAll()
+                                                .requestMatchers(HttpMethod.POST, PUBLIC_WRITE_ENDPOINTS).permitAll()
+                                                .requestMatchers(HttpMethod.GET, PUBLIC_READ_ENDPOINTS).permitAll()
+                                                .anyRequest().authenticated())
+                                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
 
-    @Bean
-    public PasswordEncoder encoder() {
-        return new BCryptPasswordEncoder();
-    }
+                return http.build();
+        }
 
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
-        return configuration.getAuthenticationManager();
-    }
+        @Bean
+        public PasswordEncoder encoder() {
+                return new BCryptPasswordEncoder();
+        }
+
+        @Bean
+        public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+                return configuration.getAuthenticationManager();
+        }
 }

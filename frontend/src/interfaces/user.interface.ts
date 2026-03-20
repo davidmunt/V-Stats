@@ -6,6 +6,7 @@ export interface User {
   email: string;
   avatar?: string;
   user_type: UserRole;
+  is_vip?: boolean;
   accessToken: string;
   slug_team: string;
 }

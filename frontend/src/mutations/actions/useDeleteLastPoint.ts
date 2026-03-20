@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { cancelLastAction } from "@/services/action/actionService";
+import { removeLastActionFromHistory } from "@/utils/saveLastAction";
 
 export const useDeleteLastPointMutation = () => {
   const queryClient = useQueryClient();
@@ -7,6 +8,7 @@ export const useDeleteLastPointMutation = () => {
   return useMutation({
     mutationFn: ({ setSlug, teamSlug }: { setSlug: string; teamSlug: string }) => cancelLastAction(setSlug, teamSlug),
     onSuccess: async () => {
+      removeLastActionFromHistory();
       await queryClient.invalidateQueries({
         queryKey: ["set", "detail"],
         exact: false,

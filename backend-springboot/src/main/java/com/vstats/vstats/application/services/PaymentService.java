@@ -16,6 +16,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.stripe.model.Event;
+import com.stripe.model.EventDataObjectDeserializer;
 import com.vstats.vstats.infrastructure.repositories.PaymentRepository;
 
 @Service
@@ -46,13 +48,12 @@ public class PaymentService {
         String userRole = authUtils.getCurrentUserRole();
 
         PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
-                .setAmount(1000L) // Precio fijo del VIP (ej: 10€)
+                .setAmount(1000L)
                 .setCurrency("eur")
                 .setAutomaticPaymentMethods(
                         PaymentIntentCreateParams.AutomaticPaymentMethods.builder()
                                 .setEnabled(true)
                                 .build())
-                // CLAVE: Metadatos para el Webhook posterior
                 .putMetadata("userId", String.valueOf(currentUserId))
                 .putMetadata("userType", userRole)
                 .build();
@@ -73,41 +74,67 @@ public class PaymentService {
 
     @Transactional
     public void processWebhookEvent(Event event) {
-        // Solo nos interesa cuando el pago ha sido un éxito
-        if ("payment_intent.succeeded".equals(event.getType())) {
+        System.out.println("--- [WEBHOOK RECEPCIÓN] Tipo: " + event.getType() + " ---");
 
-            // 1. Convertir el objeto del evento a un PaymentIntent de Stripe
-            PaymentIntent intent = (PaymentIntent) event.getDataObjectDeserializer()
-                    .getObject().orElseThrow(() -> new RuntimeException("No se pudo leer el objeto de Stripe"));
+        if (!"payment_intent.succeeded".equals(event.getType())) {
+            System.out.println("[INFO] Evento ignorado (no es 'succeeded')");
+            return;
+        }
 
-            // 2. Recuperar los metadatos que enviamos al crear el Intent
-            String userIdStr = intent.getMetadata().get("userId");
-            String userType = intent.getMetadata().get("userType");
+        try {
+            EventDataObjectDeserializer dataObjectDeserializer = event.getDataObjectDeserializer();
+            PaymentIntent intent = null;
+
+            if (dataObjectDeserializer.getObject().isPresent()) {
+                intent = (PaymentIntent) dataObjectDeserializer.getObject().get();
+            } else {
+                intent = (PaymentIntent) event.getData().getObject();
+            }
+
+            if (intent == null) {
+                throw new RuntimeException("Error crítico: El objeto PaymentIntent es nulo tras la deserialización");
+            }
+
+            if (paymentRepository.existsByIdStripePayment(intent.getId())) {
+                return;
+            }
+
+            Map<String, String> metadata = intent.getMetadata();
+
+            String userIdStr = metadata.get("userId");
+            String userType = metadata.get("userType");
+
+            if (userIdStr == null || userType == null) {
+                throw new RuntimeException("Metadatos userId o userType ausentes");
+            }
+
             Long userId = Long.parseLong(userIdStr);
 
-            // 3. Lógica de negocio: Activar VIP si es un Coach
             if ("coach".equalsIgnoreCase(userType)) {
                 CoachEntity coach = coachRepository.findById(userId)
-                        .orElseThrow(() -> new RuntimeException("Coach no encontrado"));
+                        .orElseThrow(() -> new RuntimeException("Coach no encontrado con ID: " + userId));
 
-                coach.setIsVip(true); // <--- ACTIVAMOS EL VIP
+                coach.setIsVip(true);
                 coachRepository.save(coach);
             }
 
-            // 4. Registrar el pago en nuestra tabla de auditoría (PaymentEntity)
             PaymentEntity payment = PaymentEntity.builder()
-                    .slug("pay-" + intent.getId())
+                    .slug("pay-" + intent.getId() + "-" + System.currentTimeMillis())
                     .idUser(userIdStr)
                     .userType(userType)
-                    .amount(BigDecimal.valueOf(intent.getAmount()).divide(BigDecimal.valueOf(100))) // Céntimos a Euros
-                    .currency(intent.getCurrency())
-                    .paymentMethod(intent.getPaymentMethod())
+                    .amount(BigDecimal.valueOf(intent.getAmount()).divide(BigDecimal.valueOf(100), 2,
+                            java.math.RoundingMode.HALF_UP))
+                    .currency(intent.getCurrency().toUpperCase())
+                    .paymentMethod(intent.getPaymentMethod() != null ? intent.getPaymentMethod() : "STRIPE_CARD")
                     .idStripePayment(intent.getId())
                     .status("completed")
                     .isActive(true)
                     .build();
 
             paymentRepository.save(payment);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
         }
     }
 }

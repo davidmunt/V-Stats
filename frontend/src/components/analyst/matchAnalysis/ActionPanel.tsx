@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useMemo } from "react"; // Añadimos useMemo
 import { useAddPointMutation } from "@/mutations/actions/useAddPoint";
 import type { LineupPosition } from "@/interfaces/lineupPosition.interface";
 import Swal from "sweetalert2";
 import { CoordinatePicker } from "./CoordinatePicker";
+import { getAllowedActions, type ActionType } from "@/utils/volleyLogic"; // Importamos tu lógica
 
-type ActionType = "SERVE" | "ATTACK" | "BLOCK" | "RECEPTION" | "DIG" | "SET";
 type ActionResult = "++" | "+" | "-" | "--";
 
 interface ActionPanelProps {
@@ -21,19 +21,47 @@ export const ActionPanel = ({ setSlug, selectedPosition, teamLocalSlug, teamVisi
   const [tempResult, setTempResult] = useState<ActionResult | null>(null);
   const addActionMutation = useAddPointMutation();
 
+  const allowedActions = useMemo(() => {
+    const history = JSON.parse(sessionStorage.getItem("vstats_last_actions") || "[]");
+    // selectedPosition.slug_team es siempre tu equipo
+    return getAllowedActions(history, selectedPosition);
+  }, [selectedPosition]);
+
   const handleResultButtonClick = (result: ActionResult) => {
     if (!selectedType) return;
+    if (selectedType === "SERVE") {
+      setTempResult(result);
+      setShowPicker(true);
+      return;
+    }
+    const isImpactAction = ["ATTACK", "BLOCK", "DIG"].includes(selectedType);
+    const isExtremeResult = ["++", "--"].includes(result);
+    if (isImpactAction && isExtremeResult) {
+      setTempResult(result);
+      setShowPicker(true);
+      return;
+    }
+    const isTransitionAction = ["RECEPTION", "SET"].includes(selectedType);
+    if (isTransitionAction && result === "--") {
+      setTempResult(result);
+      setShowPicker(true);
+      return;
+    }
     setTempResult(result);
-    setShowPicker(true);
+    handleSaveWithCoords({ start_x: 0, start_y: 0, end_x: 0, end_y: 0 }, result);
   };
 
-  const handleSaveWithCoords = async (coords: { start_x: number; start_y: number; end_x: number; end_y: number }) => {
-    if (!selectedType || !tempResult) return;
+  const handleSaveWithCoords = async (
+    coords: { start_x: number; start_y: number; end_x: number; end_y: number },
+    directResult?: ActionResult, // Nuevo parámetro opcional
+  ) => {
+    const resultToSave = directResult || tempResult; // Usar el directo o el del estado
+    if (!selectedType || !resultToSave) return;
 
     let pointForTeamSlug: string | null = null;
-    if (tempResult === "++") {
+    if (resultToSave === "++") {
       pointForTeamSlug = selectedPosition.slug_team;
-    } else if (tempResult === "--") {
+    } else if (resultToSave === "--") {
       pointForTeamSlug = selectedPosition.slug_team === teamLocalSlug ? teamVisitorSlug : teamLocalSlug;
     }
 
@@ -43,7 +71,7 @@ export const ActionPanel = ({ setSlug, selectedPosition, teamLocalSlug, teamVisi
         slug_team: selectedPosition.slug_team,
         slug_player: selectedPosition.slug_player,
         action_type: selectedType,
-        result: tempResult,
+        result: resultToSave,
         player_position: selectedPosition.current_position,
         slug_point_for_team: pointForTeamSlug,
         ...coords,
@@ -55,12 +83,7 @@ export const ActionPanel = ({ setSlug, selectedPosition, teamLocalSlug, teamVisi
       onSuccess();
     } catch (error: unknown) {
       const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || "Error";
-      Swal.fire({
-        title: "Error",
-        text: message,
-        icon: "error",
-        confirmButtonColor: "#ef4444",
-      });
+      Swal.fire({ title: "Error", text: message, icon: "error", confirmButtonColor: "#ef4444" });
     }
   };
 
@@ -72,59 +95,68 @@ export const ActionPanel = ({ setSlug, selectedPosition, teamLocalSlug, teamVisi
           <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center font-black text-base border border-white/10 italic">
             #{selectedPosition.dorsal}
           </div>
-          <h3 className="font-bold text-lg tracking-tight">{selectedPosition.dorsal}</h3>
+          <h3 className="font-bold text-lg tracking-tight">{`Jugador ${selectedPosition.dorsal}`}</h3>
         </div>
       </div>
-
       <div className="p-6 flex-1 flex flex-col gap-6">
         {showPicker && <CoordinatePicker onComplete={handleSaveWithCoords} onCancel={() => setShowPicker(false)} />}
-
         <section>
-          <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3 block">1. Categoría Técnica</label>
-          <div className="grid grid-cols-3 gap-2">
-            {["SERVE", "RECEPTION", "SET", "ATTACK", "BLOCK", "DIG"].map((type) => (
-              <button
-                key={type}
-                onClick={() => setSelectedType(type as ActionType)}
-                className={`py-3 px-1 rounded-xl border-2 transition-all font-bold text-[10px] uppercase tracking-tighter ${
-                  selectedType === type
-                    ? "border-blue-600 bg-blue-50 text-blue-700 shadow-inner"
-                    : "border-slate-50 bg-slate-50/50 text-slate-500 hover:bg-slate-100"
-                }`}
-              >
-                {type === "RECEPTION"
-                  ? "RECP"
-                  : type === "ATTACK"
-                    ? "ATAQ"
-                    : type === "SET"
-                      ? "COLOC"
-                      : type === "BLOCK"
-                        ? "BLOQ"
-                        : type === "SERVE"
-                          ? "SAQUE"
-                          : "DEF"}
-              </button>
-            ))}
+          <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3 block italic">1. Acción Disponible</label>
+          <div className="grid grid-cols-2 gap-2">
+            {" "}
+            {["SERVE", "RECEPTION", "SET", "ATTACK", "BLOCK", "DIG"]
+              .filter((type) => allowedActions.includes(type as ActionType))
+              .map((type) => (
+                <button
+                  key={type}
+                  onClick={() => setSelectedType(type as ActionType)}
+                  className={`py-4 px-2 rounded-2xl border-2 transition-all font-black text-[11px] uppercase tracking-wider ${
+                    selectedType === type
+                      ? "border-blue-600 bg-blue-50 text-blue-700 shadow-md scale-[1.02]"
+                      : "border-slate-100 bg-slate-50 text-slate-500 hover:border-blue-200 hover:bg-white"
+                  }`}
+                >
+                  {type === "RECEPTION"
+                    ? "RECP"
+                    : type === "ATTACK"
+                      ? "ATAQUE"
+                      : type === "SET"
+                        ? "COLOC"
+                        : type === "BLOCK"
+                          ? "BLOQUEO"
+                          : type === "SERVE"
+                            ? "SAQUE"
+                            : "DEFENSA"}
+                </button>
+              ))}
           </div>
+          {allowedActions.length === 0 && (
+            <p className="text-[10px] text-amber-600 font-bold bg-amber-50 p-3 rounded-xl border border-amber-100 italic">
+              Este jugador no tiene acciones lógicas en esta fase del punto.
+            </p>
+          )}
         </section>
-
-        <section className={`transition-all duration-300 ${!selectedType ? "opacity-20 pointer-events-none grayscale" : "opacity-100"}`}>
-          <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3 block">2. Evaluación de Calidad</label>
+        <section className={`transition-all duration-300 ${!selectedType ? "opacity-20 pointer-events-none scale-95" : "opacity-100"}`}>
+          <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3 block italic">2. Resultado</label>
           <div className="flex gap-2">
             {[
-              { val: "++" as ActionResult, color: "bg-emerald-500 hover:bg-emerald-600 shadow-emerald-200" },
-              { val: "+" as ActionResult, color: "bg-blue-500 hover:bg-blue-600 shadow-blue-200" },
-              { val: "-" as ActionResult, color: "bg-amber-500 hover:bg-amber-600 shadow-amber-200" },
-              { val: "--" as ActionResult, color: "bg-rose-500 hover:bg-rose-600 shadow-rose-200" },
-            ].map((res) => (
-              <button
-                key={res.val}
-                onClick={() => handleResultButtonClick(res.val)}
-                className={`${res.color} text-white flex-1 py-4 rounded-xl shadow-lg transition-all active:scale-90 flex items-center justify-center`}
-              >
-                <span className="text-2xl font-black italic">{res.val}</span>
-              </button>
-            ))}
+              { val: "++" as ActionResult, color: "bg-emerald-500", desc: "Punto" },
+              { val: "+" as ActionResult, color: "bg-blue-500", desc: "Continua" },
+              { val: "-" as ActionResult, color: "bg-amber-500", desc: "Mala" },
+              { val: "--" as ActionResult, color: "bg-rose-500", desc: "Error" },
+            ]
+              .filter((res) => !(res.val === "++" && ["RECEPTION", "SET"].includes(selectedType || "")))
+              .map((res) => (
+                <button
+                  key={res.val}
+                  onClick={() => handleResultButtonClick(res.val)}
+                  className={`${res.color} text-white flex-1 py-4 rounded-2xl shadow-lg transition-all active:scale-90 flex flex-col items-center justify-center gap-1`}
+                >
+                  <span className="text-2xl font-black italic">{res.val}</span>
+
+                  <span className="text-[8px] font-bold uppercase opacity-80">{res.desc}</span>
+                </button>
+              ))}
           </div>
         </section>
       </div>
