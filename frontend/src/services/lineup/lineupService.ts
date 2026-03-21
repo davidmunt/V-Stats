@@ -7,6 +7,7 @@ export interface LineupPositionPopulated extends LineupPosition {
   slug: string;
   name: string;
   role: string;
+  is_setter: boolean;
   image: string;
 }
 

@@ -4,6 +4,8 @@ export interface SaveLineupParam {
   positions: {
     slug_player: string;
     position: number;
+    is_setter: boolean;
+    libero_swap_target: boolean;
   }[];
 }
 

@@ -38,40 +38,43 @@ export const LineupManager = ({ coachSlug }: LineupManagerProps) => {
     6: null,
     7: null,
   });
+  const [setterPos, setSetterPos] = useState<number | null>(null);
   useEffect(() => {
-    if (existingLineupData && existingLineupData.positions && existingLineupData.positions.length > 0) {
-      const baseState: Record<number, Player | null> = {
-        1: null,
-        2: null,
-        3: null,
-        4: null,
-        5: null,
-        6: null,
-        7: null,
-      };
-
-      existingLineupData.positions.forEach((pos) => {
-        const positionKey = pos.current_position || pos.initial_position;
-
-        if (positionKey >= 1 && positionKey <= 7) {
-          baseState[positionKey] = {
-            slug_player: pos.slug_player,
-            name: pos.name,
-            dorsal: pos.dorsal,
-            role: pos.role,
-            image: pos.image,
-            slug: pos.slug_player,
-            slug_team: existingLineupData.lineup.slug_team,
-            status: "active",
-            is_active: true,
-          } as unknown as Player;
-        }
-      });
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setLineupState(baseState);
+    // 1. Solución error 'undefined': Verificamos existencia explícitamente
+    if (!existingLineupData || !existingLineupData.positions || existingLineupData.positions.length === 0) {
+      return;
     }
-  }, [existingLineupData]);
 
+    const baseState: Record<number, Player | null> = { 1: null, 2: null, 3: null, 4: null, 5: null, 6: null, 7: null };
+    let foundSetterPos: number | null = null;
+
+    existingLineupData.positions.forEach((pos) => {
+      const positionKey = pos.current_position || pos.initial_position;
+      if (positionKey >= 1 && positionKey <= 7) {
+        baseState[positionKey] = {
+          slug_player: pos.slug_player,
+          name: pos.name,
+          dorsal: pos.dorsal,
+          role: pos.role,
+          image: pos.image,
+          slug: pos.slug_player,
+          slug_team: existingLineupData.lineup.slug_team || "",
+          status: "active",
+          is_active: true,
+        } as unknown as Player;
+
+        if (pos.is_setter) {
+          foundSetterPos = positionKey;
+        }
+      }
+    });
+    // 2. Solución error 'cascading renders':
+    // En este caso es necesario para inicializar el componente con datos de la API.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setLineupState(baseState);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSetterPos(foundSetterPos);
+  }, [existingLineupData]);
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over) return;
@@ -106,33 +109,43 @@ export const LineupManager = ({ coachSlug }: LineupManagerProps) => {
   const handleSave = async () => {
     const missingPositions = [1, 2, 3, 4, 5, 6].filter((pos) => !lineupState[pos]);
     if (missingPositions.length > 0) {
-      return Swal.fire({
-        title: "Alineación Incompleta",
-        text: `Te faltan jugadores en las posiciones: ${missingPositions.join(", ")}`,
-        icon: "warning",
-        confirmButtonColor: "#f59e0b",
-      });
+      return Swal.fire({ title: "Incompleto", text: "Faltan posiciones", icon: "warning" });
     }
+    if (!setterPos || !lineupState[setterPos]) {
+      return Swal.fire({ title: "Falta Colocador", text: "Haz clic en un jugador para marcarlo como Colocador", icon: "info" });
+    }
+    const central1 = lineupState[3];
+    const central2 = lineupState[6];
+
+    const { value: liberoTarget } = await Swal.fire({
+      title: "Configuración de Líbero",
+      text: "¿A qué central sustituirá el líbero?",
+      input: "radio",
+      inputOptions: {
+        [central1?.slug_player || "c1"]: central1?.name || "Central 1 (Pos 3)",
+        [central2?.slug_player || "c2"]: central2?.name || "Central 2 (Pos 6)",
+      },
+      inputValidator: (value) => {
+        if (!value) return "¡Debes elegir un jugador!";
+      },
+    });
+    if (!liberoTarget) return;
     const positionsToSave = Object.entries(lineupState)
-      .filter((entry) => entry[1] !== null)
+      .filter(([, player]) => player !== null)
       .map(([pos, player]) => ({
         slug_player: player!.slug_player,
         position: Number(pos),
+        is_setter: Number(pos) === setterPos,
+        libero_swap_target: player!.slug_player === liberoTarget,
       }));
+
     try {
       await saveMutation.mutateAsync({
         slug_match: nextMatch!.slug_match,
         slug_team: currentUser?.slug_team || "",
         positions: positionsToSave,
       });
-      Swal.fire({
-        title: "¡Todo Listo!",
-        text: "La alineación titular se ha guardado correctamente para el partido.",
-        icon: "success",
-        confirmButtonColor: "#10b981",
-        timer: 800,
-        showConfirmButton: false,
-      });
+      Swal.fire({ title: "Guardado", icon: "success", timer: 1500, showConfirmButton: false });
     } catch (error: unknown) {
       const errMsg =
         (error as { response?: { data?: { message?: string } } })?.response?.data?.message || "Hubo un error al guardar la alineación.";
@@ -168,7 +181,23 @@ export const LineupManager = ({ coachSlug }: LineupManagerProps) => {
       <DndContext onDragEnd={handleDragEnd}>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           <div className="lg:col-span-7">
-            <VolleyballCourt lineupState={lineupState} />
+            <VolleyballCourt
+              lineupState={lineupState}
+              setterPos={setterPos}
+              onSelectSetter={(pos) => {
+                if (pos === 7) {
+                  Swal.fire({
+                    title: "Acción no permitida",
+                    text: "El Líbero no puede ser el colocador del equipo.",
+                    icon: "error",
+                    timer: 2000,
+                    showConfirmButton: false,
+                  });
+                  return;
+                }
+                setSetterPos(pos);
+              }}
+            />
           </div>
           <div className="lg:col-span-5">
             <PlayerBench allPlayers={players || []} lineupState={lineupState} />
