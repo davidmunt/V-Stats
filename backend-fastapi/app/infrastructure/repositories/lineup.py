@@ -4,6 +4,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.infrastructure.models.lineup import Lineup
 from app.infrastructure.models.lineup_position import LineupPosition
 from app.infrastructure.models.player import Player
+from sqlalchemy.orm import selectinload
+from sqlalchemy import select
 
 class LineupRepository:
     """
@@ -91,3 +93,13 @@ class LineupRepository:
         query = select(Lineup).where(Lineup.slug == slug)
         result = await session.execute(query)
         return result.scalar_one_or_none()
+    
+    async def get_all_positions_by_lineup(self, session: AsyncSession, id_lineup: int) -> List[LineupPosition]:
+        # Añadimos selectinload para que p.player esté disponible sin errores
+        query = (
+            select(LineupPosition)
+            .where(LineupPosition.id_lineup == id_lineup)
+            .options(selectinload(LineupPosition.player)) 
+        )
+        result = await session.execute(query)
+        return result.scalars().all()

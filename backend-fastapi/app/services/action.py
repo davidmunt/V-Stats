@@ -92,23 +92,90 @@ class ActionService(IActionService):
 
         return result_payload
 
+    # async def _handle_rotation(self, session, current_set, point_team_id, match_id):
+    #     last_point = await self._action_repo.get_previous_point_action(session, current_set.id_set)
+        
+    #     should_rotate = False
+    #     if not last_point:
+    #         pass 
+    #     elif last_point.id_point_for_team != point_team_id:
+    #         should_rotate = True
+
+    #     if should_rotate:
+    #         lineup = await self._lineup_repo.get_active_lineup_by_team_and_match(session, match_id, point_team_id)
+    #         if lineup:
+    #             positions = await self._lineup_repo.get_court_positions(session, lineup.id_lineup)
+    #             rotation_map = {1: 6, 6: 5, 5: 4, 4: 3, 3: 2, 2: 1}
+    #             for pos in positions:
+    #                 new_pos = rotation_map.get(pos.current_position)
+    #                 if new_pos: await self._lineup_repo.update_position(session, pos, new_pos)
+
     async def _handle_rotation(self, session, current_set, point_team_id, match_id):
         last_point = await self._action_repo.get_previous_point_action(session, current_set.id_set)
         
+        # Si el equipo que ganó el punto NO tenía el saque anterior, debe rotar (Recuperación)
         should_rotate = False
-        if not last_point:
-            pass 
-        elif last_point.id_point_for_team != point_team_id:
+        if last_point and last_point.id_point_for_team != point_team_id:
+            # El equipo que recibe el punto es el que rota
             should_rotate = True
 
         if should_rotate:
             lineup = await self._lineup_repo.get_active_lineup_by_team_and_match(session, match_id, point_team_id)
             if lineup:
+                # 1. Ejecutar rotación física (1 -> 6 -> 5 -> 4 -> 3 -> 2 -> 1)
                 positions = await self._lineup_repo.get_court_positions(session, lineup.id_lineup)
                 rotation_map = {1: 6, 6: 5, 5: 4, 4: 3, 3: 2, 2: 1}
+                
                 for pos in positions:
-                    new_pos = rotation_map.get(pos.current_position)
-                    if new_pos: await self._lineup_repo.update_position(session, pos, new_pos)
+                    if pos.current_position in rotation_map:
+                        new_pos = rotation_map[pos.current_position]
+                        await self._lineup_repo.update_position(session, pos, new_pos)
+                
+                # 2. Verificar sustituciones automáticas del Líbero (Entrada/Salida)
+                await session.flush() # Asegurar que las posiciones están actualizadas en DB
+                await self._check_libero_substitution(session, lineup.id_lineup)
+
+    async def _check_libero_substitution(self, session, lineup_id: int):
+        # Obtenemos todos los jugadores de la alineación
+        all_players = await self._lineup_repo.get_all_positions_by_lineup(session, lineup_id)
+        
+        # 1. Identificamos al Líbero: Es el que no tiene posición inicial 1-6
+        # (Opcional: Si tienes un flag is_libero en el modelo, úsalo. Si no, esta lógica es infalible)
+        libero = next((p for p in all_players if p.initial_position not in [1, 2, 3, 4, 5, 6]), None)
+        
+        # 2. Identificamos al Central (Target)
+        target = next((p for p in all_players if p.libero_swap_target is True), None)
+        
+        if not libero or not target:
+            return
+
+        # REGLA DE ENTRADA DEL LÍBERO:
+        # Si el Target (Central) rotó a la Posición 6
+        if target.is_on_court and target.current_position == 6:
+            # Seguridad: El Setter NUNCA sale (aunque sea el target por error)
+            if not target.is_setter:
+                target.is_on_court = False
+                target.current_position = None # Lo sacamos de las posiciones de juego
+                
+                libero.is_on_court = True
+                libero.current_position = 6
+                await session.flush()
+
+        # REGLA DE SALIDA DEL LÍBERO:
+        # Si el Líbero rotó a la Posición 4 (Zona de ataque)
+        elif libero.is_on_court and libero.current_position == 4:
+            libero.is_on_court = False
+            libero.current_position = None
+            
+            target.is_on_court = True
+            target.current_position = 4
+            await session.flush()
+            
+        # REGLA DE CONSISTENCIA (Permanencia):
+        # Si el Líbero está en pista, el Target debe estar fuera (posiciones 6, 5)
+        if libero.is_on_court and target.is_on_court:
+            target.is_on_court = False
+            target.current_position = None
 
     async def _update_score(self, session, current_set, match, point_team_id, payload):
         if point_team_id == match.id_local_team:
@@ -142,6 +209,9 @@ class ActionService(IActionService):
                 next_num = current_set.set_number + 1
                 new_set_dto = await self._set_repo.create_next_set(session, match.id_match, next_num)
                 payload["new_set"] = new_set_dto
+
+
+    # ahora probar que las sustituciones automáticas del líbero se ejecuten correctamente al hacer la rotación, tanto en la entrada como en la salida del líbero, y que el setter no sea afectado por estas reglas. Además, verificar que el marcador se actualice correctamente y que los sets y el partido finalicen según las reglas establecidas.
 
     async def make_substitution(
         self, 

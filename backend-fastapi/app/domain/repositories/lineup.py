@@ -34,3 +34,8 @@ class ILineupRepository(abc.ABC):
     async def get_by_slug_model(self, session: Any, slug: str) -> Optional[Any]:
         """Busca el modelo de alineación para validar existencia."""
         ...
+
+    @abc.abstractmethod
+    async def get_all_positions_by_lineup(self, session: Any, id_lineup: int) -> List[Any]:
+        """Obtiene todas las posiciones de una alineación."""
+        ...

@@ -21,6 +21,9 @@ class LineupPosition(Base):
     initial_position: Mapped[Optional[int]] = mapped_column(Integer)
     current_position: Mapped[Optional[int]] = mapped_column(Integer)
 
+    is_setter: Mapped[Optional[bool]] = mapped_column(Boolean)
+    libero_swap_target: Mapped[Optional[bool]] = mapped_column(Boolean)
+
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     status: Mapped[str] = mapped_column(String, default="active")
 
