@@ -18,9 +18,15 @@ public class CreateLineupRequest {
 
     @Data
     public static class PlayerPositionRequest {
-        @JsonProperty("slug_player") // React envía slug_player
-        private String player_id; // Tu Service usa player_id, así que lo dejamos así
+        @JsonProperty("slug_player")
+        private String player_id;
 
         private Integer position;
+
+        @JsonProperty("is_setter")
+        private Boolean isSetter;
+
+        @JsonProperty("libero_swap_target")
+        private Boolean liberoSwapTarget;
     }
 }

@@ -40,6 +40,12 @@ public class LineupPositionEntity {
     @Column(name = "current_position")
     private Integer currentPosition;
 
+    @Column(name = "is_setter")
+    private Boolean isSetter;
+
+    @Column(name = "libero_swap_target")
+    private Boolean liberoSwapTarget;
+
     @Builder.Default
     @Column(name = "is_active")
     private Boolean isActive = true;

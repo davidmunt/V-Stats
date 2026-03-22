@@ -30,85 +30,6 @@ public class LineupService {
         private final SeasonPlayerRepository seasonPlayerRepository;
         private final AuthUtils authUtils;
 
-        // @Transactional
-        // public LineupResponse createLineup(CreateLineupRequest request, String
-        // slugMatch) {
-        // Long coachId = authUtils.getCurrentUserId();
-        // CoachEntity coach = coachRepository.findById(coachId)
-        // .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN,
-        // "No tienes permiso para crear esta alineación"));
-        // Long teamId = coach.getTeam().getIdTeam();
-        // MatchEntity match = matchRepository.findBySlug(slugMatch)
-        // .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-        // "Partido no encontrado"));
-
-        // TeamEntity team = teamRepository.findById(teamId)
-        // .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-        // "Equipo no encontrado"));
-
-        // List<CreateLineupRequest.PlayerPositionRequest> posReq =
-        // request.getPositions();
-        // if (posReq == null || posReq.size() < 6 || posReq.size() > 7) {
-        // throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-        // "La alineación debe tener entre 6 y 7 jugadores");
-        // }
-
-        // Set<Integer> uniquePositions = posReq.stream()
-        // .map(CreateLineupRequest.PlayerPositionRequest::getPosition)
-        // .peek(p -> {
-        // if (p < 1 || p > 7)
-        // throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-        // "Posición inválida: " + p);
-        // })
-        // .collect(Collectors.toSet());
-
-        // if (uniquePositions.size() != posReq.size()) {
-        // throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-        // "No puede haber posiciones duplicadas");
-        // }
-
-        // LineupEntity lineup = lineupRepository
-        // .findByMatch_IdMatchAndTeam_IdTeam(match.getIdMatch(), team.getIdTeam())
-        // .orElseGet(() -> {
-        // String slug = "lineup-" + slugMatch + "-" + team.getSlug();
-        // return lineupRepository.save(LineupEntity.builder()
-        // .slug(slug)
-        // .match(match)
-        // .team(team)
-        // .status("active")
-        // .isActive(true)
-        // .build());
-        // });
-
-        // if (lineup.getIdLineup() != null) {
-        // lineupPositionRepository.deleteByLineup_IdLineup(lineup.getIdLineup());
-        // }
-
-        // List<LineupPositionEntity> savedPositions = new ArrayList<>();
-
-        // for (CreateLineupRequest.PlayerPositionRequest pReq : posReq) {
-        // SeasonPlayerEntity sp = seasonPlayerRepository
-        // .findByPlayer_SlugAndSeason_IsActiveTrue(pReq.getPlayer_id())
-        // .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-        // "Jugador no encontrado: " + pReq.getPlayer_id()));
-
-        // LineupPositionEntity lp = LineupPositionEntity.builder()
-        // .slug(lineup.getSlug() + "-pos-" + pReq.getPosition())
-        // .lineup(lineup)
-        // .player(sp.getPlayer())
-        // .initialPosition(pReq.getPosition())
-        // .currentPosition(pReq.getPosition())
-        // .isOnCourt(pReq.getPosition() <= 6)
-        // .status("active")
-        // .isActive(true)
-        // .build();
-
-        // savedPositions.add(lineupPositionRepository.save(lp));
-        // }
-
-        // return mapToResponse(lineup, savedPositions);
-        // }
-
         @Transactional
         public LineupResponse createLineup(CreateLineupRequest request, String slugMatch) {
                 Long currentUserId = authUtils.getCurrentUserId();
@@ -190,6 +111,8 @@ public class LineupService {
                                         .initialPosition(pReq.getPosition())
                                         .currentPosition(pReq.getPosition())
                                         .isOnCourt(pReq.getPosition() <= 6)
+                                        .isSetter(pReq.getIsSetter())
+                                        .liberoSwapTarget(pReq.getLiberoSwapTarget())
                                         .status("active")
                                         .isActive(true)
                                         .build();
@@ -233,6 +156,8 @@ public class LineupService {
                                                 .image(lp.getPlayer().getImage())
                                                 .dorsal(0)
                                                 .role("PLAYER")
+                                                .is_setter(lp.getIsSetter())
+                                                .libero_swap_target(lp.getLiberoSwapTarget())
                                                 .initial_position(lp.getInitialPosition())
                                                 .current_position(lp.getCurrentPosition())
                                                 .is_on_court(lp.getIsOnCourt())
@@ -287,6 +212,8 @@ public class LineupService {
                                 // AQUÍ ESTÁ LA MAGIA: Si existe en la temporada, ponemos su dorsal y rol real
                                 .dorsal(sp != null ? sp.getDorsal() : 0)
                                 .role(sp != null ? sp.getRole() : "PLAYER")
+                                .is_setter(lp.getIsSetter())
+                                .libero_swap_target(lp.getLiberoSwapTarget())
                                 .build();
         }
 
@@ -345,14 +272,11 @@ public class LineupService {
                                                         .slug_team(lineup.getTeam().getSlug())
                                                         .slug_player(p.getSlug())
                                                         .name(p.getName())
-                                                        // Si PlayerEntity no tiene role/dorsal, usamos valores de la
-                                                        // posición o defecto
+                                                        .is_setter(lp.getIsSetter())
+                                                        .libero_swap_target(lp.getLiberoSwapTarget())
                                                         .role(sp != null ? sp.getRole() : "PLAYER")
                                                         .image(p.getImage())
-                                                        .dorsal(sp != null ? sp.getDorsal() : 0) // El dorsal real está
-                                                                                                 // en SeasonPlayer, pon
-                                                                                                 // 0 o
-                                                        // búscalo si es crítico
+                                                        .dorsal(sp != null ? sp.getDorsal() : 0)
                                                         .is_on_court(lp.getIsOnCourt())
                                                         .initial_position(lp.getInitialPosition())
                                                         .current_position(lp.getCurrentPosition())

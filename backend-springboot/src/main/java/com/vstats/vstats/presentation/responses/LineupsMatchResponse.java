@@ -35,6 +35,8 @@ public class LineupsMatchResponse {
         private Integer initial_position;
         private Integer current_position;
         private Boolean is_on_court;
+        private Boolean is_setter;
+        private Boolean libero_swap_target;
         private String name;
         private Integer dorsal;
         private String role;

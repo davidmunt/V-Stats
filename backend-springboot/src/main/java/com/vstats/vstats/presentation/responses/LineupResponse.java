@@ -30,6 +30,8 @@ public class LineupResponse {
         private String slug_lineup;
         private String slug_team;
         private String slug_player;
+        private Boolean is_setter;
+        private Boolean libero_swap_target;
         private String name;
         private String role;
         private String image;
