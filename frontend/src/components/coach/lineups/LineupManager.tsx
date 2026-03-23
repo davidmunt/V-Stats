@@ -107,29 +107,50 @@ export const LineupManager = ({ coachSlug }: LineupManagerProps) => {
     }
   };
   const handleSave = async () => {
+    // 1. Validaciones de posiciones completas (1-6)
     const missingPositions = [1, 2, 3, 4, 5, 6].filter((pos) => !lineupState[pos]);
     if (missingPositions.length > 0) {
-      return Swal.fire({ title: "Incompleto", text: "Faltan posiciones", icon: "warning" });
+      return Swal.fire({ title: "Incompleto", text: "Faltan jugadores en posiciones 1-6", icon: "warning" });
     }
+
+    // 2. Validación de Colocador
     if (!setterPos || !lineupState[setterPos]) {
       return Swal.fire({ title: "Falta Colocador", text: "Haz clic en un jugador para marcarlo como Colocador", icon: "info" });
     }
-    const central1 = lineupState[3];
-    const central2 = lineupState[6];
 
+    // --- LÓGICA DINÁMICA 5-1 ---
+
+    // Calculamos la posición DIAGONAL (Opuesta) al colocador
+    // Regla: 1<->4, 2<->5, 3<->6
+    const oppositePos = setterPos > 3 ? setterPos - 3 : setterPos + 3;
+
+    // Filtramos los candidatos: Excluimos al Colocador, a su Opuesto y al Líbero (pos 7)
+    const availableOptions: Record<string, string> = {};
+
+    [1, 2, 3, 4, 5, 6].forEach((pos) => {
+      const player = lineupState[pos];
+      // Solo permitimos elegir a los que NO son ni el colocador ni su opuesto
+      if (player && pos !== setterPos && pos !== oppositePos) {
+        availableOptions[player.slug_player] = `${player.name} (P-${pos})`;
+      }
+    });
+
+    // 3. Lanzar el Swal con los 4 jugadores restantes (Normalmente los 2 Centrales y 2 Puntas)
     const { value: liberoTarget } = await Swal.fire({
       title: "Configuración de Líbero",
-      text: "¿A qué central sustituirá el líbero?",
+      text: `El Colocador está en ${setterPos} y su Opuesto en ${oppositePos}. ¿Por qué jugador entrará el líbero?`,
       input: "radio",
-      inputOptions: {
-        [central1?.slug_player || "c1"]: central1?.name || "Central 1 (Pos 3)",
-        [central2?.slug_player || "c2"]: central2?.name || "Central 2 (Pos 6)",
-      },
+      inputOptions: availableOptions,
       inputValidator: (value) => {
         if (!value) return "¡Debes elegir un jugador!";
       },
+      confirmButtonColor: "#3b82f6",
+      showCancelButton: true,
     });
+
     if (!liberoTarget) return;
+
+    // 4. Preparar el guardado
     const positionsToSave = Object.entries(lineupState)
       .filter(([, player]) => player !== null)
       .map(([pos, player]) => ({
@@ -145,16 +166,10 @@ export const LineupManager = ({ coachSlug }: LineupManagerProps) => {
         slug_team: currentUser?.slug_team || "",
         positions: positionsToSave,
       });
-      Swal.fire({ title: "Guardado", icon: "success", timer: 1500, showConfirmButton: false });
+      Swal.fire({ title: "¡Guardado!", icon: "success", timer: 1500, showConfirmButton: false });
     } catch (error: unknown) {
-      const errMsg =
-        (error as { response?: { data?: { message?: string } } })?.response?.data?.message || "Hubo un error al guardar la alineación.";
-      Swal.fire({
-        title: "Error",
-        text: errMsg,
-        icon: "error",
-        confirmButtonColor: "#ef4444",
-      });
+      const errMsg = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || "Error al guardar";
+      Swal.fire({ title: "Error", text: errMsg, icon: "error" });
     }
   };
   if (isLoadingMatch || isLoadingPlayers || isLoadingLineup) return <LoadingFallback />;
