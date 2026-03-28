@@ -13,7 +13,7 @@ class StatResponse(BaseModel):
     player_position: int
     action_type: str
     result: str
-    slug_point_for_team: str
+    slug_point_for_team: Optional[str] = None
     start_x: float
     start_y: float
     end_x: float
@@ -34,7 +34,7 @@ class StatResponse(BaseModel):
             player_position=dto.player_position,
             action_type=dto.action_type,
             result=dto.result,
-            slug_point_for_team=dto.slug_point_for_team,
+            slug_point_for_team=dto.slug_point_for_team if dto.slug_point_for_team else None,
             start_x=dto.start_x,
             start_y=dto.start_y,
             end_x=dto.end_x,

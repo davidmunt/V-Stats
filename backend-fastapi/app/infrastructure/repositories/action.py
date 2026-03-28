@@ -1,5 +1,5 @@
 from typing import Optional
-from sqlalchemy import case, func, select, and_
+from sqlalchemy import case, func, select, and_, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.domain.repositories.action import IActionRepository
 from app.infrastructure.models.action import Action
@@ -72,14 +72,22 @@ class ActionRepository(IActionRepository):
         await session.flush()
 
     async def get_actions_type_from_team(self, session: AsyncSession, id_team: int, action_type: str) -> list[Action]:
-        """Obtiene todas las acciones de un tipo específico que han generado punto para un equipo."""
+        """Obtiene acciones que generaron punto o saques que mantuvieron el juego."""
         query = (
             select(Action)
             .where(
                 and_(
                     Action.id_team == id_team,
                     Action.action_type == action_type,
-                    Action.id_point_for_team == id_team,
+                    or_(
+                        # Condición 1: Generó punto directo para el equipo
+                        Action.id_point_for_team == id_team,
+                        # Condición 2: Es un saque y el resultado es positivo o neutro (+, -, !, etc.)
+                        and_(
+                            Action.action_type == 'SERVE',
+                            Action.result.in_(['+', '-']) 
+                        )
+                    )
                 )
             )
             .options(
@@ -115,14 +123,22 @@ class ActionRepository(IActionRepository):
         return result.scalars().unique().all()
     
     async def get_actions_type_from_player(self, session: AsyncSession, id_player: int, action_type: str) -> list[Action]:
-        """Obtiene todas las acciones de un tipo específico que han generado punto para un jugador."""
+        """Obtiene acciones de punto o saques continuos para un jugador específico."""
         query = (
             select(Action)
             .where(
                 and_(
                     Action.id_player == id_player,
                     Action.action_type == action_type,
-                    Action.id_point_for_team == Action.id_team 
+                    or_(
+                        # Condición 1: El punto fue para el equipo del jugador
+                        Action.id_point_for_team == Action.id_team,
+                        # Condición 2: Saques que no terminaron en punto pero fueron válidos
+                        and_(
+                            Action.action_type == 'SERVE',
+                            Action.result.in_(['+', '-'])
+                        )
+                    )
                 )
             )
             .options(
