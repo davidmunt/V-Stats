@@ -10,35 +10,43 @@ interface ActionHistoryItem {
 
 export const getAllowedActions = (history: ActionHistoryItem[], selectedPlayer: LineupPosition): ActionType[] => {
   const lastAction = history[0];
+  const currentPos = selectedPlayer.current_position;
+  let allowedActions: ActionType[] = [];
 
   if (!lastAction) {
-    return ["SERVE", "RECEPTION"];
-  }
+    allowedActions = ["SERVE", "RECEPTION"];
+  } else {
+    const lastResult = lastAction.result;
+    const lastType = lastAction.action_type;
 
-  const lastResult = lastAction.result;
-  const lastType = lastAction.action_type;
-
-  if (lastResult === "++" || lastResult === "--") {
-    if (lastResult === "++") {
-      return ["SERVE"];
+    if (lastResult === "++" || lastResult === "--") {
+      if (lastResult === "++") {
+        allowedActions = ["SERVE"];
+      } else {
+        // lastResult === "--"
+        if (currentPos === 3 || currentPos === 6) {
+          allowedActions = ["RECEPTION", "SET"];
+        } else {
+          allowedActions = ["RECEPTION"];
+        }
+      }
+    } else if ((lastType === "RECEPTION" || lastType === "DIG") && ["+", "-"].includes(lastResult)) {
+      allowedActions = ["SET", "ATTACK"];
+    } else if (lastType === "SET" && ["+", "-"].includes(lastResult)) {
+      allowedActions = ["ATTACK", "SET"];
+    } else if ((lastType === "ATTACK" || lastType === "BLOCK" || lastType === "SERVE") && ["+", "-"].includes(lastResult)) {
+      allowedActions = ["BLOCK", "DIG", "SET"];
+    } else {
+      allowedActions = ["RECEPTION", "SET", "ATTACK", "BLOCK", "DIG"];
     }
-    if (selectedPlayer.current_position === 3 || selectedPlayer.current_position === 6) {
-      return ["RECEPTION", "SET"];
-    }
-    return ["RECEPTION"];
   }
 
-  if ((lastType === "RECEPTION" || lastType === "DIG") && ["+", "-"].includes(lastResult)) {
-    return ["SET", "ATTACK"];
+  if ([1, 5, 6].includes(currentPos)) {
+    allowedActions = allowedActions.filter((action) => action !== "BLOCK");
+  }
+  if (currentPos !== 1) {
+    allowedActions = allowedActions.filter((action) => action !== "SERVE");
   }
 
-  if (lastType === "SET" && ["+", "-"].includes(lastResult)) {
-    return ["ATTACK", "SET"];
-  }
-
-  if ((lastType === "ATTACK" || lastType === "BLOCK" || lastType === "SERVE") && ["+", "-"].includes(lastResult)) {
-    return ["BLOCK", "DIG", "SET"];
-  }
-
-  return ["RECEPTION", "SET", "ATTACK", "BLOCK", "DIG"];
+  return allowedActions;
 };
