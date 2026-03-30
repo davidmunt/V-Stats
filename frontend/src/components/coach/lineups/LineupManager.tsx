@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { DndContext } from "@dnd-kit/core";
 import type { DragEndEvent } from "@dnd-kit/core";
 import Swal from "sweetalert2";
 
@@ -8,7 +7,7 @@ import { usePlayersCoachQuery } from "@/queries/players/usePlayersCoach";
 import { useCoachLineupQuery } from "@/queries/lineups/useCoachLineup";
 import { useSaveLineupMutation } from "@/mutations/lineups/useSaveLineup";
 import { useCurrentUserQuery } from "@/queries/auth/useCurrentUser";
-
+import { DndContext, useSensor, useSensors, PointerSensor, TouchSensor } from "@dnd-kit/core";
 import type { Player } from "@/interfaces/player.interface";
 import LoadingFallback from "@/components/LoadingFallback";
 
@@ -39,6 +38,19 @@ export const LineupManager = ({ coachSlug }: LineupManagerProps) => {
     7: null,
   });
   const [setterPos, setSetterPos] = useState<number | null>(null);
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5, // Requiere mover el ratón 5 píxeles para iniciar el Drag
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 150, // En móviles, requiere mantener pulsado 150ms para arrastrar
+        tolerance: 5, // Permite un ligero temblor del dedo sin cancelar el clic
+      },
+    }),
+  );
   useEffect(() => {
     // 1. Solución error 'undefined': Verificamos existencia explícitamente
     if (!existingLineupData || !existingLineupData.positions || existingLineupData.positions.length === 0) {
@@ -78,33 +90,45 @@ export const LineupManager = ({ coachSlug }: LineupManagerProps) => {
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over) return;
+
     const draggedPlayer = active.data.current?.player as Player;
+    const fromPos = active.data.current?.fromPos; // Posición de origen (1-7 o 'bench')
+
     if (!draggedPlayer) return;
-    if (over.id === "bench") {
-      setLineupState((prev) => {
-        const newState = { ...prev };
-        Object.keys(newState).forEach((key) => {
-          if (newState[Number(key)]?.slug_player === draggedPlayer.slug_player) {
-            newState[Number(key)] = null;
-          }
-        });
-        return newState;
+
+    setLineupState((prev) => {
+      const newState = { ...prev };
+
+      // 1. Limpiar la posición anterior del jugador en la pista (si estaba en una)
+      Object.keys(newState).forEach((key) => {
+        if (newState[Number(key)]?.slug_player === draggedPlayer.slug_player) {
+          newState[Number(key)] = null;
+        }
       });
-      return;
-    }
-    if (typeof over.id === "string" && over.id.startsWith("pos-")) {
-      const targetPos = Number(over.id.split("-")[1]);
-      setLineupState((prev) => {
-        const newState = { ...prev };
-        Object.keys(newState).forEach((key) => {
-          if (newState[Number(key)]?.slug_player === draggedPlayer.slug_player) {
-            newState[Number(key)] = null;
-          }
-        });
+
+      // 2. Si el destino es el banquillo, ya hemos terminado (al poner a null arriba)
+      if (over.id === "bench") {
+        // Si el jugador que quitamos era el setter, reseteamos setterPos
+        if (fromPos === setterPos) setSetterPos(null);
+        return newState;
+      }
+
+      // 3. Si el destino es una zona de la pista
+      if (typeof over.id === "string" && over.id.startsWith("pos-")) {
+        const targetPos = Number(over.id.split("-")[1]);
+
+        // Si la posición de destino ya tenía un jugador, ese jugador "vuelve al banquillo"
+        // (o podrías implementar un intercambio, pero por ahora vuelve al banquillo)
         newState[targetPos] = draggedPlayer;
-        return newState;
-      });
-    }
+
+        // Si movimos al jugador que era setter a una nueva posición, actualizamos la marca
+        if (fromPos === setterPos) {
+          setSetterPos(targetPos);
+        }
+      }
+
+      return newState;
+    });
   };
   const handleSave = async () => {
     // 1. Validaciones de posiciones completas (1-6)
@@ -193,7 +217,7 @@ export const LineupManager = ({ coachSlug }: LineupManagerProps) => {
         </button>
       </div>
 
-      <DndContext onDragEnd={handleDragEnd}>
+      <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           <div className="lg:col-span-7">
             <VolleyballCourt

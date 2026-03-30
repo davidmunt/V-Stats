@@ -1,4 +1,5 @@
-import { useDroppable } from "@dnd-kit/core";
+import { useDroppable, useDraggable } from "@dnd-kit/core"; // Añadimos useDraggable
+import { CSS } from "@dnd-kit/utilities";
 import type { Player } from "@/interfaces/player.interface";
 
 interface CourtZoneProps {
@@ -10,32 +11,56 @@ interface CourtZoneProps {
 }
 
 const CourtZone = ({ id, label, player, isSetter, onSelect }: CourtZoneProps) => {
-  const { isOver, setNodeRef } = useDroppable({ id: `pos-${id}` });
+  // El Droppable siempre está activo en la zona
+  const { isOver, setNodeRef: setDroppableRef } = useDroppable({ id: `pos-${id}` });
+
+  // El Draggable solo se activa si hay un jugador
+  const {
+    attributes,
+    listeners,
+    setNodeRef: setDraggableRef,
+    transform,
+    isDragging,
+  } = useDraggable({
+    id: player ? `draggable-${player.slug_player}` : `empty-${id}`,
+    disabled: !player,
+    data: { player, fromPos: id }, // Enviamos la posición de origen
+  });
+
+  const style = {
+    transform: CSS.Translate.toString(transform),
+    zIndex: isDragging ? 100 : undefined,
+  };
 
   return (
     <div
-      ref={setNodeRef}
-      onClick={() => player && onSelect(id)}
+      ref={setDroppableRef}
       className={`
-        relative flex flex-col items-center justify-center p-4 rounded-3xl border-2 transition-all h-32 w-full cursor-pointer
+        relative flex flex-col items-center justify-center p-4 rounded-3xl border-2 transition-all h-32 w-full
         ${isOver ? "bg-blue-50 border-blue-400 shadow-inner" : "bg-white border-dashed border-slate-200"}
         ${player ? (isSetter ? "border-amber-400 bg-amber-50/30" : "border-solid border-slate-100 shadow-md") : ""}
-        ${isSetter ? "ring-2 ring-amber-400 ring-offset-2" : ""}
+        ${isDragging ? "opacity-40" : ""}
       `}
     >
-      {/* Icono de Setter */}
-      {isSetter && (
-        <div className="absolute -top-2 -right-2 bg-amber-400 text-white text-[10px] font-black px-2 py-1 rounded-full shadow-sm z-10 animate-bounce">
-          SETTER
-        </div>
-      )}
-
-      <span className="absolute top-2 left-3 text-[9px] font-black text-slate-300 uppercase tracking-tighter">
+      {/* Marcador de posición */}
+      <span className="absolute top-2 left-3 text-[9px] font-black text-slate-300 uppercase">
         Pos {id} — {label}
       </span>
 
       {player ? (
-        <div className="flex flex-col items-center">
+        <div
+          ref={setDraggableRef}
+          style={style}
+          {...listeners}
+          {...attributes}
+          onClick={() => onSelect(id)} // Permitir seleccionar setter al hacer click
+          className="flex flex-col items-center cursor-grab active:cursor-grabbing touch-none"
+        >
+          {isSetter && (
+            <div className="absolute -top-2 -right-2 bg-amber-400 text-white text-[10px] font-black px-2 py-1 rounded-full shadow-sm z-10">
+              SETTER
+            </div>
+          )}
           <div
             className={`w-12 h-12 rounded-full border-2 shadow-sm overflow-hidden flex items-center justify-center ${isSetter ? "border-amber-400" : "border-white bg-slate-100"}`}
           >
