@@ -13,25 +13,29 @@ import java.util.Optional;
 
 @Repository
 public interface SeasonTeamRepository
-        extends JpaRepository<SeasonTeamEntity, Long>, JpaSpecificationExecutor<SeasonTeamEntity> {
-    List<SeasonTeamEntity> findAllBySeason_IsActiveTrue();
+                extends JpaRepository<SeasonTeamEntity, Long>, JpaSpecificationExecutor<SeasonTeamEntity> {
 
-    Optional<SeasonTeamEntity> findByTeam_SlugAndSeason_IsActiveTrue(String slug);
+        // 1. Para encontrar la inscripción activa del Coach (ChatService Paso 1)
+        Optional<SeasonTeamEntity> findByCoach_IdCoachAndSeason_IsActiveTrue(Long idCoach);
 
-    Optional<SeasonTeamEntity> findByTeam_IdTeamAndSeason_IdSeason(Long idTeam, Long idSeason);
+        // 2. Para encontrar a todos los equipos de una temporada (ChatService Paso 4)
+        List<SeasonTeamEntity> findAllBySeason_IdSeason(Long idSeason);
 
-    List<SeasonTeamEntity> findAllByLeague_IdLeagueAndSeason_IsActiveTrue(Long idLeague);
+        // --- Otros métodos útiles que ya tenías (mantenlos solo una vez) ---
+        List<SeasonTeamEntity> findAllBySeason_IsActiveTrue();
 
-    List<SeasonTeamEntity> findAllByLeague_Admin_IdAdminAndSeason_IsActiveTrue(Long idAdmin);
+        Optional<SeasonTeamEntity> findByTeam_SlugAndSeason_IsActiveTrue(String slug);
 
-    List<SeasonTeamEntity> findAllByLeague_SlugAndSeason_IsActiveTrue(String leagueSlug);
+        Optional<SeasonTeamEntity> findByTeam_IdTeamAndSeason_IdSeason(Long idTeam, Long idSeason);
 
-    @Query("SELECT st FROM SeasonTeamEntity st " +
-            "WHERE st.season.isActive = true " +
-            "AND st.season.idSeason = (SELECT cst.season.idSeason FROM SeasonTeamEntity cst WHERE cst.coach.idCoach = :idCoach AND cst.season.isActive = true) "
-            +
-            "AND st.coach.idCoach != :idCoach")
-    List<SeasonTeamEntity> findRivalTeamsByCoachId(@Param("idCoach") Long idCoach);
+        List<SeasonTeamEntity> findAllByLeague_IdLeagueAndSeason_IsActiveTrue(Long idLeague);
 
-    Optional<SeasonTeamEntity> findByTeam_Slug(String slug);
+        @Query("SELECT st FROM SeasonTeamEntity st " +
+                        "WHERE st.season.isActive = true " +
+                        "AND st.season.idSeason = (SELECT cst.season.idSeason FROM SeasonTeamEntity cst WHERE cst.coach.idCoach = :idCoach AND cst.season.isActive = true) "
+                        +
+                        "AND st.coach.idCoach != :idCoach")
+        List<SeasonTeamEntity> findRivalTeamsByCoachId(@Param("idCoach") Long idCoach);
+
+        Optional<SeasonTeamEntity> findByTeam_Slug(String slug);
 }
