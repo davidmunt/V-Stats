@@ -312,3 +312,51 @@ class ActionService(IActionService):
         
         stats_dto = await self._action_repo.get_general_stats_by_team(session, team.id_team, team_slug)
         return stats_dto
+    
+    async def get_actions_type_from_team_match_team(self, session: Any, team_slug: str, action_type: str, match_slug: str) -> list[ActionStatDTO]:
+        team = await self._team_repo.get_by_slug(session, team_slug)
+        if not team:
+            raise ValueError("TEAM_NOT_FOUND")
+
+        match = await self._match_repo.get_model_by_slug(session, match_slug)
+        if not match:
+            raise ValueError("MATCH_NOT_FOUND")
+
+        actions = await self._action_repo.get_actions_type_from_team_match(session, team.id_team, action_type, match.id_match)
+        return [ActionModelMapper.to_stat_dto(a) for a in actions]
+    
+    async def get_actions_type_from_team_match_against_team(self, session: Any, team_slug: str, action_type: str, match_slug: str) -> list[ActionStatDTO]:
+        team = await self._team_repo.get_by_slug(session, team_slug)
+        if not team:
+            raise ValueError("TEAM_NOT_FOUND")
+
+        match = await self._match_repo.get_model_by_slug(session, match_slug)
+        if not match:
+            raise ValueError("MATCH_NOT_FOUND")
+
+        actions = await self._action_repo.get_actions_type_from_team_match_against_team(session, team.id_team, action_type, match.id_match)
+        return [ActionModelMapper.to_stat_dto(a) for a in actions]
+    
+    async def get_actions_type_from_player_match_team(self, session: Any, player_slug: str, action_type: str, match_slug: str) -> list[ActionStatDTO]:
+        player = await self._player_repo.get_by_slug(session, player_slug)
+        if not player:
+            raise ValueError("PLAYER_NOT_FOUND")
+
+        match = await self._match_repo.get_model_by_slug(session, match_slug)
+        if not match:
+            raise ValueError("MATCH_NOT_FOUND")
+
+        actions = await self._action_repo.get_actions_type_from_player_match(session, player.id_player, action_type, match.id_match)
+        return [ActionModelMapper.to_stat_dto(a) for a in actions]
+    
+    async def get_actions_type_from_player_match_against_team(self, session: Any, player_slug: str, action_type: str, match_slug: str) -> list[ActionStatDTO]:
+        player = await self._player_repo.get_by_slug(session, player_slug)
+        if not player:
+            raise ValueError("PLAYER_NOT_FOUND")
+
+        match = await self._match_repo.get_model_by_slug(session, match_slug)
+        if not match:
+            raise ValueError("MATCH_NOT_FOUND")
+
+        actions = await self._action_repo.get_actions_type_from_player_match_against_team(session, player.id_player, action_type, match.id_match)
+        return [ActionModelMapper.to_stat_dto(a) for a in actions]

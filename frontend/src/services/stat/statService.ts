@@ -30,3 +30,29 @@ export const getGeneralStatsForTeam = async (teamSlug: string) => {
   const response = await apiClient.get<StatGeneral>("fastapi", `/api/stats/team/${teamSlug}/general`);
   return response.data;
 };
+
+export const getStatsForTeamMatch = async (teamSlug: string, actionType: string, matchSlug: string) => {
+  const response = await apiClient.get<StatsResponse>("fastapi", `/api/stats/team/${teamSlug}/type/${actionType}/match/${matchSlug}`);
+  return response.data;
+};
+
+export const getStatsAgainstTeamMatch = async (teamSlug: string, actionType: string, matchSlug: string) => {
+  const response = await apiClient.get<StatsResponse>(
+    "fastapi",
+    `/api/stats/team/${teamSlug}/type/${actionType}/match/${matchSlug}/against`,
+  );
+  return response.data;
+};
+
+export const getStatsForPlayerTeamMatch = async (playerSlug: string, actionType: string, matchSlug: string) => {
+  const response = await apiClient.get<StatsResponse>("fastapi", `/api/stats/player/${playerSlug}/type/${actionType}/match/${matchSlug}`);
+  return response.data;
+};
+
+export const getStatsAgainstPlayerTeamMatch = async (playerSlug: string, actionType: string, matchSlug: string) => {
+  const response = await apiClient.get<StatsResponse>(
+    "fastapi",
+    `/api/stats/player/${playerSlug}/type/${actionType}/match/${matchSlug}/against`,
+  );
+  return response.data;
+};

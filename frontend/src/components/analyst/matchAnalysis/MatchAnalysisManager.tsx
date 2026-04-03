@@ -11,6 +11,7 @@ import LoadingFallback from "@/components/LoadingFallback";
 import type { LineupPosition } from "@/interfaces/lineupPosition.interface";
 import Swal from "sweetalert2";
 import { useFinishedSetsQuery } from "@/queries/set/useSetsFromMatch";
+import { PostMatchStats } from "./PostMatchStats";
 
 export const MatchAnalysisManager = ({ analystSlug }: { analystSlug: string }) => {
   const [selectedPosition, setSelectedPosition] = useState<LineupPosition | null>(null);
@@ -20,10 +21,21 @@ export const MatchAnalysisManager = ({ analystSlug }: { analystSlug: string }) =
   const { data: finishedSetsData } = useFinishedSetsQuery(match?.slug_match || "");
   const previousMatchSlug = useRef<string | null>(null);
   const lastScore = useRef({ local: 0, visitor: 0 });
+  const [showFinalStats, setShowFinalStats] = useState(false);
+  const [finalScore, setFinalScore] = useState({ local: 0, visitor: 0 });
+  const [finishedMatchSlug, setFinishedMatchSlug] = useState<string>("");
 
   useEffect(() => {
+    // 1. DETECTAR SI EL PARTIDO HA FINALIZADO
     if (previousMatchSlug.current && (!match || match.slug_match !== previousMatchSlug.current)) {
+      // Si ya estamos mostrando las estadísticas finales, no hacemos nada más
+      if (showFinalStats) return;
+
       const { local, visitor } = lastScore.current;
+
+      // Congelamos el slug del partido y el marcador en el estado
+      setFinishedMatchSlug(previousMatchSlug.current);
+      setFinalScore({ local, visitor });
 
       Swal.fire({
         title: "¡Partido Finalizado!",
@@ -31,40 +43,44 @@ export const MatchAnalysisManager = ({ analystSlug }: { analystSlug: string }) =
         <div class="py-4">
           <div class="flex justify-center items-center gap-6 mb-2">
             <div class="text-center">
-              <span class="block text-[10px] font-black text-gray-400 uppercase">Local</span>
+              <span class="block text-[10px] font-black text-gray-400 uppercase">Sets Local</span>
               <span class="text-4xl font-black text-slate-800">${local}</span>
             </div>
             <div class="text-2xl font-black text-gray-300 mt-4">-</div>
             <div class="text-center">
-              <span class="block text-[10px] font-black text-gray-400 uppercase">Visitante</span>
+              <span class="block text-[10px] font-black text-gray-400 uppercase">Sets Visitante</span>
               <span class="text-4xl font-black text-slate-800">${visitor}</span>
             </div>
           </div>
           <p class="text-sm font-bold text-blue-600 uppercase tracking-widest mt-4">
             ${local > visitor ? "Victoria Local" : "Victoria Visitante"}
           </p>
+          <p class="text-[11px] text-slate-400 mt-2 italic text-center">Analiza el rendimiento del equipo antes de salir</p>
         </div>
       `,
         icon: "success",
-        confirmButtonText: "Entendido",
-        confirmButtonColor: "#1e293b",
+        confirmButtonText: "Ver Estadísticas Finales",
+        confirmButtonColor: "#2563eb",
         allowOutsideClick: false,
       }).then((result) => {
         if (result.isConfirmed) {
-          window.location.reload();
+          setShowFinalStats(true);
         }
       });
+
+      // Limpiamos la referencia para evitar que el Swal salte múltiples veces si el componente se re-renderiza
+      previousMatchSlug.current = null;
     }
-    if (match) {
+
+    // 2. MIENTRAS EL PARTIDO ESTÁ VIVO
+    if (match && match.status === "live") {
       previousMatchSlug.current = match.slug_match;
+
       if (finishedSetsData && finishedSetsData.length > 0) {
         const score = finishedSetsData.reduce(
           (acc, set) => {
-            if (set.local_points > set.visitor_points) {
-              acc.local += 1;
-            } else if (set.visitor_points > set.local_points) {
-              acc.visitor += 1;
-            }
+            if (set.local_points > set.visitor_points) acc.local += 1;
+            else if (set.visitor_points > set.local_points) acc.visitor += 1;
             return acc;
           },
           { local: 0, visitor: 0 },
@@ -72,14 +88,34 @@ export const MatchAnalysisManager = ({ analystSlug }: { analystSlug: string }) =
         lastScore.current = score;
       }
     }
-  }, [match, finishedSetsData]);
+  }, [match, finishedSetsData, showFinalStats]);
 
+  // RENDERIZADO LÓGICO
+  if (showFinalStats) {
+    return (
+      <PostMatchStats
+        // Usamos el slug del equipo local (que suele ser el analizado) o el que corresponda
+        teamSlug={match?.slug_team_local || lineups?.home.slug_team || ""}
+        matchSlug={finishedMatchSlug}
+        score={finalScore}
+      />
+    );
+  }
+  // ... resto del componente
+
+  // 2. Fallbacks de carga y error habituales
   if (isLoadingMatch || isLoadingSet || isLoadingMatchLineups) return <LoadingFallback />;
-  if (!match || !actualSet) return <div className="p-8 text-center text-gray-500">No se encontraron los datos del partido.</div>;
 
+  if (!match || !actualSet) {
+    return <div className="p-8 text-center text-gray-500">No hay partido en curso.</div>;
+  }
+
+  // 3. Si el partido está pendiente de empezar
   if (match.status !== "live") {
     return <StartAnalysing match={match} analystSlug={analystSlug} />;
   }
+
+  // ... resto del render normal (Scoreboard, AnalysisCourt, etc.)
 
   const formatLineup = (positions: LineupPosition[], teamSlug: string) => {
     const map: Record<number, LineupPosition> = {};

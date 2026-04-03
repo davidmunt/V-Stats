@@ -13,9 +13,6 @@ const YourTeamStats = () => {
   const { user } = useAuthContext();
   const teamSlug = user?.slug_team || "";
 
-  // ==========================================
-  // 1. QUERIES DEL EQUIPO (Balance Colectivo)
-  // ==========================================
   const { data: serveFor, isLoading: loadingServeFor } = useTypeStatsForTeamQuery(teamSlug, "SERVE");
   const { data: attackFor, isLoading: loadingAttackFor } = useTypeStatsForTeamQuery(teamSlug, "ATTACK");
   const { data: blockFor, isLoading: loadingBlockFor } = useTypeStatsForTeamQuery(teamSlug, "BLOCK");
@@ -34,16 +31,11 @@ const YourTeamStats = () => {
     loadingReceptionAgainst ||
     loadingBlockAgainst;
 
-  // ==========================================
-  // 2. QUERIES DEL JUGADOR (Rendimiento Individual)
-  // ==========================================
   const [selectedPlayerSlug, setSelectedPlayerSlug] = useState<string>("");
   const { data: players } = usePlayersFromTeamQuery(teamSlug);
 
-  // Si no hay jugador seleccionado, pillamos el primero de la lista
   const activePlayerSlug = selectedPlayerSlug || (players && players.length > 0 ? players[0].slug_player : "");
 
-  // Cargamos todas las acciones del jugador seleccionado
   const { data: pServeFor, isLoading: lpServeFor } = useTypeStatsForPlayerQuery(activePlayerSlug, "SERVE");
   const { data: pAttackFor, isLoading: lpAttackFor } = useTypeStatsForPlayerQuery(activePlayerSlug, "ATTACK");
   const { data: pBlockFor, isLoading: lpBlockFor } = useTypeStatsForPlayerQuery(activePlayerSlug, "BLOCK");
@@ -58,7 +50,6 @@ const YourTeamStats = () => {
 
   return (
     <div className="space-y-12 animate-in fade-in duration-500 pb-20">
-      {/* SECCIÓN 1: MI EQUIPO */}
       <section className="space-y-6">
         <div className="bg-white p-6 rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 flex flex-col lg:flex-row justify-between items-center gap-6">
           <div className="space-y-1 text-center lg:text-left">
@@ -92,7 +83,6 @@ const YourTeamStats = () => {
         )}
       </section>
 
-      {/* SECCIÓN 3: TABLA DE PORCENTAJES */}
       <section className="bg-white p-8 rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100">
         <div className="mb-6">
           <h4 className="text-sm font-black text-slate-800 uppercase tracking-widest italic">Porcentajes de Eficacia Global</h4>
@@ -101,7 +91,6 @@ const YourTeamStats = () => {
         <StatsTable slug_team={teamSlug} />
       </section>
 
-      {/* SECCIÓN 2: MIS JUGADORES */}
       <section className="space-y-6">
         <div className="bg-white p-6 rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 flex flex-col lg:flex-row justify-between items-center gap-6">
           <div className="space-y-1 text-center lg:text-left">
@@ -121,7 +110,6 @@ const YourTeamStats = () => {
                 </option>
               ))}
             </select>
-            {/* Hemos quitado el select de acciones porque ahora mostramos todas debajo */}
           </div>
         </div>
 
@@ -131,17 +119,14 @@ const YourTeamStats = () => {
           </div>
         ) : (
           <div className="space-y-10">
-            {/* Saques Jugador */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <CourtTrajectories stats={pServeFor || []} title="Sus Saques - Aciertos" />
               <CourtTrajectories stats={pServeAgainst || []} title="Sus Saques - Errores" />
             </div>
-            {/* Ataques Jugador */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <CourtTrajectories stats={pAttackFor || []} title="Sus Ataques - Puntos" />
               <CourtTrajectories stats={pAttackAgainst || []} title="Sus Ataques - Errores" />
             </div>
-            {/* Bloqueos y Recepción Jugador */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <HeatMap stats={pBlockFor || []} mode="for" title="Sus Bloqueos - Puntos" />
               <HeatMap stats={pBlockAgainst || []} mode="against" title="Sus Bloqueos - Errores" />

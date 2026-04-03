@@ -173,6 +173,112 @@ class ActionRepository(IActionRepository):
         result = await session.execute(query)
         return result.scalars().unique().all()
     
+    async def get_actions_type_from_team_match(self, session: AsyncSession, id_team: int, action_type: str, id_match: int) -> list[Action]:
+        """Obtiene acciones de un tipo específico para un equipo en un partido, incluyendo saques de continuidad."""
+        query = (
+            select(Action)
+            .where(
+                and_(
+                    Action.id_team == id_team,
+                    Action.action_type == action_type,
+                    Action.set.has(Set.id_match == id_match),
+                    or_(
+                        # Caso A: Generó punto para el equipo
+                        Action.id_point_for_team == id_team,
+                        # Caso B: Es un saque que mantuvo el juego en curso
+                        and_(
+                            Action.action_type == 'SERVE',
+                            Action.result.in_(['+', '-'])
+                        )
+                    )
+                )
+            )
+            .options(
+                joinedload(Action.team),
+                joinedload(Action.player).selectinload(Player.seasons),
+                joinedload(Action.set).joinedload(Set.match),
+                joinedload(Action.point_for_team)
+            )
+        )
+        result = await session.execute(query)
+        return result.scalars().unique().all()
+    
+    async def get_actions_type_from_team_match_against_team(self, session: AsyncSession, id_team: int, action_type: str, id_match: int) -> list[Action]:
+        """Obtiene acciones de un tipo específico para un equipo en un partido específico que terminaron en punto rival."""
+        query = (
+            select(Action)
+            .where(
+                and_(
+                    Action.id_team == id_team,
+                    Action.action_type == action_type,
+                    Action.set.has(Set.id_match == id_match),
+                    Action.id_point_for_team != id_team,
+                    Action.id_point_for_team.is_not(None)
+                )
+            )
+            .options(
+                joinedload(Action.team),
+                joinedload(Action.player).selectinload(Player.seasons),
+                joinedload(Action.set).joinedload(Set.match),
+                joinedload(Action.point_for_team)
+            )
+        )
+        result = await session.execute(query)
+        return result.scalars().unique().all()
+    
+    async def get_actions_type_from_player_match(self, session: AsyncSession, id_player: int, action_type: str, id_match: int) -> list[Action]:
+        """Obtiene acciones de un tipo específico para un jugador en un partido, incluyendo saques de continuidad."""
+        query = (
+            select(Action)
+            .where(
+                and_(
+                    Action.id_player == id_player,
+                    Action.action_type == action_type,
+                    Action.set.has(Set.id_match == id_match),
+                    or_(
+                        # Caso A: El equipo del jugador ganó el punto
+                        Action.id_point_for_team == Action.id_team,
+                        # Caso B: Saques válidos sin punto inmediato
+                        and_(
+                            Action.action_type == 'SERVE',
+                            Action.result.in_(['+', '-'])
+                        )
+                    )
+                )
+            )
+            .options(
+                joinedload(Action.team),
+                joinedload(Action.player).selectinload(Player.seasons),
+                joinedload(Action.set).joinedload(Set.match),
+                joinedload(Action.point_for_team)
+            )
+        )
+        result = await session.execute(query)
+        return result.scalars().unique().all()
+    
+    async def get_actions_type_from_player_match_against_team(self, session: AsyncSession, id_player: int, action_type: str, id_match: int) -> list[Action]:
+        """Obtiene acciones de un tipo específico para un jugador en un partido específico que terminaron en punto rival."""
+        query = (
+            select(Action)
+            .where(
+                and_(
+                    Action.id_player == id_player,
+                    Action.action_type == action_type,
+                    Action.set.has(Set.id_match == id_match),
+                    Action.id_point_for_team != Action.id_team,
+                    Action.id_point_for_team.is_not(None)
+                )
+            )
+            .options(
+                joinedload(Action.team),
+                joinedload(Action.player).selectinload(Player.seasons),
+                joinedload(Action.set).joinedload(Set.match),
+                joinedload(Action.point_for_team)
+            )
+        )
+        result = await session.execute(query)
+        return result.scalars().unique().all()
+    
     async def get_general_stats_by_team(self, session: AsyncSession, id_team: int, team_slug: str) -> ActionGeneralStatsDTO:
         """Calcula porcentajes de éxito y error por tipo de acción para un equipo."""
         

@@ -129,3 +129,104 @@ async def get_general_stats_by_team(
             if "TEAM_NOT_FOUND" in error_msg:
                 raise HTTPException(status_code=404, detail=error_msg)
             raise HTTPException(status_code=400, detail=error_msg)
+        
+@router.get("/team/{team_slug}/type/{action_type}/match/{match_slug}", response_model=StatsResponse)
+async def get_actions_type_from_team_match_team(
+    team_slug: str,
+    action_type: str,
+    match_slug: str,
+    user_data: dict = Depends(auth_analyst),
+    service = Depends(get_action_service)
+):
+    """
+    Obtiene todas las acciones de un tipo específico que ha generado un equipo en un partido específico.
+    """
+    async with container_instance.context_session() as session:
+        try:
+            actions_dtos = await service.get_actions_type_from_team_match_team(session, team_slug, action_type, match_slug)
+            stats_list = [StatResponse.from_dto(a) for a in actions_dtos]
+            return StatsResponse(stats=stats_list)
+
+        except ValueError as e:
+            error_msg = str(e)
+            if "TEAM_NOT_FOUND" in error_msg or "MATCH_NOT_FOUND" in error_msg:
+                raise HTTPException(status_code=404, detail=error_msg)
+            raise HTTPException(status_code=400, detail=error_msg)
+        except PermissionError as e:
+            raise HTTPException(status_code=403, detail=str(e))
+
+@router.get("/team/{team_slug}/type/{action_type}/match/{match_slug}/against", response_model=StatsResponse)
+async def get_actions_type_from_team_match_against_team(
+    team_slug: str,
+    action_type: str,
+    match_slug: str,
+    user_data: dict = Depends(auth_analyst),
+    service = Depends(get_action_service)
+):
+    """
+    Obtiene todas las acciones de un tipo específico realizadas POR OTROS equipos
+    donde el punto fue CONTRA el equipo indicado en un partido específico.
+    """
+    async with container_instance.context_session() as session:
+        try:
+            actions_dtos = await service.get_actions_type_from_team_match_against_team(session, team_slug, action_type, match_slug)
+            stats_list = [StatResponse.from_dto(a) for a in actions_dtos]
+            return StatsResponse(stats=stats_list)
+
+        except ValueError as e:
+            error_msg = str(e)
+            if "TEAM_NOT_FOUND" in error_msg or "MATCH_NOT_FOUND" in error_msg:
+                raise HTTPException(status_code=404, detail=error_msg)
+            raise HTTPException(status_code=400, detail=error_msg)
+        except PermissionError as e:
+            raise HTTPException(status_code=403, detail=str(e))
+        
+@router.get("/player/{player_slug}/type/{action_type}/match/{match_slug}", response_model=StatsResponse)
+async def get_actions_type_from_player_match_team(
+    player_slug: str,
+    action_type: str,
+    match_slug: str,
+    user_data: dict = Depends(auth_analyst),
+    service = Depends(get_action_service)
+):
+    """
+    Obtiene todas las acciones de un tipo específico que ha generado un jugador en un partido específico.
+    """
+    async with container_instance.context_session() as session:
+        try:
+            actions_dtos = await service.get_actions_type_from_player_match_team(session, player_slug, action_type, match_slug)
+            stats_list = [StatResponse.from_dto(a) for a in actions_dtos]
+            return StatsResponse(stats=stats_list)
+
+        except ValueError as e:
+            error_msg = str(e)
+            if "PLAYER_NOT_FOUND" in error_msg or "MATCH_NOT_FOUND" in error_msg:
+                raise HTTPException(status_code=404, detail=error_msg)
+            raise HTTPException(status_code=400, detail=error_msg)
+        except PermissionError as e:
+            raise HTTPException(status_code=403, detail=str(e))
+        
+@router.get("/player/{player_slug}/type/{action_type}/match/{match_slug}/against", response_model=StatsResponse)
+async def get_actions_type_from_player_match_against_team(
+    player_slug: str,
+    action_type: str,
+    match_slug: str,
+    user_data: dict = Depends(auth_analyst),
+    service = Depends(get_action_service)
+):
+    """
+    Obtiene todas las acciones de un tipo específico de un jugador que resultaron en punto para el rival en un partido específico.
+    """
+    async with container_instance.context_session() as session:
+        try:
+            actions_dtos = await service.get_actions_type_from_player_match_against_team(session, player_slug, action_type, match_slug)
+            stats_list = [StatResponse.from_dto(a) for a in actions_dtos]
+            return StatsResponse(stats=stats_list)
+
+        except ValueError as e:
+            error_msg = str(e)
+            if "PLAYER_NOT_FOUND" in error_msg or "MATCH_NOT_FOUND" in error_msg:
+                raise HTTPException(status_code=404, detail=error_msg)
+            raise HTTPException(status_code=400, detail=error_msg)
+        except PermissionError as e:
+            raise HTTPException(status_code=403, detail=str(e))
