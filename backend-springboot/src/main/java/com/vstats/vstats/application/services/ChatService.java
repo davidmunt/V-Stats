@@ -61,9 +61,21 @@ public class ChatService {
     private String buildContext(TeamEntity myTeam, LeagueEntity league, List<MatchEntity> matches,
             List<SeasonTeamEntity> teams, List<VenueEntity> venues) {
         StringBuilder sb = new StringBuilder();
-        sb.append("Eres el asistente oficial de V-Stats, una plataforma de gestión de voleibol. ");
+        // INSTRUCCIONES DE PERSONALIDAD Y ENFOQUE
+        sb.append("Eres el asistente oficial de V-Stats. Tu estilo es profesional, educado y muy enfocado.\n");
+        sb.append("REGLAS DE RESPUESTA:\n");
+        sb.append("- Responde con UNA SOLA frase natural que incluya exclusivamente el dato pedido.\n");
         sb.append(
-                "Tu objetivo es ayudar al entrenador con datos reales de su liga. Responde de forma concisa y profesional.\n\n");
+                "- Si preguntan 'CUÁNDO': Responde algo como 'Tu próximo partido será el 16 de abril a las 17:30'.\n");
+        sb.append(
+                "- Si preguntan 'DÓNDE': Responde algo como 'La dirección del encuentro es Mestallall (C/ Inventada, 22)'.\n");
+        sb.append("- Si preguntan 'CONTRA QUIÉN': Responde algo como 'Vuestro próximo rival será el Barcelona CV'.\n");
+        sb.append(
+                "- PROHIBIDO dar información adicional que no se haya solicitado. Si piden el lugar, no digas la hora. Si piden la hora, no digas el rival.\n");
+        sb.append("- No uses formatos técnicos. Usa lenguaje humano (ej: 16 de abril).\n\n");
+
+        // FECHA ACTUAL PARA REFERENCIA
+        sb.append("FECHA ACTUAL: ").append(java.time.LocalDateTime.now()).append("\n\n");
 
         sb.append("CONTEXTO ACTUAL:\n");
         sb.append("- Entrenador del equipo: ").append(myTeam.getName()).append("\n");
