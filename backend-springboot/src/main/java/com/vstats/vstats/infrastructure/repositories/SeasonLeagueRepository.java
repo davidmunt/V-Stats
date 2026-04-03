@@ -7,6 +7,8 @@ import com.vstats.vstats.domain.entities.SeasonTeamEntity;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -25,9 +27,7 @@ public interface SeasonLeagueRepository
 
     Optional<SeasonLeagueEntity> findByLeague_IdLeagueAndSeason_IdSeason(Long idLeague, Long idSeason);
 
-    // Este es el que usa el ChatService (Paso 2)
-    Optional<SeasonLeagueEntity> findBySeason_IdSeason(Long idSeason);
+    Optional<SeasonLeagueEntity> findFirstBySeason_IdSeason(Long idSeason);
 
-    // Cambia el nombre a este:
     List<SeasonLeagueEntity> findAllByLeague_Admin_IdAdminAndSeason_IsActiveTrue(Long idAdmin);
 }

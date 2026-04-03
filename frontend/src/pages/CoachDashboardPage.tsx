@@ -8,6 +8,7 @@ import { CoachStandings } from "@/components/coach/standings/CoachStandings";
 import { CoachMatchesCalendar } from "@/components/coach/calendar/CoachMatchesCalendar";
 import StatsManager from "@/components/coach/stats/StatsManager";
 import LoadingFallback from "@/components/LoadingFallback";
+import { CoachAIAssistant } from "@/components/coach/chatBot/CoachAIAssistant";
 
 const CoachDashboardPage = () => {
   const [currentView, setCurrentView] = useState<string>("players");
@@ -41,6 +42,8 @@ const CoachDashboardPage = () => {
           </>
         )}
       </main>
+      {/* CHATBOT IA - Aparecerá encima de todo gracias al fixed z-100 */}
+      {hasTeam && <CoachAIAssistant />}
     </div>
   );
 };

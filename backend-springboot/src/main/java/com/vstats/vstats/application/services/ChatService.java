@@ -74,8 +74,17 @@ public class ChatService {
 
         sb.append("- Calendario de partidos:\n");
         for (MatchEntity m : matches) {
-            sb.append(String.format("  * %s vs %s | Fecha: %s | Estado: %s\n",
-                    m.getLocalTeam().getName(), m.getVisitorTeam().getName(), m.getDate(), m.getStatus()));
+            // Extraemos el nombre de la sede si existe
+            String nombreSede = (m.getVenue() != null) ? m.getVenue().getName() : "Sede no asignada";
+            String direccionSede = (m.getVenue() != null) ? m.getVenue().getAddress() : "";
+
+            sb.append(String.format("  * %s vs %s | Fecha: %s | Estado: %s | Campo: %s (%s)\n",
+                    m.getLocalTeam().getName(),
+                    m.getVisitorTeam().getName(),
+                    m.getDate(),
+                    m.getStatus(),
+                    nombreSede,
+                    direccionSede));
         }
 
         sb.append("- Sedes disponibles:\n");
@@ -102,12 +111,8 @@ public class ChatService {
 
         // 2. Obtener la liga a la que pertenece esa temporada
         // Relacionamos a través de la Season que ya tenemos
-        SeasonLeagueEntity seasonLeague = seasonLeagueRepository
-                .findBySeason_IdSeason(currentSeason.getIdSeason())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "No se encontró una liga para la temporada actual"));
 
-        LeagueEntity league = seasonLeague.getLeague();
+        LeagueEntity league = mySeasonInscriptions.getLeague();
 
         // 3. Recoger todos los partidos de esta liga/temporada
         List<MatchEntity> allMatches = matchRepository

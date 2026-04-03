@@ -1,5 +1,6 @@
 package com.vstats.vstats.infrastructure.repositories;
 
+import com.vstats.vstats.domain.entities.SeasonLeagueEntity;
 import com.vstats.vstats.domain.entities.SeasonTeamEntity;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -38,4 +39,5 @@ public interface SeasonTeamRepository
         List<SeasonTeamEntity> findRivalTeamsByCoachId(@Param("idCoach") Long idCoach);
 
         Optional<SeasonTeamEntity> findByTeam_Slug(String slug);
+
 }
