@@ -13,6 +13,9 @@ interface PlayerNodeProps {
 export const PlayerNode = ({ player, position, isHome, onPlayerClick, phase, setterPos }: PlayerNodeProps) => {
   const isSetter = player?.is_setter || false;
   const isLibero = player?.initial_position == 7;
+  const history = JSON.parse(sessionStorage.getItem("vstats_last_actions") || "[]");
+  const lastResult = history[0]?.result;
+  const isAutoSelected = phase === "SERVE_OWN" && position === 1 && isHome && lastResult === "++";
   const offsetStyle = isHome ? getPlayerVisualOffset(position, isSetter, phase, isHome, setterPos) : { transform: "translate(0%, 0%)" };
 
   if (!player) {
@@ -31,6 +34,7 @@ export const PlayerNode = ({ player, position, isHome, onPlayerClick, phase, set
       className={`
       group relative w-16 h-16 rounded-3xl border-2 flex items-center justify-center shadow-lg
       transition-all duration-700 ease-in-out z-10 hover:z-30
+      ${isAutoSelected ? "ring-4 ring-blue-500 animate-pulse shadow-blue-500/50" : ""}
       ${
         isHome
           ? isLibero
@@ -46,7 +50,11 @@ export const PlayerNode = ({ player, position, isHome, onPlayerClick, phase, set
           SETTER
         </span>
       )}
-
+      {isAutoSelected && (
+        <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-[9px] px-3 py-1 rounded-full font-black z-30 shadow-lg animate-bounce">
+          SACADOR
+        </span>
+      )}
       {isLibero && (
         <span className="absolute -bottom-2 bg-purple-800 text-white text-[7px] px-2 py-0.5 rounded-full font-black z-30 uppercase tracking-wider">
           Líbero

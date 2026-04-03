@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { PlayerNode } from "./Player";
 import type { LineupPosition } from "@/interfaces/lineupPosition.interface";
 import { getGamePhase } from "@/utils/courtPositioning";
@@ -19,6 +19,25 @@ export const AnalysisCourt = ({ homeLineup, awayLineup, onPlayerClick }: Analysi
     const setterNode = Object.values(homeLineup).find((p) => p?.is_setter);
     return setterNode ? setterNode.current_position : 0;
   }, [homeLineup]);
+
+  useEffect(() => {
+    const history = JSON.parse(sessionStorage.getItem("vstats_last_actions") || "[]");
+    const lastAction = history[0];
+
+    // CONDICIÓN:
+    // 1. Estamos en fase de saque propio.
+    // 2. La ÚLTIMA acción registrada fue un punto ganado (++) por nosotros.
+    // 3. Existe el jugador en la posición 1.
+    if (currentPhase === "SERVE_OWN" && lastAction?.result === "++" && homeLineup[1]) {
+      // Opcional: Podrías añadir un pequeño delay para que el usuario vea la rotación
+      const timer = setTimeout(() => {
+        console.log("Punto ganado: Auto-seleccionando sacador en P1");
+        onPlayerClick(homeLineup[1]!, true);
+      }, 500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [currentPhase, homeLineup, onPlayerClick]);
 
   return (
     <div className="relative w-full aspect-[18/11] bg-slate-100 rounded-[2.5rem] border border-slate-200 shadow-2xl overflow-hidden flex select-none p-4">
