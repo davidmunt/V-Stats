@@ -13,9 +13,10 @@ interface ActionPanelProps {
   teamLocalSlug: string;
   teamVisitorSlug: string;
   onSuccess: () => void;
+  onFinishMatch?: () => void;
 }
 
-export const ActionPanel = ({ setSlug, selectedPosition, teamLocalSlug, teamVisitorSlug, onSuccess }: ActionPanelProps) => {
+export const ActionPanel = ({ setSlug, selectedPosition, teamLocalSlug, teamVisitorSlug, onSuccess, onFinishMatch }: ActionPanelProps) => {
   const [selectedType, setSelectedType] = useState<ActionType | null>(null);
   const [showPicker, setShowPicker] = useState(false);
   const [tempResult, setTempResult] = useState<ActionResult | null>(null);
@@ -98,13 +99,7 @@ export const ActionPanel = ({ setSlug, selectedPosition, teamLocalSlug, teamVisi
         };
       };
 
-      // 2. Ahora ya puedes usar axiosError con total seguridad
-      console.log("--- ERROR DETECTADO ---");
-      console.log("Status Code:", axiosError.response?.status);
-      console.log("Data completa del error:", axiosError.response?.data);
-
       const backendMessage = axiosError.response?.data?.message || "";
-      console.log("Mensaje extraído:", backendMessage);
 
       // 3. Lógica de Partido Finalizado
       if (backendMessage === "MATCH_ALREADY_FINISHED" || axiosError.response?.status === 400) {
@@ -114,15 +109,7 @@ export const ActionPanel = ({ setSlug, selectedPosition, teamLocalSlug, teamVisi
         setTempResult(null);
         setShowPicker(false);
 
-        Swal.fire({
-          title: "¡Partido Finalizado!",
-          text: "Se ha registrado el último punto. Generando estadísticas...",
-          icon: "success",
-          timer: 2500,
-          showConfirmButton: false,
-        }).then(() => {
-          onSuccess();
-        });
+        onFinishMatch?.();
 
         return;
       }

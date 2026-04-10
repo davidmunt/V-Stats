@@ -7,8 +7,8 @@ interface StartAnalysingProps {
   analystSlug: string;
 }
 
-export const StartAnalysing = ({ match, analystSlug }: StartAnalysingProps) => {
-  const startMutation = useStartMatchMutation(analystSlug);
+export const StartAnalysing = ({ match }: StartAnalysingProps) => {
+  const startMutation = useStartMatchMutation();
 
   const handleStart = async () => {
     const matchTime = new Date(match.date);

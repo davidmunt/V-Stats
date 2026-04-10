@@ -20,5 +20,7 @@ public interface MatchRepository extends JpaRepository<MatchEntity, Long> {
     // Buscar partidos donde el equipo sea local o visitante
     List<MatchEntity> findAllByLocalTeam_IdTeamOrVisitorTeam_IdTeam(Long localId, Long visitorId);
 
+    List<MatchEntity> findByLeague_IdLeague(Long idLeague);
+
     List<MatchEntity> findAllByLeague_IdLeague(Long idLeague);
 }

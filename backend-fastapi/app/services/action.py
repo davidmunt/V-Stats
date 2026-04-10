@@ -8,6 +8,7 @@ from app.domain.repositories.set import ISetRepository
 from app.domain.repositories.match import IMatchRepository
 from app.domain.repositories.team import ITeamRepository
 from app.domain.repositories.player import IPlayerRepository
+from app.domain.repositories.analyst import IAnalystRepository
 from app.domain.repositories.lineup import ILineupRepository
 from app.infrastructure.models.action import Action
 from app.infrastructure.mappers.action import ActionModelMapper
@@ -21,6 +22,7 @@ class ActionService(IActionService):
         match_repo: IMatchRepository,
         team_repo: ITeamRepository,
         player_repo: IPlayerRepository,
+        analyst_repo: IAnalystRepository,
         lineup_repo: ILineupRepository
     ):
         self._action_repo = action_repo
@@ -28,9 +30,10 @@ class ActionService(IActionService):
         self._match_repo = match_repo
         self._team_repo = team_repo
         self._player_repo = player_repo
+        self._analyst_repo = analyst_repo
         self._lineup_repo = lineup_repo
 
-    async def create_action(self, session, set_slug: str, data: dict, role: str) -> dict:
+    async def create_action(self, session, set_slug: str, data: dict, role: str, user_email: str) -> dict:
         if role.lower() != "analyst":
             raise PermissionError("Solo los analistas pueden registrar acciones.")
 
@@ -41,7 +44,11 @@ class ActionService(IActionService):
         if match.status == "finished": raise ValueError("MATCH_ALREADY_FINISHED")
 
         team_dto = await self._team_repo.get_by_slug(session, data['slug_team'])
-        
+
+        analyst = await self._analyst_repo.get_by_email(session, user_email)
+        if not analyst:
+            raise ValueError("ANALYST_NOT_FOUND")
+
         player_id = None
         if data.get('slug_player'):
             player_dto = await self._player_repo.get_by_slug(session, data['slug_player'])
@@ -73,6 +80,7 @@ class ActionService(IActionService):
             id_team=team_dto.id_team,
             id_player=player_id,
             id_point_for_team=point_team_id,
+            id_analyst=analyst.id_analyst,
             player_position=data.get('player_position'),
             action_type=data['action_type'],
             result=result_symbol if result_symbol else "+", 

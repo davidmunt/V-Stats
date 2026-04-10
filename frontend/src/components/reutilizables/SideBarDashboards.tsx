@@ -26,7 +26,10 @@ const Sidebar = ({ currentView, onViewChange }: SidebarProps) => {
             { id: "calendar", label: "Calendario de Partidos" },
           ]
         : user?.user_type === "analyst"
-          ? [{ id: "match", label: "Empezar Análisis Partido" }]
+          ? [
+              { id: "match", label: "Empezar Análisis Partido" },
+              { id: "otherTeam", label: "Análisis de Otro Equipo" },
+            ]
           : [];
 
   return (

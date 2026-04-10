@@ -24,6 +24,7 @@ async def create_new_action(
     Calcula puntos, rotaciones y posibles cierres de set/match.
     """
     user_role = user_data.get("role")
+    user_email = user_data.get("sub")
     
     async with container_instance.context_session() as session:
         try:
@@ -31,7 +32,8 @@ async def create_new_action(
                 session=session,
                 set_slug=slug_set,
                 data=payload.model_dump(),
-                role=user_role
+                role=user_role,
+                user_email=user_email
             )
             
             return SingleActionResponse(

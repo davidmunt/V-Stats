@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     from .set import Set
     from .team import Team
     from .player import Player
+    from .analyst import Analyst
 
 class Action(Base):
     __tablename__ = "actions"
@@ -19,6 +20,7 @@ class Action(Base):
     id_set: Mapped[int] = mapped_column(ForeignKey("sets.id_set"), nullable=False)
     id_team: Mapped[int] = mapped_column(ForeignKey("teams.id_team"), nullable=False)
     id_player: Mapped[int] = mapped_column(ForeignKey("players.id_player"), nullable=False)
+    id_analyst: Mapped[int] = mapped_column(ForeignKey("analysts.id_analyst"), nullable=False)
     id_point_for_team: Mapped[Optional[int]] = mapped_column(ForeignKey("teams.id_team"), nullable=True)
     player_position: Mapped[Optional[int]] = mapped_column(Integer) 
     action_type: Mapped[str] = mapped_column(String, nullable=False)
@@ -37,4 +39,5 @@ class Action(Base):
     set: Mapped["Set"] = relationship(lazy="selectin")
     team: Mapped["Team"] = relationship(lazy="selectin", foreign_keys=[id_team])
     player: Mapped["Player"] = relationship(lazy="selectin")
+    analyst: Mapped["Analyst"] = relationship(lazy="selectin")
     point_for_team: Mapped[Optional["Team"]] = relationship(lazy="selectin", foreign_keys=[id_point_for_team])

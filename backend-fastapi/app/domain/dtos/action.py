@@ -12,6 +12,7 @@ class ActionDTO:
     slug_match: str
     slug_set: str
     slug_team: str
+    slug_analyst: str
     slug_player: str
     action_type: str
     result: str
@@ -31,6 +32,7 @@ class ActionStatDTO:
     slug_set: str
     set_number: int
     slug_team: str
+    slug_analyst: str
     slug_player: str
     player_name: str
     player_dorsal: int

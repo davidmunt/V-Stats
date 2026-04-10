@@ -32,6 +32,10 @@ public class ActionEntity {
     private SetEntity set;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_analyst", nullable = false)
+    private AnalystEntity analyst;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_team", nullable = false)
     private TeamEntity team;
 

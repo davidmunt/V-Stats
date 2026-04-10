@@ -60,6 +60,11 @@ public class MatchController {
         return ResponseEntity.ok(Map.of("matches", matchService.getMatchesByAnalyst(slugAnalyst)));
     }
 
+    @GetMapping("/analyst")
+    public ResponseEntity<Map<String, List<MatchResponse>>> getByAnalystLeague() {
+        return ResponseEntity.ok(Map.of("matches", matchService.getMatchesByAnalystLeague()));
+    }
+
     @PutMapping("/{slug}")
     @CheckSecurity.Matches.CanManage
     public ResponseEntity<Map<String, MatchResponse>> update(

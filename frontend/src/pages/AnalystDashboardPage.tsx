@@ -3,6 +3,7 @@ import { MatchAnalysisManager } from "@/components/analyst/matchAnalysis/MatchAn
 import Sidebar from "@/components/reutilizables/SideBarDashboards";
 import { useCurrentUserQuery } from "@/queries/auth/useCurrentUser";
 import LoadingFallback from "@/components/LoadingFallback";
+import { ScoutingFeature } from "@/components/analyst/matchAnalysis/ScoutingPage";
 
 const AnalystDashboardPage = () => {
   const [currentView, setCurrentView] = useState<string>("match");
@@ -14,7 +15,6 @@ const AnalystDashboardPage = () => {
   return (
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar currentView={currentView} onViewChange={setCurrentView} />
-
       <main className="flex-1 p-8 overflow-y-auto">
         {!hasTeam ? (
           <div className="flex flex-col items-center justify-center h-full text-center space-y-4">
@@ -24,7 +24,10 @@ const AnalystDashboardPage = () => {
             </p>
           </div>
         ) : (
-          <>{currentView === "match" && <MatchAnalysisManager analystSlug={analyst?.slug_user || "slug"} />}</>
+          <>
+            {currentView === "match" && <MatchAnalysisManager analystSlug={analyst?.slug_user || "slug"} />}
+            {currentView === "otherTeam" && <ScoutingFeature analystSlug={analyst?.slug_user || "slug"} />}
+          </>
         )}
       </main>
     </div>

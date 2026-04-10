@@ -71,6 +71,11 @@ export const getMatchesForCoach = async (slug: string): Promise<Match[]> => {
   return response.data.matches;
 };
 
+export const getMatchesForAnalyst = async (): Promise<Match[]> => {
+  const response = await apiClient.get<MatchesResponse>("spring", `/api/matches/analyst`);
+  return response.data.matches;
+};
+
 export const getNextMatchForCoach = async (): Promise<Match> => {
   const response = await apiClient.get<SingleMatchResponse>("fastapi", `/api/matches/next`);
   return response.data.match;
@@ -78,6 +83,11 @@ export const getNextMatchForCoach = async (): Promise<Match> => {
 
 export const getNextMatchForAnalyst = async (): Promise<Match> => {
   const response = await apiClient.get<SingleMatchResponse>("fastapi", `/api/matches/next`);
+  return response.data.match;
+};
+
+export const getMatchDetails = async (slug: string): Promise<Match> => {
+  const response = await apiClient.get<SingleMatchResponse>("spring", `/api/matches/${slug}`);
   return response.data.match;
 };
 

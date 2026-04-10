@@ -16,7 +16,7 @@ class ActionRepository(IActionRepository):
     async def create(self, session: AsyncSession, action_model: Action) -> ActionDTO:
         session.add(action_model)
         await session.flush() 
-        await session.refresh(action_model, ["match", "set", "team", "player", "point_for_team"])
+        await session.refresh(action_model, ["match", "set", "team", "player", "analyst", "point_for_team"])
         return self.mapper.to_dto(action_model)
 
     async def get_last_point_action(self, session: AsyncSession, id_set: int) -> Optional[Action]:

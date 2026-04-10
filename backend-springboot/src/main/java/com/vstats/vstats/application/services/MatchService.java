@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -222,6 +223,37 @@ public class MatchService {
                 .orElseThrow(() -> new RuntimeException("Error: El analista no tiene equipo asignado esta temporada"));
 
         return getMatchesByTeamId(st.getTeam().getIdTeam());
+    }
+
+    public List<MatchResponse> getMatchesByAnalystLeague() {
+        Long currentAnalystId = authUtils.getCurrentUserId();
+
+        AnalystEntity analyst = analystRepository.findById(currentAnalystId)
+                .orElseThrow(() -> new RuntimeException("Error: Analista no encontrado"));
+
+        // 1. Buscamos la relación de temporada activa para este analista
+        SeasonTeamEntity st = seasonTeamRepository.findAllBySeason_IsActiveTrue().stream()
+                .filter(s -> s.getAnalyst() != null && s.getAnalyst().getIdAnalyst().equals(analyst.getIdAnalyst()))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException(
+                        "Error: El analista no tiene equipo asignado en la temporada activa"));
+
+        // 2. ID de la liga desde SeasonTeam
+        Long leagueId = st.getLeague().getIdLeague();
+
+        // 3. Buscamos los partidos y mapeamos usando "this::mapToResponse"
+        // He usado el nombre del método que aparece en tus otras funciones de la clase
+
+        List<MatchEntity> matches = matchRepository.findByLeague_IdLeague(leagueId);
+        return matches.stream()
+                .map(this::mapToResponse) // Usamos tu función interna
+                .collect(Collectors.toList());
+    }
+
+    public MatchResponse getMatchBySlug(String slug) {
+        return matchRepository.findBySlug(slug)
+                .map(this::mapToResponse)
+                .orElseThrow(() -> new RuntimeException("Error: Partido no encontrado"));
     }
 
     @Transactional

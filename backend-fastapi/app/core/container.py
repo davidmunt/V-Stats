@@ -156,6 +156,7 @@ class Container:
             set_repo=self.set_repository(),
             match_repo=self.match_repository(),
             team_repo=self.team_repository(),
+            analyst_repo=self.analyst_repository(),
             player_repo=self.player_repository(),
             lineup_repo=self.lineup_repository()
         )
