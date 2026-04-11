@@ -1,5 +1,5 @@
 from typing import List, Optional
-from sqlalchemy import select
+from sqlalchemy import and_, select
 from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -7,6 +7,7 @@ from app.domain.repositories.analyst import IAnalystRepository
 from app.domain.dtos.analyst import AnalystDTO
 from app.infrastructure.models.analyst import Analyst
 from app.domain.mapper import IModelMapper
+from app.infrastructure.models.season_team import SeasonTeam
 
 class AnalystRepository(IAnalystRepository):
     def __init__(self, analyst_mapper: IModelMapper):
@@ -41,3 +42,20 @@ class AnalystRepository(IAnalystRepository):
         result = await session.execute(query)
         analysts = result.scalars().all()
         return [self.mapper.to_dto(c) for c in analysts]
+
+    async def get_by_team_id(self, session: AsyncSession, team_id: int) -> Optional[Analyst]:
+        query = (
+            select(Analyst)
+            .join(SeasonTeam, Analyst.id_analyst == SeasonTeam.id_analyst)
+            .where(
+                and_(
+                    SeasonTeam.id_team == team_id,
+                    SeasonTeam.is_active == True,
+                    Analyst.is_active == True
+                )
+            )
+            .options(selectinload(Analyst.team))
+        )
+        
+        result = await session.execute(query)
+        return result.scalars().first()

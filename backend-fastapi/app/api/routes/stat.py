@@ -24,7 +24,7 @@ async def get_actions_by_team_and_type(
     """
     async with container_instance.context_session() as session:
         try:
-            actions_dtos = await service.get_actions_type_from_team(session, team_slug, action_type)
+            actions_dtos = await service.get_actions_type_from_team(session, team_slug, action_type, user_data.get("sub"), user_data.get("role"))
             stats_list = [StatResponse.from_dto(a) for a in actions_dtos]
             return StatsResponse(stats=stats_list)
 
@@ -50,7 +50,7 @@ async def get_actions_by_team_and_type_against_team(
     """
     async with container_instance.context_session() as session:
         try:
-            actions_dtos = await service.get_actions_type_from_team_against_team(session, team_slug, action_type)
+            actions_dtos = await service.get_actions_type_from_team_against_team(session, team_slug, action_type, user_data.get("sub"), user_data.get("role"))
             stats_list = [StatResponse.from_dto(a) for a in actions_dtos]
             return StatsResponse(stats=stats_list)
 
@@ -74,7 +74,7 @@ async def get_actions_by_player_and_type(
     """
     async with container_instance.context_session() as session:
         try:
-            actions_dtos = await service.get_actions_type_from_player(session, player_slug, action_type)
+            actions_dtos = await service.get_actions_type_from_player(session, player_slug, action_type, user_data.get("sub"), user_data.get("role"))
             stats_list = [StatResponse.from_dto(a) for a in actions_dtos]
             return StatsResponse(stats=stats_list)
 
@@ -98,7 +98,7 @@ async def get_actions_by_player_and_type_against_team(
     """
     async with container_instance.context_session() as session:
         try:
-            actions_dtos = await service.get_actions_type_from_player_against_team(session, player_slug, action_type)
+            actions_dtos = await service.get_actions_type_from_player_against_team(session, player_slug, action_type, user_data.get("sub"), user_data.get("role"))
             stats_list = [StatResponse.from_dto(a) for a in actions_dtos]
             return StatsResponse(stats=stats_list)
 
@@ -121,7 +121,7 @@ async def get_general_stats_by_team(
     """
     async with container_instance.context_session() as session:
         try:
-            stats_dto = await service.get_general_stats_by_team(session, team_slug)
+            stats_dto = await service.get_general_stats_by_team(session, team_slug, user_data.get("sub"), user_data.get("role"))
             return StatGeneralResponse.from_dto(stats_dto)
 
         except ValueError as e:

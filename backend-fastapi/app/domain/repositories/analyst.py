@@ -1,6 +1,7 @@
 import abc
 from typing import Any, List, Optional
 from app.domain.dtos.analyst import AnalystDTO
+from app.infrastructure.models.analyst import Analyst
 
 class IAnalystRepository(abc.ABC):
     """Interfaz del repositorio de Analistas."""
@@ -25,4 +26,9 @@ class IAnalystRepository(abc.ABC):
     @abc.abstractmethod
     async def get_assigned_analysts(self, session: Any) -> List[AnalystDTO]:
         """Obtiene analistas donde id_team NO es NULL."""
+        ...
+
+    @abc.abstractmethod
+    async def get_by_team_id(self, session: Any, team_id: int) -> Optional[Analyst]:
+        """Obtiene el analista asignado a un equipo específico."""
         ...

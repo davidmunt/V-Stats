@@ -9,6 +9,7 @@ from app.domain.repositories.match import IMatchRepository
 from app.domain.repositories.team import ITeamRepository
 from app.domain.repositories.player import IPlayerRepository
 from app.domain.repositories.analyst import IAnalystRepository
+from app.domain.repositories.coach import ICoachRepository
 from app.domain.repositories.lineup import ILineupRepository
 from app.infrastructure.models.action import Action
 from app.infrastructure.mappers.action import ActionModelMapper
@@ -23,6 +24,7 @@ class ActionService(IActionService):
         team_repo: ITeamRepository,
         player_repo: IPlayerRepository,
         analyst_repo: IAnalystRepository,
+        coach_repo: ICoachRepository,
         lineup_repo: ILineupRepository
     ):
         self._action_repo = action_repo
@@ -31,6 +33,7 @@ class ActionService(IActionService):
         self._team_repo = team_repo
         self._player_repo = player_repo
         self._analyst_repo = analyst_repo
+        self._coach_repo = coach_repo
         self._lineup_repo = lineup_repo
 
     async def create_action(self, session, set_slug: str, data: dict, role: str, user_email: str) -> dict:
@@ -100,37 +103,16 @@ class ActionService(IActionService):
 
         return result_payload
 
-    # async def _handle_rotation(self, session, current_set, point_team_id, match_id):
-    #     last_point = await self._action_repo.get_previous_point_action(session, current_set.id_set)
-        
-    #     should_rotate = False
-    #     if not last_point:
-    #         pass 
-    #     elif last_point.id_point_for_team != point_team_id:
-    #         should_rotate = True
-
-    #     if should_rotate:
-    #         lineup = await self._lineup_repo.get_active_lineup_by_team_and_match(session, match_id, point_team_id)
-    #         if lineup:
-    #             positions = await self._lineup_repo.get_court_positions(session, lineup.id_lineup)
-    #             rotation_map = {1: 6, 6: 5, 5: 4, 4: 3, 3: 2, 2: 1}
-    #             for pos in positions:
-    #                 new_pos = rotation_map.get(pos.current_position)
-    #                 if new_pos: await self._lineup_repo.update_position(session, pos, new_pos)
-
     async def _handle_rotation(self, session, current_set, point_team_id, match_id):
         last_point = await self._action_repo.get_previous_point_action(session, current_set.id_set)
         
-        # Si el equipo que ganó el punto NO tenía el saque anterior, debe rotar (Recuperación)
         should_rotate = False
         if last_point and last_point.id_point_for_team != point_team_id:
-            # El equipo que recibe el punto es el que rota
             should_rotate = True
 
         if should_rotate:
             lineup = await self._lineup_repo.get_active_lineup_by_team_and_match(session, match_id, point_team_id)
             if lineup:
-                # 1. Ejecutar rotación física (1 -> 6 -> 5 -> 4 -> 3 -> 2 -> 1)
                 positions = await self._lineup_repo.get_court_positions(session, lineup.id_lineup)
                 rotation_map = {1: 6, 6: 5, 5: 4, 4: 3, 3: 2, 2: 1}
                 
@@ -139,16 +121,12 @@ class ActionService(IActionService):
                         new_pos = rotation_map[pos.current_position]
                         await self._lineup_repo.update_position(session, pos, new_pos)
                 
-                # 2. Verificar sustituciones automáticas del Líbero (Entrada/Salida)
-                await session.flush() # Asegurar que las posiciones están actualizadas en DB
+                await session.flush() 
                 await self._check_libero_substitution(session, lineup.id_lineup)
 
     async def _check_libero_substitution(self, session, lineup_id: int):
-        # Obtenemos todos los jugadores de la alineación
         all_players = await self._lineup_repo.get_all_positions_by_lineup(session, lineup_id)
         
-        # 1. Identificamos al Líbero: Es el que no tiene posición inicial 1-6
-        # (Opcional: Si tienes un flag is_libero en el modelo, úsalo. Si no, esta lógica es infalible)
         libero = next((p for p in all_players if p.initial_position not in [1, 2, 3, 4, 5, 6]), None)
         
         # 2. Identificamos al Central (Target)
@@ -218,7 +196,6 @@ class ActionService(IActionService):
                 new_set_dto = await self._set_repo.create_next_set(session, match.id_match, next_num)
                 payload["new_set"] = new_set_dto
 
-
     # ahora probar que las sustituciones automáticas del líbero se ejecuten correctamente al hacer la rotación, tanto en la entrada como en la salida del líbero, y que el setter no sea afectado por estas reglas. Además, verificar que el marcador se actualice correctamente y que los sets y el partido finalicen según las reglas establecidas.
 
     async def make_substitution(
@@ -281,44 +258,186 @@ class ActionService(IActionService):
 
         return True
 
-    async def get_actions_type_from_team(self, session: Any, team_slug: str, action_type: str) -> list[ActionStatDTO]:
+    async def get_actions_type_from_team(self, session: Any, team_slug: str, action_type: str, user_email: str, role: str) -> list[ActionStatDTO]:
         team = await self._team_repo.get_by_slug(session, team_slug)
         if not team:
             raise ValueError("TEAM_NOT_FOUND")
         
-        actions = await self._action_repo.get_actions_type_from_team(session, team.id_team, action_type)
-        return [ActionModelMapper.to_stat_dto(a) for a in actions]
-    
-    async def get_actions_type_from_team_against_team(self, session: Any, team_slug: str, action_type: str) -> list[ActionStatDTO]:
-        team = await self._team_repo.get_by_slug(session, team_slug)
-        if not team:
-            raise ValueError("TEAM_NOT_FOUND")
+        id_analyst_to_query = None
 
-        actions = await self._action_repo.get_actions_type_from_team_against_team(session, team.id_team, action_type)
-        return [ActionModelMapper.to_stat_dto(a) for a in actions]
-    
-    async def get_actions_type_from_player(self, session: Any, player_slug: str, action_type: str) -> list[ActionStatDTO]:
-        player = await self._player_repo.get_by_slug(session, player_slug)
-        if not player:
-            raise ValueError("PLAYER_NOT_FOUND")
+        # Identificación del analista según el rol
+        if role.lower() == "analyst":
+            analyst = await self._analyst_repo.get_by_email(session, user_email)
+            if not analyst: 
+                raise ValueError("ANALYST_NOT_FOUND")
+            id_analyst_to_query = analyst.id_analyst
 
-        actions = await self._action_repo.get_actions_type_from_player(session, player.id_player, action_type)
-        return [ActionModelMapper.to_stat_dto(a) for a in actions]
-    
-    async def get_actions_type_from_player_against_team(self, session: Any, player_slug: str, action_type: str) -> list[ActionStatDTO]:
-        player = await self._player_repo.get_by_slug(session, player_slug)
-        if not player:
-            raise ValueError("PLAYER_NOT_FOUND")
+        elif role.lower() == "coach":
+            coach = await self._coach_repo.get_by_email(session, user_email) 
+            if not coach or not coach.id_team: 
+                raise ValueError("COACH_NOT_FOUND_OR_NO_TEAM")
+            
+            # Buscamos al analista vinculado al equipo del coach
+            analyst_of_team = await self._analyst_repo.get_by_team_id(session, coach.id_team)
+            if not analyst_of_team: 
+                raise ValueError("TEAM_ANALYST_NOT_FOUND")
+            id_analyst_to_query = analyst_of_team.id_analyst
+        
+        # Si llegamos aquí y no tenemos ID de analista, es un rol no permitido
+        if id_analyst_to_query is None:
+            raise PermissionError("Acceso denegado: Rol no reconocido para estadísticas.")
 
-        actions = await self._action_repo.get_actions_type_from_player_against_team(session, player.id_player, action_type)
+        actions = await self._action_repo.get_actions_type_from_team(
+            session, 
+            team.id_team, 
+            action_type, 
+            id_analyst_to_query
+        )
+        
         return [ActionModelMapper.to_stat_dto(a) for a in actions]
     
-    async def get_general_stats_by_team(self, session: Any, team_slug: str) -> ActionGeneralStatsDTO:
+    async def get_actions_type_from_team_against_team(self, session: Any, team_slug: str, action_type: str, user_email: str, role: str) -> list[ActionStatDTO]:
         team = await self._team_repo.get_by_slug(session, team_slug)
         if not team:
             raise ValueError("TEAM_NOT_FOUND")
         
-        stats_dto = await self._action_repo.get_general_stats_by_team(session, team.id_team, team_slug)
+        id_analyst_to_query = None
+
+        if role.lower() == "analyst":
+            analyst = await self._analyst_repo.get_by_email(session, user_email)
+            if not analyst: 
+                raise ValueError("ANALYST_NOT_FOUND")
+            id_analyst_to_query = analyst.id_analyst
+
+        elif role.lower() == "coach":
+            coach = await self._coach_repo.get_by_email(session, user_email) 
+            if not coach: 
+                raise ValueError("COACH_NOT_FOUND")
+            
+            analyst_of_team = await self._analyst_repo.get_by_team_id(session, coach.id_team)
+            if not analyst_of_team: 
+                raise ValueError("TEAM_ANALYST_NOT_FOUND")
+            id_analyst_to_query = analyst_of_team.id_analyst
+
+        if id_analyst_to_query is None:
+            raise PermissionError("Acceso denegado.")
+
+        actions = await self._action_repo.get_actions_type_from_team_against_team(
+            session, 
+            team.id_team, 
+            action_type, 
+            id_analyst_to_query
+        )
+        return [ActionModelMapper.to_stat_dto(a) for a in actions]
+    
+    async def get_actions_type_from_player(self, session: Any, player_slug: str, action_type: str, user_email: str, role: str) -> list[ActionStatDTO]:
+        # 1. Buscamos al jugador
+        player = await self._player_repo.get_by_slug(session, player_slug)
+        if not player:
+            raise ValueError("PLAYER_NOT_FOUND")
+        
+        id_analyst_to_query = None
+
+        # 2. Lógica de Identificación del Analista
+        if role.lower() == "analyst":
+            analyst = await self._analyst_repo.get_by_email(session, user_email)
+            if not analyst: 
+                raise ValueError("ANALYST_NOT_FOUND")
+            id_analyst_to_query = analyst.id_analyst
+
+        elif role.lower() == "coach":
+            coach = await self._coach_repo.get_by_email(session, user_email)
+            if not coach: 
+                raise ValueError("COACH_NOT_FOUND")
+            
+            # Buscamos al analista del equipo del coach
+            analyst_of_team = await self._analyst_repo.get_by_team_id(session, coach.id_team)
+            if not analyst_of_team: 
+                raise ValueError("TEAM_ANALYST_NOT_FOUND")
+            id_analyst_to_query = analyst_of_team.id_analyst
+
+        # 3. Consultamos usando id_analyst_to_query (que ahora siempre existirá si no dio error antes)
+        actions = await self._action_repo.get_actions_type_from_player(
+            session, 
+            player.id_player, 
+            action_type, 
+            id_analyst_to_query
+        )
+        
+        return [ActionModelMapper.to_stat_dto(a) for a in actions]
+    
+    async def get_actions_type_from_player_against_team(self, session: Any, player_slug: str, action_type: str, user_email: str, role: str) -> list[ActionStatDTO]:
+    # 1. Buscamos al jugador
+        player = await self._player_repo.get_by_slug(session, player_slug)
+        if not player:
+            raise ValueError("PLAYER_NOT_FOUND")
+        
+        id_analyst_to_query = None
+
+        # 2. Lógica de Identificación del Analista
+        if role.lower() == "analyst":
+            analyst = await self._analyst_repo.get_by_email(session, user_email)
+            if not analyst: 
+                raise ValueError("ANALYST_NOT_FOUND")
+            id_analyst_to_query = analyst.id_analyst
+
+        elif role.lower() == "coach":
+            coach = await self._coach_repo.get_by_email(session, user_email)
+            if not coach: 
+                raise ValueError("COACH_NOT_FOUND")
+            
+            # Buscamos al analista del equipo del coach
+            analyst_of_team = await self._analyst_repo.get_by_team_id(session, coach.id_team)
+            if not analyst_of_team: 
+                raise ValueError("TEAM_ANALYST_NOT_FOUND")
+            id_analyst_to_query = analyst_of_team.id_analyst
+
+        actions = await self._action_repo.get_actions_type_from_player_against_team(session, player.id_player, action_type, id_analyst_to_query)
+        return [ActionModelMapper.to_stat_dto(a) for a in actions]
+    
+    async def get_general_stats_by_team(self, session: Any, team_slug: str, user_email: str, role: str) -> ActionGeneralStatsDTO:
+        # 1. Buscamos el equipo por el slug solicitado
+        team = await self._team_repo.get_by_slug(session, team_slug)
+        if not team:
+            raise ValueError("TEAM_NOT_FOUND")
+        
+        id_analyst_to_query = None
+        
+        # 2. Lógica de roles
+        if role.lower() == "analyst":
+            analyst = await self._analyst_repo.get_by_email(session, user_email)
+            if not analyst: 
+                raise ValueError("ANALYST_NOT_FOUND")
+            id_analyst_to_query = analyst.id_analyst
+
+        elif role.lower() == "coach":
+            coach = await self._coach_repo.get_by_email(session, user_email) 
+            if not coach: 
+                raise ValueError("COACH_NOT_FOUND")
+            
+            # SEGURIDAD: El Coach solo puede ver estadísticas generales de SU equipo
+            if coach.id_team != team.id_team:
+                raise PermissionError("No tienes permiso para ver estadísticas de este equipo.")
+            
+            # Buscamos al analista que generó los datos del equipo del coach
+            analyst_of_team = await self._analyst_repo.get_by_team_id(session, coach.id_team)
+            if not analyst_of_team: 
+                raise ValueError("TEAM_ANALYST_NOT_FOUND")
+            
+            id_analyst_to_query = analyst_of_team.id_analyst
+
+        # 3. Validación final del ID antes de ir al repositorio
+        if id_analyst_to_query is None:
+            raise PermissionError("Acceso denegado: Rol no autorizado.")
+
+        # 4. Llamada al repositorio pasando el filtro del analista
+        stats_dto = await self._action_repo.get_general_stats_by_team(
+            session, 
+            team.id_team, 
+            team_slug, 
+            id_analyst_to_query
+        )
+        
         return stats_dto
     
     async def get_actions_type_from_team_match_team(self, session: Any, team_slug: str, action_type: str, match_slug: str) -> list[ActionStatDTO]:

@@ -71,7 +71,7 @@ class ActionRepository(IActionRepository):
         await session.delete(action_model)
         await session.flush()
 
-    async def get_actions_type_from_team(self, session: AsyncSession, id_team: int, action_type: str) -> list[Action]:
+    async def get_actions_type_from_team(self, session: AsyncSession, id_team: int, action_type: str, analyst_id: int) -> list[Action]:
         """Obtiene acciones que generaron punto o saques que mantuvieron el juego."""
         query = (
             select(Action)
@@ -79,6 +79,7 @@ class ActionRepository(IActionRepository):
                 and_(
                     Action.id_team == id_team,
                     Action.action_type == action_type,
+                    Action.id_analyst == analyst_id,
                     or_(
                         # Condición 1: Generó punto directo para el equipo
                         Action.id_point_for_team == id_team,
@@ -100,7 +101,7 @@ class ActionRepository(IActionRepository):
         result = await session.execute(query)
         return result.scalars().unique().all()
     
-    async def get_actions_type_from_team_against_team(self, session: AsyncSession, id_team: int, action_type: str) -> list[Action]:
+    async def get_actions_type_from_team_against_team(self, session: AsyncSession, id_team: int, action_type: str, analyst_id: int) -> list[Action]:
         """Obtiene todas las acciones de un tipo específico que han hecho punto contra el equipo (errores propios)."""
         query = (
             select(Action)
@@ -109,7 +110,8 @@ class ActionRepository(IActionRepository):
                     Action.id_team == id_team,
                     Action.action_type == action_type,
                     Action.id_point_for_team != id_team, 
-                    Action.id_point_for_team.is_not(None)
+                    Action.id_point_for_team.is_not(None),
+                    Action.id_analyst == analyst_id
                 )
             )
             .options(
@@ -122,7 +124,7 @@ class ActionRepository(IActionRepository):
         result = await session.execute(query)
         return result.scalars().unique().all()
     
-    async def get_actions_type_from_player(self, session: AsyncSession, id_player: int, action_type: str) -> list[Action]:
+    async def get_actions_type_from_player(self, session: AsyncSession, id_player: int, action_type: str, analyst_id: int) -> list[Action]:
         """Obtiene acciones de punto o saques continuos para un jugador específico."""
         query = (
             select(Action)
@@ -130,6 +132,7 @@ class ActionRepository(IActionRepository):
                 and_(
                     Action.id_player == id_player,
                     Action.action_type == action_type,
+                    Action.id_analyst == analyst_id,
                     or_(
                         # Condición 1: El punto fue para el equipo del jugador
                         Action.id_point_for_team == Action.id_team,
@@ -151,7 +154,7 @@ class ActionRepository(IActionRepository):
         result = await session.execute(query)
         return result.scalars().unique().all()
     
-    async def get_actions_type_from_player_against_team(self, session: AsyncSession, id_player: int, action_type: str) -> list[Action]:
+    async def get_actions_type_from_player_against_team(self, session: AsyncSession, id_player: int, action_type: str, analyst_id: int) -> list[Action]:
         """Obtiene todas las acciones de un tipo específico de un jugador que terminaron en punto rival."""
         query = (
             select(Action)
@@ -160,7 +163,8 @@ class ActionRepository(IActionRepository):
                     Action.id_player == id_player,
                     Action.action_type == action_type,
                     Action.id_point_for_team != Action.id_team,
-                    Action.id_point_for_team.is_not(None)
+                    Action.id_point_for_team.is_not(None),
+                    Action.id_analyst == analyst_id
                 )
             )
             .options(
@@ -279,7 +283,7 @@ class ActionRepository(IActionRepository):
         result = await session.execute(query)
         return result.scalars().unique().all()
     
-    async def get_general_stats_by_team(self, session: AsyncSession, id_team: int, team_slug: str) -> ActionGeneralStatsDTO:
+    async def get_general_stats_by_team(self, session: AsyncSession, id_team: int, team_slug: str, id_analyst: int) -> ActionGeneralStatsDTO:
         """Calcula porcentajes de éxito y error por tipo de acción para un equipo."""
         
         is_success = Action.id_point_for_team == id_team
@@ -292,7 +296,7 @@ class ActionRepository(IActionRepository):
                 func.count(case((is_success, 1))).label("successes"),
                 func.count(case((is_error, 1))).label("errors")
             )
-            .where(Action.id_team == id_team)
+            .where(Action.id_team == id_team and Action.id_analyst == id_analyst)
             .group_by(Action.action_type)
         )
         
