@@ -6,7 +6,6 @@ import { StartAnalysing } from "./StartAnalysing";
 import { Scoreboard } from "./Scoreboard";
 import { AnalysisCourt } from "./AnalysisCourt";
 import { ActionPanel } from "./ActionPanel";
-import { SubstitutionPanel } from "./SubstitutionPanel";
 import LoadingFallback from "@/components/LoadingFallback";
 import type { LineupPosition } from "@/interfaces/lineupPosition.interface";
 import Swal from "sweetalert2";
@@ -161,15 +160,6 @@ export const OtherTeamAnalysisManager = ({
         <div className="lg:col-span-4 h-full">
           {selectedPosition ? (
             <>
-              <SubstitutionPanel
-                slugLineup={
-                  lineups?.home?.slug_team === selectedPosition.slug_team ? lineups.home.slug_lineup : lineups?.away?.slug_lineup || ""
-                }
-                selectedPosition={selectedPosition}
-                allPositions={[...Object.values(homeLineupMap), ...Object.values(awayLineupMap)]}
-                onSuccess={() => setSelectedPosition(null)}
-              />
-
               <ActionPanel
                 setSlug={actualSet.slug_set}
                 selectedPosition={selectedPosition}

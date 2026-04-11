@@ -6,7 +6,6 @@ import { StartAnalysing } from "./StartAnalysing";
 import { Scoreboard } from "./Scoreboard";
 import { AnalysisCourt } from "./AnalysisCourt";
 import { ActionPanel } from "./ActionPanel";
-import { SubstitutionPanel } from "./SubstitutionPanel";
 import LoadingFallback from "@/components/LoadingFallback";
 import type { LineupPosition } from "@/interfaces/lineupPosition.interface";
 import Swal from "sweetalert2";
@@ -90,6 +89,81 @@ export const MatchAnalysisManager = ({ analystSlug }: { analystSlug: string }) =
     }
   }, [match, finishedSetsData, showFinalStats]);
 
+  const handleManualFinish = () => {
+    // 1. Obtenemos el marcador actual de la referencia
+    const { local, visitor } = lastScore.current;
+
+    // 2. Seteamos los estados necesarios para mostrar PostMatchStats
+    setFinishedMatchSlug(match?.slug_match || "");
+    setFinalScore({ local, visitor });
+
+    // 3. Mostramos el Swal que ya tenías definido
+    Swal.fire({
+      title: "¡Partido Finalizado!",
+      html: `
+        <div class="py-4">
+          <div class="flex justify-center items-center gap-6 mb-2">
+            <div class="text-center">
+              <span class="block text-[10px] font-black text-gray-400 uppercase">Sets Local</span>
+              <span class="text-4xl font-black text-slate-800">${local}</span>
+            </div>
+            <div class="text-2xl font-black text-gray-300 mt-4">-</div>
+            <div class="text-center">
+              <span class="block text-[10px] font-black text-gray-400 uppercase">Sets Visitante</span>
+              <span class="text-4xl font-black text-slate-800">${visitor}</span>
+            </div>
+          </div>
+          <p class="text-sm font-bold text-blue-600 uppercase tracking-widest mt-4">
+            ${local > visitor ? "Victoria Local" : "Victoria Visitante"}
+          </p>
+        </div>
+      `,
+      icon: "success",
+      confirmButtonText: "Ver Estadísticas Finales",
+      confirmButtonColor: "#2563eb",
+      allowOutsideClick: false,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setShowFinalStats(true);
+      }
+    });
+  };
+
+  useEffect(() => {
+    const isJustFinished =
+      previousMatchSlug.current && (!match || match.status === "finished" || match.slug_match !== previousMatchSlug.current);
+
+    if (isJustFinished) {
+      if (showFinalStats) return;
+
+      const { local, visitor } = lastScore.current;
+      setFinishedMatchSlug(previousMatchSlug.current!);
+      setFinalScore({ local, visitor });
+
+      handleManualFinish();
+
+      // Limpiamos la referencia para evitar que el Swal salte múltiples veces si el componente se re-renderiza
+      previousMatchSlug.current = null;
+    }
+
+    // 2. MIENTRAS EL PARTIDO ESTÁ VIVO
+    if (match && match.status === "live") {
+      previousMatchSlug.current = match.slug_match;
+
+      if (finishedSetsData) {
+        const score = finishedSetsData.reduce(
+          (acc, set) => {
+            if (set.local_points > set.visitor_points) acc.local += 1;
+            else if (set.visitor_points > set.local_points) acc.visitor += 1;
+            return acc;
+          },
+          { local: 0, visitor: 0 },
+        );
+        lastScore.current = score;
+      }
+    }
+  }, [match, finishedSetsData, showFinalStats]);
+
   // RENDERIZADO LÓGICO
   if (showFinalStats) {
     return (
@@ -145,21 +219,13 @@ export const MatchAnalysisManager = ({ analystSlug }: { analystSlug: string }) =
         <div className="lg:col-span-4 h-full">
           {selectedPosition ? (
             <>
-              <SubstitutionPanel
-                slugLineup={
-                  lineups?.home?.slug_team === selectedPosition.slug_team ? lineups.home.slug_lineup : lineups?.away?.slug_lineup || ""
-                }
-                selectedPosition={selectedPosition}
-                allPositions={[...Object.values(homeLineupMap), ...Object.values(awayLineupMap)]}
-                onSuccess={() => setSelectedPosition(null)}
-              />
-
               <ActionPanel
                 setSlug={actualSet.slug_set}
                 selectedPosition={selectedPosition}
                 teamLocalSlug={match.slug_team_local}
                 teamVisitorSlug={match.slug_team_visitor}
                 onSuccess={() => setSelectedPosition(null)}
+                onFinishMatch={handleManualFinish}
               />
             </>
           ) : (

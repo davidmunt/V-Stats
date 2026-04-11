@@ -163,6 +163,39 @@ class ActionService(IActionService):
             target.is_on_court = False
             target.current_position = None
 
+    # async def _update_score(self, session, current_set, match, point_team_id, payload):
+    #     if point_team_id == match.id_local_team:
+    #         current_set.local_points += 1
+    #     else:
+    #         current_set.visitor_points += 1
+        
+    #     await session.flush()
+
+    #     limit = 15 if current_set.set_number == 5 else 25
+    #     pts_local = current_set.local_points
+    #     pts_visitor = current_set.visitor_points
+    #     diff = abs(pts_local - pts_visitor)
+
+    #     if (pts_local >= limit or pts_visitor >= limit) and diff >= 2:
+    #         current_set.status = "finished"
+    #         current_set.finished_at = datetime.now()
+            
+    #         finished_sets = await self._set_repo.get_finished_sets_by_match_slug(session, match.slug)
+            
+    #         local_sets = sum(1 for s in finished_sets if s.local_points > s.visitor_points)
+    #         visitor_sets = sum(1 for s in finished_sets if s.local_points < s.visitor_points)
+            
+    #         if pts_local > pts_visitor: local_sets += 1
+    #         else: visitor_sets += 1
+
+    #         if local_sets == 3 or visitor_sets == 3:
+    #             match.status = "finished"
+    #             payload["match_finished"] = True
+    #         else:
+    #             next_num = current_set.set_number + 1
+    #             new_set_dto = await self._set_repo.create_next_set(session, match.id_match, next_num)
+    #             payload["new_set"] = new_set_dto
+
     async def _update_score(self, session, current_set, match, point_team_id, payload):
         if point_team_id == match.id_local_team:
             current_set.local_points += 1
@@ -172,6 +205,7 @@ class ActionService(IActionService):
         await session.flush()
 
         limit = 15 if current_set.set_number == 5 else 25
+        
         pts_local = current_set.local_points
         pts_visitor = current_set.visitor_points
         diff = abs(pts_local - pts_visitor)
@@ -179,17 +213,16 @@ class ActionService(IActionService):
         if (pts_local >= limit or pts_visitor >= limit) and diff >= 2:
             current_set.status = "finished"
             current_set.finished_at = datetime.now()
-            
+            await session.flush()
+
             finished_sets = await self._set_repo.get_finished_sets_by_match_slug(session, match.slug)
             
-            local_sets = sum(1 for s in finished_sets if s.local_points > s.visitor_points)
-            visitor_sets = sum(1 for s in finished_sets if s.local_points < s.visitor_points)
-            
-            if pts_local > pts_visitor: local_sets += 1
-            else: visitor_sets += 1
+            local_sets_won = sum(1 for s in finished_sets if s.local_points > s.visitor_points)
+            visitor_sets_won = sum(1 for s in finished_sets if s.local_points < s.visitor_points)
 
-            if local_sets == 3 or visitor_sets == 3:
+            if local_sets_won == 3 or visitor_sets_won == 3:
                 match.status = "finished"
+                match.finished_at = datetime.now()
                 payload["match_finished"] = True
             else:
                 next_num = current_set.set_number + 1
