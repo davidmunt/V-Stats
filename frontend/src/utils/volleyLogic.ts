@@ -33,7 +33,7 @@ export const getAllowedActions = (history: ActionHistoryItem[], selectedPlayer: 
     } else if ((lastType === "RECEPTION" || lastType === "DIG") && ["+", "-"].includes(lastResult)) {
       allowedActions = ["SET", "ATTACK"];
     } else if (lastType === "SET" && ["+", "-"].includes(lastResult)) {
-      allowedActions = ["ATTACK", "SET"];
+      allowedActions = ["ATTACK"];
     } else if ((lastType === "ATTACK" || lastType === "BLOCK" || lastType === "SERVE") && ["+", "-"].includes(lastResult)) {
       allowedActions = ["BLOCK", "DIG", "SET"];
     } else {
