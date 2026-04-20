@@ -110,7 +110,7 @@ async def get_actions_by_player_and_type_against_team(
         except PermissionError as e:
             raise HTTPException(status_code=403, detail=str(e))
 
-@router.get("/team/{team_slug}/general", response_model=StatGeneralResponse) # <--- Cambiado a StatGeneralResponse
+@router.get("/team/{team_slug}/general", response_model=StatGeneralResponse) 
 async def get_general_stats_by_team(
     team_slug: str,
     user_data: dict = Depends(auth_analyst),

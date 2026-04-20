@@ -16,7 +16,7 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @PostMapping("/create-intent")
-    @PreAuthorize("hasRole('coach')") // Solo los coaches pueden comprar el VIP
+    @PreAuthorize("hasRole('coach')")
     public ResponseEntity<PaymentIntentResponse> createPaymentIntent(@RequestBody CreatePaymentRequest request) {
         return ResponseEntity.ok(paymentService.createPaymentIntent(request));
     }

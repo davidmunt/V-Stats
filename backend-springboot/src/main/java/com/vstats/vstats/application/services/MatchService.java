@@ -100,36 +100,30 @@ public class MatchService {
 
     @Transactional
     public MatchResponse updateMatch(String slug, UpdateMatchRequest request) {
-        // 1. Buscar partido existente (404)
         MatchEntity match = matchRepository.findBySlug(slug)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Partido no encontrado"));
 
-        // Bloquear si ya está eliminado
         if ("deleted".equals(match.getStatus())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede editar un partido eliminado");
         }
 
-        // 2. Validaciones de Negocio (400)
         if (request.getSlug_team_local().equals(request.getSlug_team_visitor())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Un equipo no puede jugar contra sí mismo");
         }
 
         LocalDateTime matchDate;
         try {
-            // OffsetDateTime sí entiende la 'Z', luego lo pasamos a LocalDateTime
             matchDate = java.time.OffsetDateTime.parse(request.getDate()).toLocalDateTime();
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Formato de fecha inválido: " + e.getMessage());
         }
 
-        // 3. Cargar nuevas entidades
         TeamEntity local = teamRepository.findBySlug(request.getSlug_team_local())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Equipo local no encontrado"));
 
         TeamEntity visitor = teamRepository.findBySlug(request.getSlug_team_visitor())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Equipo visitante no encontrado"));
 
-        // 4. Validar Sede del nuevo local
         SeasonTeamEntity localSeasonData = seasonTeamRepository.findByTeam_SlugAndSeason_IsActiveTrue(local.getSlug())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "El nuevo equipo local no tiene datos en esta temporada"));
@@ -139,13 +133,11 @@ public class MatchService {
                     "El nuevo equipo local no tiene una sede asignada");
         }
 
-        // 5. Aplicar cambios
         match.setLocalTeam(local);
         match.setVisitorTeam(visitor);
         match.setVenue(localSeasonData.getVenue());
         match.setDate(matchDate);
 
-        // 6. Lógica de Status
         if (request.getStatus() != null) {
             String status = request.getStatus().toLowerCase().trim();
 
@@ -231,22 +223,17 @@ public class MatchService {
         AnalystEntity analyst = analystRepository.findById(currentAnalystId)
                 .orElseThrow(() -> new RuntimeException("Error: Analista no encontrado"));
 
-        // 1. Buscamos la relación de temporada activa para este analista
         SeasonTeamEntity st = seasonTeamRepository.findAllBySeason_IsActiveTrue().stream()
                 .filter(s -> s.getAnalyst() != null && s.getAnalyst().getIdAnalyst().equals(analyst.getIdAnalyst()))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException(
                         "Error: El analista no tiene equipo asignado en la temporada activa"));
 
-        // 2. ID de la liga desde SeasonTeam
         Long leagueId = st.getLeague().getIdLeague();
-
-        // 3. Buscamos los partidos y mapeamos usando "this::mapToResponse"
-        // He usado el nombre del método que aparece en tus otras funciones de la clase
 
         List<MatchEntity> matches = matchRepository.findByLeague_IdLeague(leagueId);
         return matches.stream()
-                .map(this::mapToResponse) // Usamos tu función interna
+                .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 

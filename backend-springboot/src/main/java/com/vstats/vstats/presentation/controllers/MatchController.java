@@ -36,25 +36,21 @@ public class MatchController {
         return ResponseEntity.ok(Map.of("match", matchService.startMatch(slug)));
     }
 
-    // Partidos por liga
     @GetMapping("/league/{slugLeague}")
     public ResponseEntity<Map<String, List<MatchResponse>>> getByLeague(@PathVariable String slugLeague) {
         return ResponseEntity.ok(Map.of("matches", matchService.getMatchesByLeague(slugLeague)));
     }
 
-    // Un solo partido
     @GetMapping("/{slug}")
     public ResponseEntity<Map<String, MatchResponse>> getOne(@PathVariable String slug) {
         return ResponseEntity.ok(Map.of("match", matchService.getMatch(slug)));
     }
 
-    // Partidos del equipo de un Coach
     @GetMapping("/coach/{slugCoach}")
     public ResponseEntity<Map<String, List<MatchResponse>>> getByCoach(@PathVariable String slugCoach) {
         return ResponseEntity.ok(Map.of("matches", matchService.getMatchesByCoach(slugCoach)));
     }
 
-    // Partidos del equipo de un Analista
     @GetMapping("/analyst/{slugAnalyst}")
     public ResponseEntity<Map<String, List<MatchResponse>>> getByAnalyst(@PathVariable String slugAnalyst) {
         return ResponseEntity.ok(Map.of("matches", matchService.getMatchesByAnalyst(slugAnalyst)));

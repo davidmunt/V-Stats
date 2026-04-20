@@ -13,6 +13,5 @@ public interface LineupPositionRepository extends JpaRepository<LineupPositionEn
 
     void deleteByLineup_IdLineup(Long idLineup);
 
-    // Busca todas las posiciones asociadas a una alineación específica
     List<LineupPositionEntity> findAllByLineup_IdLineup(Long idLineup);
 }

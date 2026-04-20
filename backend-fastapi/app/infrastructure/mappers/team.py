@@ -10,10 +10,9 @@ class TeamModelMapper(IModelMapper[Union[Team, SeasonTeam], TeamDTO]):
         if model is None:
             return None
 
-        # CASO 1: Si recibimos SeasonTeam (Listado desde el partido)
         if isinstance(model, SeasonTeam):
             return TeamDTO(
-                slug_team=model.team.slug, # Usamos slug_team
+                slug_team=model.team.slug, 
                 slug_league=model.league.slug if model.league else "none",
                 name=model.team.name,
                 slug_venue=model.venue.slug if model.venue else "none",
@@ -27,9 +26,8 @@ class TeamModelMapper(IModelMapper[Union[Team, SeasonTeam], TeamDTO]):
                 id_league=model.id_league
             )
 
-        # CASO 2: Si recibimos Team directamente (get_by_id)
         return TeamDTO(
-            slug_team=model.slug, # Usamos slug_team
+            slug_team=model.slug, 
             slug_league="none",
             name=model.name,
             image=model.image or "",

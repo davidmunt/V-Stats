@@ -79,7 +79,6 @@ class Container:
         return LeagueModelMapper()
 
     def league_repository(self):
-        # Usamos 'mapper' porque así lo definimos en el __init__ de LeagueRepository
         return LeagueRepository(mapper=self.league_model_mapper())
 
     def league_service(self):
@@ -96,7 +95,6 @@ class Container:
         return MatchModelMapper()
 
     def match_repository(self):
-        # Usamos 'match_mapper' porque así está en el repo de infraestructura
         return MatchRepository(match_mapper=self.match_model_mapper())
 
     def match_service(self):
@@ -139,7 +137,6 @@ class Container:
 
     # --- LINEUP ---
     def lineup_repository(self):
-        # LineupRepository no usa mapper según nuestra implementación
         return LineupRepository()
 
     # --- ACTION ---

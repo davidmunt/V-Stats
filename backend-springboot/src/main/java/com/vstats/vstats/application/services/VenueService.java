@@ -77,7 +77,6 @@ public class VenueService {
                 return mapToResponse(venueRepository.save(venue));
         }
 
-        // añadirle aqui lo del id de admin
         public Map<String, Object> getAllVenues(String q, String status, String sort, int page, int size) {
 
                 Sort sortOrder = switch (sort != null ? sort : "recent") {

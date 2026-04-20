@@ -199,8 +199,6 @@ public class LeagueService {
                 seasonLeagueRepository.save(sl);
         }
 
-        // --- Mapeo y Auxiliares ---
-
         private LeagueResponse mapToResponse(SeasonLeagueEntity sl) {
                 return LeagueResponse.builder()
                                 .slug_league(sl.getLeague().getSlug())

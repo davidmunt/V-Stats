@@ -27,7 +27,6 @@ class SetResponse(BaseModel):
             is_active=dto.is_active
         )
 
-# Este envuelve al objeto para cumplir con SingleSetResponse del front
 class SingleSetResponse(BaseModel):
     set: SetResponse
 

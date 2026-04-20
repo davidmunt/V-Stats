@@ -11,29 +11,24 @@ import java.util.Optional;
 
 @Repository
 public interface SeasonPlayerRepository
-        extends JpaRepository<SeasonPlayerEntity, Long>, JpaSpecificationExecutor<SeasonPlayerEntity> {
+                extends JpaRepository<SeasonPlayerEntity, Long>, JpaSpecificationExecutor<SeasonPlayerEntity> {
 
-    Optional<SeasonPlayerEntity> findByPlayer_Slug(String slug);
+        Optional<SeasonPlayerEntity> findByPlayer_Slug(String slug);
 
-    boolean existsByPlayer_SlugAndSeason_IdSeason(String slug, Long idSeason);
+        boolean existsByPlayer_SlugAndSeason_IdSeason(String slug, Long idSeason);
 
-    boolean existsByDorsalAndSeasonTeam_Team_Slug(Integer dorsal, String teamSlug);
+        boolean existsByDorsalAndSeasonTeam_Team_Slug(Integer dorsal, String teamSlug);
 
-    // Cambiado 'IdSeasonTeam' por 'IdTeamSeason'
-    boolean existsByDorsalAndSeasonTeam_IdTeamSeasonAndIdSeasonPlayerNot(Integer dorsal, Long idTeamSeason,
-            Long idSeasonPlayer);
+        boolean existsByDorsalAndSeasonTeam_IdTeamSeasonAndIdSeasonPlayerNot(Integer dorsal, Long idTeamSeason,
+                        Long idSeasonPlayer);
 
-    // Buscar por el slug del jugador en la temporada activa
-    Optional<SeasonPlayerEntity> findByPlayer_SlugAndSeason_IsActiveTrue(String playerSlug);
+        Optional<SeasonPlayerEntity> findByPlayer_SlugAndSeason_IsActiveTrue(String playerSlug);
 
-    // Buscar jugadores de un equipo específico
-    List<SeasonPlayerEntity> findAllBySeasonTeam_Team_SlugAndSeason_IsActiveTrue(String teamSlug);
+        List<SeasonPlayerEntity> findAllBySeasonTeam_Team_SlugAndSeason_IsActiveTrue(String teamSlug);
 
-    // Buscar jugadores por el equipo donde está un Coach específico
-    List<SeasonPlayerEntity> findAllBySeasonTeam_Coach_SlugAndSeason_IsActiveTrue(String coachSlug);
+        List<SeasonPlayerEntity> findAllBySeasonTeam_Coach_SlugAndSeason_IsActiveTrue(String coachSlug);
 
-    // Buscar jugadores por el equipo donde está un Analyst específico
-    List<SeasonPlayerEntity> findAllBySeasonTeam_Analyst_SlugAndSeason_IsActiveTrue(String analystSlug);
+        List<SeasonPlayerEntity> findAllBySeasonTeam_Analyst_SlugAndSeason_IsActiveTrue(String analystSlug);
 
-    Optional<SeasonPlayerEntity> findByPlayer_IdPlayerAndSeason_IsActiveTrue(Long idPlayer);
+        Optional<SeasonPlayerEntity> findByPlayer_IdPlayerAndSeason_IsActiveTrue(Long idPlayer);
 }

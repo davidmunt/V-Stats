@@ -35,18 +35,15 @@ class MatchRepository(IMatchRepository):
                 selectinload(Match.local_team),
                 selectinload(Match.visitor_team),
                 selectinload(Match.venue),
-                # --- ESTA ES LA LÍNEA QUE FALTA ---
                 selectinload(Match.sets) 
             )
         )
         result = await session.execute(query)
         match_model = result.scalar_one_or_none()
         
-        # Ahora, cuando el mapper haga model.sets, ya estarán cargados y no dará error
         return self.mapper.to_dto(match_model)
     
     async def get_next_match_by_team_id_analyst(self, session: AsyncSession, team_id: int) -> Optional[MatchDTO]:
-        # --- 1. CONSULTA PARA PARTIDO EN VIVO ---
         query_live = (
             select(Match)
             .where(
@@ -61,7 +58,7 @@ class MatchRepository(IMatchRepository):
                 selectinload(Match.local_team),
                 selectinload(Match.visitor_team),
                 selectinload(Match.venue),
-                selectinload(Match.sets) # <--- AÑADIR AQUÍ
+                selectinload(Match.sets) 
             )
             .limit(1)
         )
@@ -69,7 +66,6 @@ class MatchRepository(IMatchRepository):
         result = await session.execute(query_live)
         match_model = result.scalar_one_or_none()
 
-        # --- 2. SI NO HAY LIVE, BUSCAMOS EL PRÓXIMO SCHEDULED ---
         if not match_model:
             today_start = datetime.combine(datetime.now().date(), time.min)
             
@@ -89,7 +85,7 @@ class MatchRepository(IMatchRepository):
                     selectinload(Match.local_team),
                     selectinload(Match.visitor_team),
                     selectinload(Match.venue),
-                    selectinload(Match.sets) # <--- AÑADIR TAMBIÉN AQUÍ
+                    selectinload(Match.sets) 
                 )
                 .limit(1)
             )
@@ -97,7 +93,6 @@ class MatchRepository(IMatchRepository):
             result = await session.execute(query_scheduled)
             match_model = result.scalar_one_or_none()
 
-        # Ahora el Mapper encontrará los sets precargados y no fallará
         return self.mapper.to_dto(match_model)
 
     async def get_matches_by_league_slug(self, session: AsyncSession, league_slug: str) -> List[MatchDTO]:
@@ -124,7 +119,6 @@ class MatchRepository(IMatchRepository):
         """
         Obtiene todos los partidos donde el equipo (local o visitante) coincida con el slug.
         """
-        # Creamos alias para la tabla Team para unirla dos veces
         LocalTeam = aliased(Team)
         VisitorTeam = aliased(Team)
 
@@ -151,7 +145,6 @@ class MatchRepository(IMatchRepository):
         result = await session.execute(query)
         matches = result.scalars().unique().all()
         
-        # IMPORTANTE: Mapear a DTO antes de devolver, para mantener consistencia
         return [self.mapper.to_dto(m) for m in matches]
     
     async def get_model_by_slug(self, session: AsyncSession, slug: str) -> Optional[Match]:
@@ -187,14 +180,13 @@ class MatchRepository(IMatchRepository):
                 Match.status == "finished"
             )
             .options(
-                selectinload(Match.sets), # Carga los sets de forma eficiente
+                selectinload(Match.sets),
                 selectinload(Match.league),
                 selectinload(Match.local_team),
                 selectinload(Match.visitor_team)
             )
         )
         result = await session.execute(query)
-        # .unique() es obligatorio cuando usas selectinload/joinedload para no duplicar filas
         matches = result.scalars().unique().all() 
         return [self.mapper.to_dto(m) for m in matches]
     
@@ -209,10 +201,9 @@ class MatchRepository(IMatchRepository):
             .join(Set, Set.id_match == Match.id_match)
             .where(Match.id_match == match_id)
             .group_by(Team.id_team)
-            .having(func.count(Set.id_set) > 0)  # Asegura que haya al menos un set creado para ese equipo
+            .having(func.count(Set.id_set) > 0)
         )
         result = await session.execute(query)
         teams_with_lineups = result.scalars().all()
         
-        # Si el partido tiene dos equipos y ambos tienen alineación, entonces está listo para iniciar
         return len(teams_with_lineups) == 2

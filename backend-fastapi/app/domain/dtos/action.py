@@ -2,7 +2,6 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional, Literal
 
-# Definimos los tipos literales para mayor seguridad en el dominio
 ActionType = Literal["SERVE", "RECEPTION", "SET", "ATTACK", "BLOCK", "ERROR"]
 ResultType = Literal["SUCCESS", "FAIL", "ACE", "BLOCKED", "ERROR"]
 

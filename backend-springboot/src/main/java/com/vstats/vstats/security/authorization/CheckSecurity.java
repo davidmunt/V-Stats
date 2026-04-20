@@ -9,7 +9,6 @@ import java.lang.annotation.Target;
 
 public @interface CheckSecurity {
 
-    // Para cualquier usuario logueado (independientemente del rol)
     public @interface Protected {
         @Retention(RetentionPolicy.RUNTIME)
         @Target(ElementType.METHOD)

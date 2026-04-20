@@ -71,7 +71,6 @@ public class CategoryService {
                 return mapToResponse(categoryRepository.save(category));
         }
 
-        // añade lo de id admin despes
         public Map<String, Object> getAllCategories(String q, String status, String sort, int page, int size) {
 
                 Sort sortOrder = switch (sort != null ? sort : "recent") {

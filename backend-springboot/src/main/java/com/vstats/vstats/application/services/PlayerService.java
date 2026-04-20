@@ -98,8 +98,8 @@ public class PlayerService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Equipo no encontrado"));
 
         Sort sortOrder = switch (sort != null ? sort : "recent") {
-            case "name_asc" -> Sort.by("player.name").ascending(); // Ordena por el nombre del chaval
-            case "dorsal" -> Sort.by("dorsal").ascending(); // Ordena por número
+            case "name_asc" -> Sort.by("player.name").ascending();
+            case "dorsal" -> Sort.by("dorsal").ascending();
             default -> Sort.by("createdAt").descending();
         };
 

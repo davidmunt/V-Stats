@@ -61,7 +61,6 @@ public class ChatService {
     private String buildContext(TeamEntity myTeam, LeagueEntity league, List<MatchEntity> matches,
             List<SeasonTeamEntity> teams, List<VenueEntity> venues) {
         StringBuilder sb = new StringBuilder();
-        // INSTRUCCIONES DE PERSONALIDAD Y ENFOQUE
         sb.append("Eres el asistente oficial de V-Stats. Tu estilo es profesional, educado y muy enfocado.\n");
         sb.append("REGLAS DE RESPUESTA:\n");
         sb.append("- Responde con UNA SOLA frase natural que incluya exclusivamente el dato pedido.\n");
@@ -74,7 +73,6 @@ public class ChatService {
                 "- PROHIBIDO dar información adicional que no se haya solicitado. Si piden el lugar, no digas la hora. Si piden la hora, no digas el rival.\n");
         sb.append("- No uses formatos técnicos. Usa lenguaje humano (ej: 16 de abril).\n\n");
 
-        // FECHA ACTUAL PARA REFERENCIA
         sb.append("FECHA ACTUAL: ").append(java.time.LocalDateTime.now()).append("\n\n");
 
         sb.append("CONTEXTO ACTUAL:\n");
@@ -86,7 +84,6 @@ public class ChatService {
 
         sb.append("- Calendario de partidos:\n");
         for (MatchEntity m : matches) {
-            // Extraemos el nombre de la sede si existe
             String nombreSede = (m.getVenue() != null) ? m.getVenue().getName() : "Sede no asignada";
             String direccionSede = (m.getVenue() != null) ? m.getVenue().getAddress() : "";
 
@@ -109,7 +106,6 @@ public class ChatService {
 
     @Transactional(readOnly = true)
     public ChatResponse createChat(ChatRequest request) {
-        // 1. Identificar al Coach y su inscripción actual (Temporada Activa)
         Long currentCoachId = authUtils.getCurrentUserId();
 
         SeasonTeamEntity mySeasonInscriptions = seasonTeamRepository
@@ -117,28 +113,19 @@ public class ChatService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "El entrenador no está inscrito en ninguna temporada activa"));
 
-        // Datos base
         TeamEntity myTeam = mySeasonInscriptions.getTeam();
         SeasonEntity currentSeason = mySeasonInscriptions.getSeason();
 
-        // 2. Obtener la liga a la que pertenece esa temporada
-        // Relacionamos a través de la Season que ya tenemos
-
         LeagueEntity league = mySeasonInscriptions.getLeague();
 
-        // 3. Recoger todos los partidos de esta liga/temporada
         List<MatchEntity> allMatches = matchRepository
                 .findAllByLeague_IdLeague(league.getIdLeague());
 
-        // 4. Recoger todos los equipos rivales de la misma liga
         List<SeasonTeamEntity> leagueTeams = seasonTeamRepository
                 .findAllBySeason_IdSeason(currentSeason.getIdSeason());
 
-        // 5. Recoger las sedes (Venues)
-        // Podemos sacarlas de los partidos o traer todas las disponibles en el sistema
         List<VenueEntity> allVenues = venueRepository.findAll();
 
-        // 6. Construir el prompt con contexto + pregunta
         String systemContext = buildContext(myTeam, league, allMatches, leagueTeams, allVenues);
         String userQuestion = request.getText();
 
@@ -166,8 +153,6 @@ public class ChatService {
         }
     }
 
-    // --- IMPLEMENTACIONES DE APIs ---
-
     private String callGemini(String context, String question) {
         String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key="
                 + geminiKey;
@@ -177,7 +162,6 @@ public class ChatService {
                         Map.of("parts", List.of(Map.of("text", context + "\n\nPregunta: " + question)))));
 
         Map<String, Object> response = restTemplate.postForObject(url, body, Map.class);
-        // Navegamos por el JSON de respuesta de Google
         List candidates = (List) response.get("candidates");
         Map content = (Map) ((Map) candidates.get(0)).get("content");
         List parts = (List) content.get("parts");
@@ -194,7 +178,6 @@ public class ChatService {
                 context, question);
     }
 
-    // Método genérico para Groq y Cerebras ya que usan el mismo estándar que OpenAI
     private String callOpenAICompatible(String url, String key, String model, String context, String question) {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(key);

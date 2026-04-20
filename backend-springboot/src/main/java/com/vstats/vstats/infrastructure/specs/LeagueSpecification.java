@@ -7,7 +7,7 @@ public class LeagueSpecification {
 
     public static Specification<SeasonLeagueEntity> build(String q, String categorySlug, String status) {
         return Specification
-                .where(isAvailable()) // Siempre activo y no borrado
+                .where(isAvailable())
                 .and(searchByQ(q))
                 .and(filterByCategory(categorySlug))
                 .and(filterByStatus(status));

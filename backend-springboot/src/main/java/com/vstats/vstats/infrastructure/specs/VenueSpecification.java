@@ -21,7 +21,6 @@ public class VenueSpecification {
             if (q == null || q.isBlank())
                 return null;
             String pattern = "%" + q.toLowerCase() + "%";
-            // QUITAMOS el .get("venue") intermedio
             return cb.or(
                     cb.like(cb.lower(root.get("name")), pattern),
                     cb.like(cb.lower(root.get("slug")), pattern));

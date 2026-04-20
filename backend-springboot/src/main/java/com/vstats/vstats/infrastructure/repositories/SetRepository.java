@@ -8,6 +8,5 @@ import java.util.Optional;
 @Repository
 public interface SetRepository extends JpaRepository<SetEntity, Long> {
 
-    // Buscar el set específico de un partido
     Optional<SetEntity> findByMatch_SlugAndSetNumber(String matchSlug, Integer setNumber);
 }

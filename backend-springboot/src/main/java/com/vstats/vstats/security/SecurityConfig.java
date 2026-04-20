@@ -24,7 +24,6 @@ public class SecurityConfig {
 
         private final SecurityFilter securityFilter;
 
-        // 1. Declaramos los endpoints de lectura pública (GET)
         private static final String[] PUBLIC_READ_ENDPOINTS = {
                         "/api/leagues/**",
                         "/api/teams/**",
@@ -38,7 +37,6 @@ public class SecurityConfig {
                         "/swagger-ui.html"
         };
 
-        // 2. Declaramos los endpoints de escritura pública (POST para Auth)
         private static final String[] PUBLIC_WRITE_ENDPOINTS = {
                         "/api/auth/register",
                         "/api/auth/login",
@@ -51,7 +49,6 @@ public class SecurityConfig {
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
                 http
                                 .cors(org.springframework.security.config.Customizer.withDefaults())
-                                // DESACTIVAR COMPLETAMENTE AQUÍ:
                                 .csrf(AbstractHttpConfigurer::disable)
 
                                 .sessionManagement(session -> session

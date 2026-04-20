@@ -22,7 +22,6 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
-        // 1. Buscar en Admin
         var admin = adminRepo.findByEmail(email);
         if (admin.isPresent()) {
             var a = admin.get();
@@ -30,7 +29,6 @@ public class CustomUserDetailsService implements UserDetailsService {
                     a.getSessionVersion());
         }
 
-        // 2. Buscar en Coach
         var coach = coachRepo.findByEmail(email);
         if (coach.isPresent()) {
             var c = coach.get();
@@ -38,7 +36,6 @@ public class CustomUserDetailsService implements UserDetailsService {
                     c.getSessionVersion());
         }
 
-        // 3. Buscar en Analyst
         var analyst = analystRepo.findByEmail(email);
         if (analyst.isPresent()) {
             var an = analyst.get();
@@ -46,7 +43,6 @@ public class CustomUserDetailsService implements UserDetailsService {
                     an.getSessionVersion());
         }
 
-        // 4. Buscar en User
         var user = userRepo.findByEmail(email);
         if (user.isPresent()) {
             var u = user.get();

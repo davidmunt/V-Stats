@@ -240,7 +240,7 @@ public class UserService {
                 .email(e.getEmail())
                 .avatar(e.getAvatar())
                 .slug_coach(e.getSlug())
-                .user_type("coach") // Añadimos esto para que no sea null
+                .user_type("coach")
                 .slug_team(e.getTeam() != null ? e.getTeam().getSlug() : null)
                 .build();
     }

@@ -44,7 +44,7 @@ public class SubstitutionEntity {
     private PlayerEntity liberoPlayer;
 
     @Column(name = "libero_is_replacing")
-    private Boolean liberoIsReplacing; // true si el líbero entra, false si sale
+    private Boolean liberoIsReplacing;
 
     @Column(nullable = false)
     private Integer position; // 1 a 6

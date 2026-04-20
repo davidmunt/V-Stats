@@ -48,7 +48,6 @@ class LineupRepository:
     async def update_position(self, session: AsyncSession, position_model: LineupPosition, new_pos: int):
         """Actualiza la posición de un jugador."""
         position_model.current_position = new_pos
-        # Usamos flush para sincronizar con la DB sin cerrar la transacción
         await session.flush()
 
     async def get_position_by_player_slug(
@@ -95,7 +94,6 @@ class LineupRepository:
         return result.scalar_one_or_none()
     
     async def get_all_positions_by_lineup(self, session: AsyncSession, id_lineup: int) -> List[LineupPosition]:
-        # Añadimos selectinload para que p.player esté disponible sin errores
         query = (
             select(LineupPosition)
             .where(LineupPosition.id_lineup == id_lineup)

@@ -81,9 +81,7 @@ class ActionRepository(IActionRepository):
                     Action.action_type == action_type,
                     Action.id_analyst == analyst_id,
                     or_(
-                        # Condición 1: Generó punto directo para el equipo
                         Action.id_point_for_team == id_team,
-                        # Condición 2: Es un saque y el resultado es positivo o neutro (+, -, !, etc.)
                         and_(
                             Action.action_type == 'SERVE',
                             Action.result.in_(['+', '-']) 
@@ -134,9 +132,7 @@ class ActionRepository(IActionRepository):
                     Action.action_type == action_type,
                     Action.id_analyst == analyst_id,
                     or_(
-                        # Condición 1: El punto fue para el equipo del jugador
                         Action.id_point_for_team == Action.id_team,
-                        # Condición 2: Saques que no terminaron en punto pero fueron válidos
                         and_(
                             Action.action_type == 'SERVE',
                             Action.result.in_(['+', '-'])
@@ -187,9 +183,7 @@ class ActionRepository(IActionRepository):
                     Action.action_type == action_type,
                     Action.set.has(Set.id_match == id_match),
                     or_(
-                        # Caso A: Generó punto para el equipo
                         Action.id_point_for_team == id_team,
-                        # Caso B: Es un saque que mantuvo el juego en curso
                         and_(
                             Action.action_type == 'SERVE',
                             Action.result.in_(['+', '-'])
@@ -240,9 +234,7 @@ class ActionRepository(IActionRepository):
                     Action.action_type == action_type,
                     Action.set.has(Set.id_match == id_match),
                     or_(
-                        # Caso A: El equipo del jugador ganó el punto
                         Action.id_point_for_team == Action.id_team,
-                        # Caso B: Saques válidos sin punto inmediato
                         and_(
                             Action.action_type == 'SERVE',
                             Action.result.in_(['+', '-'])

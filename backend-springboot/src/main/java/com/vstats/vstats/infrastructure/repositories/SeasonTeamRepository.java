@@ -16,13 +16,10 @@ import java.util.Optional;
 public interface SeasonTeamRepository
                 extends JpaRepository<SeasonTeamEntity, Long>, JpaSpecificationExecutor<SeasonTeamEntity> {
 
-        // 1. Para encontrar la inscripción activa del Coach (ChatService Paso 1)
         Optional<SeasonTeamEntity> findByCoach_IdCoachAndSeason_IsActiveTrue(Long idCoach);
 
-        // 2. Para encontrar a todos los equipos de una temporada (ChatService Paso 4)
         List<SeasonTeamEntity> findAllBySeason_IdSeason(Long idSeason);
 
-        // --- Otros métodos útiles que ya tenías (mantenlos solo una vez) ---
         List<SeasonTeamEntity> findAllBySeason_IsActiveTrue();
 
         Optional<SeasonTeamEntity> findByTeam_SlugAndSeason_IsActiveTrue(String slug);

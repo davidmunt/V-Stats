@@ -26,15 +26,12 @@ public class WebhookController {
             @RequestHeader("Stripe-Signature") String sigHeader) {
 
         try {
-            // 1. Validar que la petición viene de Stripe y no ha sido alterada
             Event event = Webhook.constructEvent(payload, sigHeader, endpointSecret);
 
-            // 2. Pasamos el evento al servicio para procesar la lógica de negocio
             paymentService.processWebhookEvent(event);
 
             return ResponseEntity.ok("Webhook procesado");
         } catch (SignatureVerificationException e) {
-            // Si la firma es falsa, devolvemos 400
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Firma inválida");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno");

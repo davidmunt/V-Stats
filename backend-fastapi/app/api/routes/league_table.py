@@ -22,7 +22,7 @@ async def get_league_table(
         except ValueError as e:
             raise HTTPException(status_code=404, detail=str(e))
         except Exception as e:
-            traceback.print_exc() # Esto imprime el error detallado en la consola
+            traceback.print_exc() 
             raise HTTPException(
                 status_code=500, 
                 detail=f"Error: {type(e).__name__} - {str(e)}"

@@ -7,9 +7,9 @@ import java.util.List;
 @Data
 public class CreateLineupRequest {
 
-    private String slugMatch; // Este viene de la URL (@PathVariable), no importa el nombre aquí
+    private String slugMatch;
 
-    @JsonProperty("slug_team") // Obligatorio para que entienda el JSON de React
+    @JsonProperty("slug_team")
     private String slugTeam;
 
     private Integer setNumber;
