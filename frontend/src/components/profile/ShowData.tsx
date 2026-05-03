@@ -10,7 +10,6 @@ const ShowData = ({ userData, onEdit, onChangePassword }: Props) => {
   return (
     <div className="max-w-2xl mx-auto mt-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/60 overflow-hidden border border-slate-100">
-        {/* Header con Gradiente (Part_VII_background) */}
         <div className="h-32 bg-gradient-to-r from-blue-600 to-indigo-700" />
 
         <div className="px-8 pb-10">

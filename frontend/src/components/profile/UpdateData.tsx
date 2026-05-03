@@ -31,7 +31,6 @@ const UpdateData = ({ userData, onCancel }: Props) => {
         </div>
 
         <div className="space-y-8">
-          {/* Avatar Input */}
           <div className="space-y-3">
             <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">URL del Avatar</label>
             <input
@@ -43,7 +42,6 @@ const UpdateData = ({ userData, onCancel }: Props) => {
             />
           </div>
 
-          {/* Name Input */}
           <div className="space-y-3">
             <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Nombre Completo</label>
             <input

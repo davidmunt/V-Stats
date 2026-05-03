@@ -40,7 +40,7 @@ export const getPlayerVisualOffset = (position: number, isSetter: boolean, phase
   let y = 0;
 
   // =========================================================
-  // 1. FASE DE SAQUE (K2 - Antes de sacar)
+  // 1. FASE DE SAQUE (Antes de sacar)
   // =========================================================
   if (phase === "SERVE_OWN") {
     switch (setterPos) {
@@ -137,7 +137,7 @@ export const getPlayerVisualOffset = (position: number, isSetter: boolean, phase
   }
 
   // =========================================================
-  // 2. FASE EN JUEGO TRAS SAQUE (K2 - Defensa y Bloqueo)
+  // 2. FASE EN JUEGO TRAS SAQUE (Defensa y Bloqueo)
   // =========================================================
   else if (phase === "IN_PLAY_AFTER_SERVE") {
     switch (setterPos) {
@@ -266,7 +266,7 @@ export const getPlayerVisualOffset = (position: number, isSetter: boolean, phase
     }
 
     // =========================================================
-    // 3. FASE EN JUEGO TRAS RECIBIR (K1 - Ataque y Cobertura)
+    // 3. FASE EN JUEGO TRAS RECIBIR (Ataque y Cobertura)
     // =========================================================
   } else if (phase === "IN_PLAY_AFTER_RECEIVE") {
     switch (setterPos) {
@@ -387,7 +387,7 @@ export const getPlayerVisualOffset = (position: number, isSetter: boolean, phase
   }
 
   // =========================================================
-  // 4. FASE DE RECEPCIÓN (K1 - Antes de recibir)
+  // 4. FASE DE RECEPCIÓN (Antes de recibir)
   // =========================================================
   else if (phase === "RECEIVE_OWN") {
     switch (setterPos) {

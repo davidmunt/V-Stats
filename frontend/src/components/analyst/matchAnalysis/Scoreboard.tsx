@@ -61,43 +61,47 @@ export const Scoreboard = ({ matchSlug }: ScoreboardProps) => {
   };
 
   return (
-    <div className="bg-[#334155] text-white p-4 rounded-[2rem] shadow-xl border-b-4 border-blue-500 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent pointer-events-none"></div>
-
-      <div className="flex justify-between items-center max-w-6xl mx-auto relative z-10">
-        <div className="flex flex-col items-start gap-2 flex-1">
+    <div className="bg-gradient-to-r from-blue-600 to-blue-500 text-white p-5 rounded-[2.5rem] shadow-2xl shadow-blue-900/20 border border-white/10">
+      <div className="flex justify-between items-center max-w-6xl mx-auto">
+        <div className="flex flex-col items-start gap-3 flex-1">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-xl bg-white/10 border border-white/20 overflow-hidden shadow-inner flex items-center justify-center">
-              <img src={teamHome.image} alt={teamHome.name} className="w-full h-full object-cover" />
+            <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 p-1 flex items-center justify-center shadow-lg">
+              <img src={teamHome.image} alt={teamHome.name} className="w-full h-full object-contain rounded-xl" />
             </div>
-            <span className="text-[13px] font-black uppercase tracking-wider text-blue-300 truncate max-w-[140px]">{teamHome.name}</span>
+            <div className="flex flex-col">
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/70 leading-none mb-1">Local</span>
+              <span className="text-[14px] font-black uppercase tracking-tight text-white truncate max-w-[140px]">{teamHome.name}</span>
+            </div>
           </div>
-          <div className="flex items-center gap-4 ml-1 mt-1">
+
+          <div className="flex items-center gap-4 ml-1">
             <button
               onClick={() => handleRemovePoint(teamHome.slug_team)}
-              className="w-7 h-7 flex items-center justify-center rounded-lg bg-white/5 hover:bg-red-500/40 text-red-400 border border-white/10 transition-all"
+              className="w-8 h-8 flex items-center justify-center rounded-xl bg-white/10 hover:bg-red-500/40 text-white/70 hover:text-white transition-all active:scale-90 border border-white/10"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
-                strokeWidth="2.5"
+                strokeWidth="3"
                 stroke="currentColor"
                 className="w-4 h-4"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14" />
               </svg>
             </button>
-            <span className="text-5xl font-black tabular-nums tracking-tighter leading-none">{actualSet.local_points}</span>
+            <span className="text-6xl font-black tabular-nums tracking-tighter text-white leading-none drop-shadow-[0_4px_10px_rgba(0,0,0,0.2)]">
+              {actualSet.local_points}
+            </span>
             <button
               onClick={() => handleAddPoint(teamHome.slug_team)}
-              className="w-9 h-9 flex items-center justify-center rounded-lg bg-blue-600 hover:bg-blue-500 shadow-lg active:scale-90 transition-all"
+              className="w-10 h-10 flex items-center justify-center rounded-xl bg-amber-500 hover:bg-amber-400 text-white shadow-lg shadow-amber-900/40 active:scale-95 transition-all border border-white/20"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
-                strokeWidth="2.5"
+                strokeWidth="3"
                 stroke="currentColor"
                 className="w-5 h-5"
               >
@@ -107,44 +111,54 @@ export const Scoreboard = ({ matchSlug }: ScoreboardProps) => {
           </div>
         </div>
 
-        <div className="flex flex-col items-center px-6 border-x border-white/10 mx-2">
-          <span className="text-slate-400 font-black text-[9px] tracking-[0.2em] uppercase opacity-60">Set</span>
-          <span className="text-4xl font-mono font-bold text-white italic leading-none mt-1">{actualSet.set_number}</span>
+        <div className="flex flex-col items-center px-10 border-x border-white/10 mx-4">
+          <div className="bg-white/10 px-4 py-1 rounded-full border border-white/20 mb-2 shadow-inner">
+            <span className="text-white font-black text-[10px] tracking-[0.2em] uppercase">Set Actual</span>
+          </div>
+          <span className="text-5xl font-black text-white italic leading-none drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">
+            {actualSet.set_number}
+          </span>
         </div>
 
-        <div className="flex flex-col items-end gap-2 flex-1 text-right">
+        <div className="flex flex-col items-end gap-3 flex-1 text-right">
           <div className="flex flex-row-reverse items-center gap-4">
-            <div className="w-14 h-14 rounded-xl bg-white/10 border border-white/20 overflow-hidden shadow-inner flex items-center justify-center">
-              <img src={teamAway.image} alt={teamAway.name} className="w-full h-full object-cover" />
+            <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 p-1 flex items-center justify-center shadow-lg">
+              <img src={teamAway.image} alt={teamAway.name} className="w-full h-full object-contain rounded-xl" />
             </div>
-            <span className="text-[13px] font-black uppercase tracking-wider text-blue-300 truncate max-w-[140px]">{teamAway.name}</span>
+            <div className="flex flex-col items-end">
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/70 leading-none mb-1">Visitante</span>
+              <span className="text-[14px] font-black uppercase tracking-tight text-white truncate max-w-[140px]">{teamAway.name}</span>
+            </div>
           </div>
-          <div className="flex flex-row-reverse items-center gap-4 mr-1 mt-1">
+
+          <div className="flex flex-row-reverse items-center gap-4 mr-1">
             <button
               onClick={() => handleRemovePoint(teamAway.slug_team)}
-              className="w-7 h-7 flex items-center justify-center rounded-lg bg-white/5 hover:bg-red-500/40 text-red-400 border border-white/10 transition-all"
+              className="w-8 h-8 flex items-center justify-center rounded-xl bg-white/10 hover:bg-red-500/40 text-white/70 hover:text-white transition-all active:scale-90 border border-white/10"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
-                strokeWidth="2.5"
+                strokeWidth="3"
                 stroke="currentColor"
                 className="w-4 h-4"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14" />
               </svg>
             </button>
-            <span className="text-5xl font-black tabular-nums tracking-tighter leading-none">{actualSet.visitor_points}</span>
+            <span className="text-6xl font-black tabular-nums tracking-tighter text-white leading-none drop-shadow-[0_4px_10px_rgba(0,0,0,0.2)]">
+              {actualSet.visitor_points}
+            </span>
             <button
               onClick={() => handleAddPoint(teamAway.slug_team)}
-              className="w-9 h-9 flex items-center justify-center rounded-lg bg-blue-600 hover:bg-blue-500 shadow-lg active:scale-90 transition-all"
+              className="w-10 h-10 flex items-center justify-center rounded-xl bg-amber-500 hover:bg-amber-400 text-white shadow-lg shadow-amber-900/40 active:scale-95 transition-all border border-white/20"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
-                strokeWidth="2.5"
+                strokeWidth="3"
                 stroke="currentColor"
                 className="w-5 h-5"
               >
@@ -155,8 +169,10 @@ export const Scoreboard = ({ matchSlug }: ScoreboardProps) => {
         </div>
       </div>
 
-      <div className="mt-3 pt-2 border-t border-white/5 flex justify-center opacity-80 scale-90">
-        <FinishedSets matchSlug={matchSlug} />
+      <div className="mt-6 pt-4 border-t border-white/10 flex justify-center scale-90">
+        <div className="bg-white/10 backdrop-blur-md px-6 py-2.5 rounded-2xl border border-white/10 shadow-inner">
+          <FinishedSets matchSlug={matchSlug} />
+        </div>
       </div>
     </div>
   );

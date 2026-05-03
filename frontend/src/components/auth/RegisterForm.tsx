@@ -45,7 +45,6 @@ const RegisterForm = ({ onSwitch }: RegisterFormProps) => {
   return (
     <>
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-        {/* Campos de texto con el mismo estilo refinado */}
         <div className="space-y-4">
           <input
             type="text"
@@ -84,7 +83,7 @@ const RegisterForm = ({ onSwitch }: RegisterFormProps) => {
                   value={option.id}
                   checked={user_type === option.id}
                   onChange={handleChange}
-                  className="sr-only" // Ocultamos el radio nativo para usar el estilo táctico
+                  className="sr-only"
                 />
                 <div
                   className={`w-full text-center py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${

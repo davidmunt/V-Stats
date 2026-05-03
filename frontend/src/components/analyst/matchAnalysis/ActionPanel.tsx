@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react"; // IMPORTANTE: Añadimos useEffect
+import { useState, useMemo, useEffect } from "react";
 import { useAddPointMutation } from "@/mutations/actions/useAddPoint";
 import type { LineupPosition } from "@/interfaces/lineupPosition.interface";
 import Swal from "sweetalert2";
@@ -91,7 +91,6 @@ export const ActionPanel = ({ setSlug, selectedPosition, teamLocalSlug, teamVisi
       setShowPicker(false);
       onSuccess();
     } catch (error: unknown) {
-      // 1. Creamos una referencia tipada para que TS no se queje
       const axiosError = error as {
         response?: {
           status?: number;
@@ -101,7 +100,6 @@ export const ActionPanel = ({ setSlug, selectedPosition, teamLocalSlug, teamVisi
 
       const backendMessage = axiosError.response?.data?.message || "";
 
-      // 3. Lógica de Partido Finalizado
       if (backendMessage === "MATCH_ALREADY_FINISHED" || axiosError.response?.status === 400) {
         console.log("¡Último punto registrado detectado!");
 
@@ -114,7 +112,6 @@ export const ActionPanel = ({ setSlug, selectedPosition, teamLocalSlug, teamVisi
         return;
       }
 
-      // 4. Otros errores
       Swal.fire({
         title: "Error al registrar acción",
         text: backendMessage || "Error desconocido en el servidor",

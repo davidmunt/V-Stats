@@ -39,13 +39,6 @@ const AuthProvider = ({ children }: Props) => {
     setHasToken(true);
   };
 
-  // const logoutDevice = async () => {
-  //   tokenService.removeToken(ACCESS_TOKEN_KEY);
-  //   await logoutDeviceMutation.reset();
-  //   setHasToken(false);
-  //   navigate("/auth", { replace: true });
-  // };
-
   const logoutDevice = async () => {
     logoutDeviceMutation.mutate();
   };

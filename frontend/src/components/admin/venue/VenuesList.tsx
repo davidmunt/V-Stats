@@ -8,7 +8,6 @@ interface VenuesListProps {
   onEdit: (venue: Venue) => void;
 }
 
-// Componente que muestra todas las sedes/estadios registrados
 export const VenuesList = ({ onCreate, onEdit }: VenuesListProps) => {
   const { data: venues, isLoading, isError } = useVenuesQuery();
   const deleteMutation = useDeleteVenueMutation();

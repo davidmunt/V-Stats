@@ -1,4 +1,4 @@
-import { useDroppable, useDraggable } from "@dnd-kit/core"; // Añadimos useDraggable
+import { useDroppable, useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import type { Player } from "@/interfaces/player.interface";
 
@@ -11,10 +11,8 @@ interface CourtZoneProps {
 }
 
 const CourtZone = ({ id, label, player, isSetter, onSelect }: CourtZoneProps) => {
-  // El Droppable siempre está activo en la zona
   const { isOver, setNodeRef: setDroppableRef } = useDroppable({ id: `pos-${id}` });
 
-  // El Draggable solo se activa si hay un jugador
   const {
     attributes,
     listeners,
@@ -24,7 +22,7 @@ const CourtZone = ({ id, label, player, isSetter, onSelect }: CourtZoneProps) =>
   } = useDraggable({
     id: player ? `draggable-${player.slug_player}` : `empty-${id}`,
     disabled: !player,
-    data: { player, fromPos: id }, // Enviamos la posición de origen
+    data: { player, fromPos: id },
   });
 
   const style = {
@@ -42,7 +40,6 @@ const CourtZone = ({ id, label, player, isSetter, onSelect }: CourtZoneProps) =>
         ${isDragging ? "opacity-40" : ""}
       `}
     >
-      {/* Marcador de posición */}
       <span className="absolute top-2 left-3 text-[9px] font-black text-slate-300 uppercase">
         Pos {id} — {label}
       </span>
@@ -53,7 +50,7 @@ const CourtZone = ({ id, label, player, isSetter, onSelect }: CourtZoneProps) =>
           style={style}
           {...listeners}
           {...attributes}
-          onClick={() => onSelect(id)} // Permitir seleccionar setter al hacer click
+          onClick={() => onSelect(id)}
           className="flex flex-col items-center cursor-grab active:cursor-grabbing touch-none"
         >
           {isSetter && (

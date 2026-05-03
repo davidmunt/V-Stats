@@ -23,7 +23,6 @@ export const getAllowedActions = (history: ActionHistoryItem[], selectedPlayer: 
       if (lastResult === "++") {
         allowedActions = ["SERVE"];
       } else {
-        // lastResult === "--"
         if (currentPos === 3 || currentPos === 6) {
           allowedActions = ["RECEPTION", "SET"];
         } else {

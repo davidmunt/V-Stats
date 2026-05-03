@@ -10,7 +10,6 @@ interface LeagueFormProps {
   onSuccess: () => void;
 }
 
-//componente formulario para crear o editar una de tus ligas
 export const LeagueForm = ({ initialData, onCancel, onSuccess }: LeagueFormProps) => {
   const isEditing = !!initialData;
   const createMutation = useCreateLeagueMutation();

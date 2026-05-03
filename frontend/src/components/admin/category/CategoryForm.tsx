@@ -9,7 +9,6 @@ interface CategoryFormProps {
   onSuccess: () => void;
 }
 
-//componente formulario para crear o editar una de tus categorias
 export const CategoryForm = ({ initialData, onCancel, onSuccess }: CategoryFormProps) => {
   const isEditing = !!initialData;
   const createMutation = useCreateCategoryLeagueMutation();

@@ -42,7 +42,6 @@ const CoachDashboardPage = () => {
           </>
         )}
       </main>
-      {/* CHATBOT IA - Aparecerá encima de todo gracias al fixed z-100 */}
       {hasTeam && <CoachAIAssistant />}
     </div>
   );

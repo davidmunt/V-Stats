@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useTypeStatsForTeamMatchQuery } from "@/queries/stats/useTypeStatsForTeamMatch";
 import { useTypeStatsAgainstTeamMatchQuery } from "@/queries/stats/useTypeStatsAgainstTeamMatch";
-// Importar las queries de jugador por partido (asumiendo que las has creado)
 import { useTypeStatsForPlayerMatchQuery } from "@/queries/stats/useTypeStatsForPlayerMatch";
 import { useTypeStatsAgainstPlayerMatchQuery } from "@/queries/stats/useTypeStatsAgainstPlayerMatch";
 import { usePlayersFromTeamQuery } from "@/queries/players/usePlayersFromTeam";
@@ -18,10 +17,8 @@ export const PostMatchStats = ({ teamSlug, matchSlug, score }: PostMatchStatsPro
   const { data: players } = usePlayersFromTeamQuery(teamSlug);
   const [selectedPlayerSlug, setSelectedPlayerSlug] = useState<string>("");
 
-  // Jugador activo para las estadísticas individuales
   const activePlayerSlug = selectedPlayerSlug || (players && players.length > 0 ? players[0].slug_player : "");
 
-  // 1. QUERIES DEL EQUIPO (Para el partido)
   const { data: serveFor, isLoading: l1 } = useTypeStatsForTeamMatchQuery(teamSlug, "SERVE", matchSlug);
   const { data: attackFor, isLoading: l2 } = useTypeStatsForTeamMatchQuery(teamSlug, "ATTACK", matchSlug);
   const { data: blockFor, isLoading: l3 } = useTypeStatsForTeamMatchQuery(teamSlug, "BLOCK", matchSlug);
@@ -30,7 +27,6 @@ export const PostMatchStats = ({ teamSlug, matchSlug, score }: PostMatchStatsPro
   const { data: attackAgainst, isLoading: l5 } = useTypeStatsAgainstTeamMatchQuery(teamSlug, "ATTACK", matchSlug);
   const { data: receptionAgainst, isLoading: l6 } = useTypeStatsAgainstTeamMatchQuery(teamSlug, "RECEPTION", matchSlug);
 
-  // 2. QUERIES DEL JUGADOR SELECCIONADO (Para el partido)
   const { data: pServeFor, isLoading: lp1 } = useTypeStatsForPlayerMatchQuery(activePlayerSlug, "SERVE", matchSlug);
   const { data: pAttackFor, isLoading: lp2 } = useTypeStatsForPlayerMatchQuery(activePlayerSlug, "ATTACK", matchSlug);
   const { data: pServeAgainst, isLoading: lp3 } = useTypeStatsAgainstPlayerMatchQuery(activePlayerSlug, "SERVE", matchSlug);
@@ -41,7 +37,6 @@ export const PostMatchStats = ({ teamSlug, matchSlug, score }: PostMatchStatsPro
 
   return (
     <div className="fixed inset-0 z-[100] bg-slate-50 overflow-y-auto animate-in fade-in slide-in-from-bottom-8 duration-500">
-      {/* HEADER DE MARCADOR FINAL */}
       <div className="bg-slate-900 text-white p-8 sticky top-0 z-10 shadow-2xl">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div>
@@ -71,7 +66,6 @@ export const PostMatchStats = ({ teamSlug, matchSlug, score }: PostMatchStatsPro
       </div>
 
       <div className="max-w-7xl mx-auto p-8 space-y-20">
-        {/* SECCIÓN 1: ANÁLISIS DEL EQUIPO */}
         <section className="space-y-8">
           <div className="border-l-8 border-blue-600 pl-6">
             <h3 className="text-3xl font-black text-slate-800 uppercase italic">Desempeño del Equipo</h3>
@@ -94,7 +88,6 @@ export const PostMatchStats = ({ teamSlug, matchSlug, score }: PostMatchStatsPro
           )}
         </section>
 
-        {/* SECCIÓN 2: ANÁLISIS INDIVIDUAL */}
         <section className="space-y-8 pb-20">
           <div className="bg-white p-6 rounded-[2.5rem] shadow-xl border border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="border-l-8 border-emerald-500 pl-6">

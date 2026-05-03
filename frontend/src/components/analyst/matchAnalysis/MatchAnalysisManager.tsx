@@ -25,14 +25,11 @@ export const MatchAnalysisManager = ({ analystSlug }: { analystSlug: string }) =
   const [finishedMatchSlug, setFinishedMatchSlug] = useState<string>("");
 
   useEffect(() => {
-    // 1. DETECTAR SI EL PARTIDO HA FINALIZADO
     if (previousMatchSlug.current && (!match || match.slug_match !== previousMatchSlug.current)) {
-      // Si ya estamos mostrando las estadísticas finales, no hacemos nada más
       if (showFinalStats) return;
 
       const { local, visitor } = lastScore.current;
 
-      // Congelamos el slug del partido y el marcador en el estado
       setFinishedMatchSlug(previousMatchSlug.current);
       setFinalScore({ local, visitor });
 
@@ -67,11 +64,9 @@ export const MatchAnalysisManager = ({ analystSlug }: { analystSlug: string }) =
         }
       });
 
-      // Limpiamos la referencia para evitar que el Swal salte múltiples veces si el componente se re-renderiza
       previousMatchSlug.current = null;
     }
 
-    // 2. MIENTRAS EL PARTIDO ESTÁ VIVO
     if (match && match.status === "live") {
       previousMatchSlug.current = match.slug_match;
 
@@ -90,14 +85,11 @@ export const MatchAnalysisManager = ({ analystSlug }: { analystSlug: string }) =
   }, [match, finishedSetsData, showFinalStats]);
 
   const handleManualFinish = () => {
-    // 1. Obtenemos el marcador actual de la referencia
     const { local, visitor } = lastScore.current;
 
-    // 2. Seteamos los estados necesarios para mostrar PostMatchStats
     setFinishedMatchSlug(match?.slug_match || "");
     setFinalScore({ local, visitor });
 
-    // 3. Mostramos el Swal que ya tenías definido
     Swal.fire({
       title: "¡Partido Finalizado!",
       html: `
@@ -142,11 +134,9 @@ export const MatchAnalysisManager = ({ analystSlug }: { analystSlug: string }) =
 
       handleManualFinish();
 
-      // Limpiamos la referencia para evitar que el Swal salte múltiples veces si el componente se re-renderiza
       previousMatchSlug.current = null;
     }
 
-    // 2. MIENTRAS EL PARTIDO ESTÁ VIVO
     if (match && match.status === "live") {
       previousMatchSlug.current = match.slug_match;
 
@@ -164,32 +154,20 @@ export const MatchAnalysisManager = ({ analystSlug }: { analystSlug: string }) =
     }
   }, [match, finishedSetsData, showFinalStats]);
 
-  // RENDERIZADO LÓGICO
   if (showFinalStats) {
     return (
-      <PostMatchStats
-        // Usamos el slug del equipo local (que suele ser el analizado) o el que corresponda
-        teamSlug={match?.slug_team_local || lineups?.home.slug_team || ""}
-        matchSlug={finishedMatchSlug}
-        score={finalScore}
-      />
+      <PostMatchStats teamSlug={match?.slug_team_local || lineups?.home.slug_team || ""} matchSlug={finishedMatchSlug} score={finalScore} />
     );
   }
-  // ... resto del componente
-
-  // 2. Fallbacks de carga y error habituales
   if (isLoadingMatch || isLoadingSet || isLoadingMatchLineups) return <LoadingFallback />;
 
   if (!match || !actualSet) {
     return <div className="p-8 text-center text-gray-500">No hay partido en curso.</div>;
   }
 
-  // 3. Si el partido está pendiente de empezar
   if (match.status !== "live") {
     return <StartAnalysing match={match} analystSlug={analystSlug} />;
   }
-
-  // ... resto del render normal (Scoreboard, AnalysisCourt, etc.)
 
   const formatLineup = (positions: LineupPosition[], teamSlug: string) => {
     const map: Record<number, LineupPosition> = {};

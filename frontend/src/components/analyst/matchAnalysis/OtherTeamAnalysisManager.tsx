@@ -22,7 +22,6 @@ export const OtherTeamAnalysisManager = ({
   targetTeamSlug: string | null;
 }) => {
   const [selectedPosition, setSelectedPosition] = useState<LineupPosition | null>(null);
-  // Aqui se guardara el lgud del partyo y el equipo seleccionado para analizar
   const { data: match, isLoading: isLoadingMatch } = useMatchQuery(matchSlug);
   const { data: actualSet, isLoading: isLoadingSet } = useActualSetQuery(matchSlug);
   const { data: lineups, isLoading: isLoadingMatchLineups } = useMatchLineupsQuery(matchSlug);
@@ -34,14 +33,11 @@ export const OtherTeamAnalysisManager = ({
   const [finishedMatchSlug, setFinishedMatchSlug] = useState<string>("");
 
   const handleManualFinish = () => {
-    // 1. Obtenemos el marcador actual de la referencia
     const { local, visitor } = lastScore.current;
 
-    // 2. Seteamos los estados necesarios para mostrar PostMatchStats
     setFinishedMatchSlug(matchSlug);
     setFinalScore({ local, visitor });
 
-    // 3. Mostramos el Swal que ya tenías definido
     Swal.fire({
       title: "¡Partido Finalizado!",
       html: `
@@ -86,11 +82,9 @@ export const OtherTeamAnalysisManager = ({
 
       handleManualFinish();
 
-      // Limpiamos la referencia para evitar que el Swal salte múltiples veces si el componente se re-renderiza
       previousMatchSlug.current = null;
     }
 
-    // 2. MIENTRAS EL PARTIDO ESTÁ VIVO
     if (match && match.status === "live") {
       previousMatchSlug.current = match.slug_match;
 
@@ -108,11 +102,9 @@ export const OtherTeamAnalysisManager = ({
     }
   }, [match, finishedSetsData, showFinalStats]);
 
-  // RENDERIZADO LÓGICO
   if (showFinalStats) {
     return (
       <PostMatchStats
-        // Priorizamos el equipo que elegimos scoutear
         teamSlug={targetTeamSlug || match?.slug_team_local || ""}
         matchSlug={finishedMatchSlug || matchSlug}
         score={finalScore}
@@ -120,14 +112,12 @@ export const OtherTeamAnalysisManager = ({
     );
   }
 
-  // 2. Fallbacks de carga y error habituales
   if (isLoadingMatch || isLoadingSet || isLoadingMatchLineups) return <LoadingFallback />;
 
   if (!match || !actualSet) {
     return <div className="p-8 text-center text-gray-500">No hay partido en curso.</div>;
   }
 
-  // 3. Si el partido está pendiente de empezar
   if (match.status !== "live") {
     return <StartAnalysing match={match} analystSlug={analystSlug} />;
   }

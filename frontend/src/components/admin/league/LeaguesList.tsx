@@ -2,7 +2,6 @@ import { useLeaguesQuery } from "@/queries/leagues/useLeagues";
 import { useDeleteLeagueMutation } from "@/mutations/leagues/useDelete";
 import type { League } from "@/interfaces/league.interface";
 import LoadingFallback from "@/components/LoadingFallback";
-// import { useCategoryLeaguesQuery } from "@/queries/category/useCategories";
 
 interface LeaguesListProps {
   onCreate: () => void;
@@ -10,17 +9,9 @@ interface LeaguesListProps {
   onViewDetail: (league: League) => void;
 }
 
-//componente que muestra todas tus ligas creadas
 export const LeaguesList = ({ onCreate, onEdit, onViewDetail }: LeaguesListProps) => {
   const { data: leagues, isLoading, isError } = useLeaguesQuery();
-  // const { data: categories } = useCategoryLeaguesQuery();
   const deleteMutation = useDeleteLeagueMutation();
-
-  // const getCategoryName = (categorySlug: string) => {
-  //   if (!categories) return "Cargando...";
-  //   const category = categories.find((cat) => cat.slug_category === categorySlug);
-  //   return category ? category.name : "Sin categoría";
-  // };
 
   const handleDelete = (slug_league: string) => {
     deleteMutation.mutate({ slug_league });

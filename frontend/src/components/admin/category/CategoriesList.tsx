@@ -8,7 +8,6 @@ interface CategoriesListProps {
   onEdit: (category: CategoryLeague) => void;
 }
 
-//componente que muestra todas tus categorias creadas
 export const CategoriesList = ({ onCreate, onEdit }: CategoriesListProps) => {
   const { data: categories, isLoading, isError } = useCategoryLeaguesQuery();
   const deleteMutation = useDeleteCategoryLeagueMutation();
@@ -22,7 +21,6 @@ export const CategoriesList = ({ onCreate, onEdit }: CategoriesListProps) => {
 
   return (
     <div className="w-full space-y-6 animate-in fade-in duration-500">
-      {/* HEADER ADAPTATIVO: Se ajusta de fila a columna en móviles (Part_V Flexbox) */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-8 px-2 md:px-0">
         <div>
           <h2 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight leading-tight italic">Categorías de Liga</h2>
@@ -48,18 +46,15 @@ export const CategoriesList = ({ onCreate, onEdit }: CategoriesListProps) => {
         </button>
       </div>
 
-      {/* CONTENEDOR DE TABLA: Bordes redondeados premium (Part_VII_background) */}
       <div className="bg-white border border-slate-200 rounded-[1.5rem] md:rounded-[2.5rem] shadow-xl shadow-slate-200/60 overflow-hidden">
         {!categories || categories.length === 0 ? (
           <div className="p-20 text-center bg-slate-50/50">
             <p className="text-slate-400 font-medium italic">No hay categorías configuradas en el sistema.</p>
           </div>
         ) : (
-          /* SCROLL HORIZONTAL FORZADO: Esto evita que los botones desaparezcan (Part_VII_taules) */
           <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-slate-200">
             <table className="w-full text-left border-collapse min-w-[800px]">
               {" "}
-              {/* min-w asegura espacio para el botón Borrar */}
               <thead className="bg-slate-50 border-b border-slate-200">
                 <tr>
                   <th className="py-5 px-6 md:px-8 text-[10px] md:text-[11px] font-black text-slate-400 uppercase tracking-widest">
@@ -68,7 +63,6 @@ export const CategoriesList = ({ onCreate, onEdit }: CategoriesListProps) => {
                   <th className="py-5 px-6 md:px-8 text-[10px] md:text-[11px] font-black text-slate-400 uppercase tracking-widest">
                     Nombre
                   </th>
-                  {/* COLUMNA CONDICIONAL: Oculta la descripción en tablets para ganar espacio (Part_IV Columnas) */}
                   <th className="hidden lg:table-cell py-5 px-6 md:px-8 text-[10px] md:text-[11px] font-black text-slate-400 uppercase tracking-widest">
                     Descripción
                   </th>
@@ -99,7 +93,6 @@ export const CategoriesList = ({ onCreate, onEdit }: CategoriesListProps) => {
                       <div className="font-bold text-slate-800 text-base md:text-lg leading-tight uppercase tracking-tight italic">
                         {category.name}
                       </div>
-                      {/* Subtítulo visible solo en pantallas donde se oculta la columna descripción */}
                       <div className="lg:hidden text-[10px] text-slate-400 font-medium mt-0.5 truncate max-w-[150px]">
                         {category.description || "Sin descripción"}
                       </div>
@@ -123,7 +116,6 @@ export const CategoriesList = ({ onCreate, onEdit }: CategoriesListProps) => {
 
                     <td className="py-5 px-6 md:px-8 text-right">
                       <div className="flex justify-end gap-2 md:gap-3">
-                        {/* Botón Editar */}
                         <button
                           onClick={() => onEdit(category)}
                           className="text-blue-600 hover:text-blue-800 p-2.5 hover:bg-blue-50 rounded-xl transition-all shadow-sm shadow-blue-100/20"
@@ -145,7 +137,6 @@ export const CategoriesList = ({ onCreate, onEdit }: CategoriesListProps) => {
                           </svg>
                         </button>
 
-                        {/* Botón Borrar (Faltaba visibilidad en móvil) */}
                         <button
                           onClick={() => handleDelete(category.slug_category)}
                           disabled={deleteMutation.isPending}

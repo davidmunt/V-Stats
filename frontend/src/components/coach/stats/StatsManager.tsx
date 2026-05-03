@@ -30,7 +30,6 @@ const StatsManager = () => {
             }`}
           >
             Equipos Rivales
-            {/* Si no es VIP, mostramos el candado */}
             {!isVip && <span className="text-[10px]">🔒</span>}
           </button>
         </div>

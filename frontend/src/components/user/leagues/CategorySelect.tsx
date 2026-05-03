@@ -18,7 +18,6 @@ export const CategorySelect = ({ value, onChange }: CategorySelectProps) => {
       <option value="">Todas las categorías</option>
 
       {categories?.map((cat) => (
-        //cambiar de slug a slug_...
         <option key={cat.slug_category} value={cat.slug_category}>
           {cat.name}
         </option>

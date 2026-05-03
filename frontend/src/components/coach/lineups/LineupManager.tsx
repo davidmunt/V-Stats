@@ -38,21 +38,41 @@ export const LineupManager = ({ coachSlug }: LineupManagerProps) => {
     7: null,
   });
   const [setterPos, setSetterPos] = useState<number | null>(null);
+  const [selectedTactic, setSelectedTactic] = useState<string>("5-1");
+
+  const tactics = [
+    { id: "5-1", name: "5-1" },
+    { id: "4-2", name: "4-2" },
+    { id: "6-2", name: "6-2" },
+  ];
+
+  const handleTacticChange = (tacticId: string) => {
+    if (tacticId === "5-1") {
+      setSelectedTactic("5-1");
+    } else {
+      Swal.fire({
+        title: "Próximamente",
+        text: `La lógica para la táctica ${tacticId} estará disponible en futuras actualizaciones del sistema de análisis profesional.`,
+        icon: "info",
+        confirmButtonColor: "#3b82f6",
+        confirmButtonText: "Entendido",
+      });
+    }
+  };
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 5, // Requiere mover el ratón 5 píxeles para iniciar el Drag
+        distance: 5,
       },
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: 150, // En móviles, requiere mantener pulsado 150ms para arrastrar
-        tolerance: 5, // Permite un ligero temblor del dedo sin cancelar el clic
+        delay: 150,
+        tolerance: 5,
       },
     }),
   );
   useEffect(() => {
-    // 1. Solución error 'undefined': Verificamos existencia explícitamente
     if (!existingLineupData || !existingLineupData.positions || existingLineupData.positions.length === 0) {
       return;
     }
@@ -80,8 +100,6 @@ export const LineupManager = ({ coachSlug }: LineupManagerProps) => {
         }
       }
     });
-    // 2. Solución error 'cascading renders':
-    // En este caso es necesario para inicializar el componente con datos de la API.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setLineupState(baseState);
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -92,36 +110,29 @@ export const LineupManager = ({ coachSlug }: LineupManagerProps) => {
     if (!over) return;
 
     const draggedPlayer = active.data.current?.player as Player;
-    const fromPos = active.data.current?.fromPos; // Posición de origen (1-7 o 'bench')
+    const fromPos = active.data.current?.fromPos;
 
     if (!draggedPlayer) return;
 
     setLineupState((prev) => {
       const newState = { ...prev };
 
-      // 1. Limpiar la posición anterior del jugador en la pista (si estaba en una)
       Object.keys(newState).forEach((key) => {
         if (newState[Number(key)]?.slug_player === draggedPlayer.slug_player) {
           newState[Number(key)] = null;
         }
       });
 
-      // 2. Si el destino es el banquillo, ya hemos terminado (al poner a null arriba)
       if (over.id === "bench") {
-        // Si el jugador que quitamos era el setter, reseteamos setterPos
         if (fromPos === setterPos) setSetterPos(null);
         return newState;
       }
 
-      // 3. Si el destino es una zona de la pista
       if (typeof over.id === "string" && over.id.startsWith("pos-")) {
         const targetPos = Number(over.id.split("-")[1]);
 
-        // Si la posición de destino ya tenía un jugador, ese jugador "vuelve al banquillo"
-        // (o podrías implementar un intercambio, pero por ahora vuelve al banquillo)
         newState[targetPos] = draggedPlayer;
 
-        // Si movimos al jugador que era setter a una nueva posición, actualizamos la marca
         if (fromPos === setterPos) {
           setSetterPos(targetPos);
         }
@@ -131,35 +142,26 @@ export const LineupManager = ({ coachSlug }: LineupManagerProps) => {
     });
   };
   const handleSave = async () => {
-    // 1. Validaciones de posiciones completas (1-6)
     const missingPositions = [1, 2, 3, 4, 5, 6].filter((pos) => !lineupState[pos]);
     if (missingPositions.length > 0) {
       return Swal.fire({ title: "Incompleto", text: "Faltan jugadores en posiciones 1-6", icon: "warning" });
     }
 
-    // 2. Validación de Colocador
     if (!setterPos || !lineupState[setterPos]) {
       return Swal.fire({ title: "Falta Colocador", text: "Haz clic en un jugador para marcarlo como Colocador", icon: "info" });
     }
 
-    // --- LÓGICA DINÁMICA 5-1 ---
-
-    // Calculamos la posición DIAGONAL (Opuesta) al colocador
-    // Regla: 1<->4, 2<->5, 3<->6
     const oppositePos = setterPos > 3 ? setterPos - 3 : setterPos + 3;
 
-    // Filtramos los candidatos: Excluimos al Colocador, a su Opuesto y al Líbero (pos 7)
     const availableOptions: Record<string, string> = {};
 
     [1, 2, 3, 4, 5, 6].forEach((pos) => {
       const player = lineupState[pos];
-      // Solo permitimos elegir a los que NO son ni el colocador ni su opuesto
       if (player && pos !== setterPos && pos !== oppositePos) {
         availableOptions[player.slug_player] = `${player.name} (P-${pos})`;
       }
     });
 
-    // 3. Lanzar el Swal con los 4 jugadores restantes (Normalmente los 2 Centrales y 2 Puntas)
     const { value: liberoTarget } = await Swal.fire({
       title: "Configuración de Líbero",
       text: `El Colocador está en ${setterPos} y su Opuesto en ${oppositePos}. ¿Por qué jugador entrará el líbero?`,
@@ -174,7 +176,6 @@ export const LineupManager = ({ coachSlug }: LineupManagerProps) => {
 
     if (!liberoTarget) return;
 
-    // 4. Preparar el guardado
     const positionsToSave = Object.entries(lineupState)
       .filter(([, player]) => player !== null)
       .map(([pos, player]) => ({
@@ -215,6 +216,26 @@ export const LineupManager = ({ coachSlug }: LineupManagerProps) => {
         >
           {saveMutation.isPending ? "Guardando..." : "Confirmar Titulares"}
         </button>
+      </div>
+
+      <div className="flex flex-col gap-3 mb-6">
+        <label className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 italic">Sistema Táctico</label>
+        <div className="flex flex-wrap gap-2">
+          {tactics.map((tactic) => (
+            <button
+              key={tactic.id}
+              onClick={() => handleTacticChange(tactic.id)}
+              className={`px-4 py-2 rounded-xl text-[11px] font-black transition-all border-2 
+          ${
+            selectedTactic === tactic.id
+              ? "bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-100 scale-105"
+              : "bg-white border-slate-100 text-slate-500 hover:border-blue-200 hover:text-blue-600"
+          }`}
+            >
+              {tactic.name}
+            </button>
+          ))}
+        </div>
       </div>
 
       <DndContext sensors={sensors} onDragEnd={handleDragEnd}>

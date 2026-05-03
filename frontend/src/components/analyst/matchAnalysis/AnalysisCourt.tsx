@@ -23,13 +23,7 @@ export const AnalysisCourt = ({ homeLineup, awayLineup, onPlayerClick }: Analysi
   useEffect(() => {
     const history = JSON.parse(sessionStorage.getItem("vstats_last_actions") || "[]");
     const lastAction = history[0];
-
-    // CONDICIÓN:
-    // 1. Estamos en fase de saque propio.
-    // 2. La ÚLTIMA acción registrada fue un punto ganado (++) por nosotros.
-    // 3. Existe el jugador en la posición 1.
     if (currentPhase === "SERVE_OWN" && lastAction?.result === "++" && homeLineup[1]) {
-      // Opcional: Podrías añadir un pequeño delay para que el usuario vea la rotación
       const timer = setTimeout(() => {
         console.log("Punto ganado: Auto-seleccionando sacador en P1");
         onPlayerClick(homeLineup[1]!, true);

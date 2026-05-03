@@ -11,21 +11,29 @@ const FinishedSets: React.FC<Props> = ({ matchSlug }) => {
   if (isLoading || isError || !sets || sets.length === 0) return null;
 
   return (
-    <div className="flex items-center gap-3 py-2 px-4 bg-white/5 rounded-2xl backdrop-blur-sm border border-white/10 w-fit">
-      <span className="text-[9px] font-black text-slate-500 uppercase tracking-[0.3em] mr-2">Sets:</span>
-      <div className="flex gap-2">
+    <div className="flex items-center gap-6">
+      <span className="text-[10px] font-black text-white/80 uppercase tracking-[0.25em] flex items-center gap-2">Historial</span>
+
+      <div className="flex gap-2.5">
         {sets.map((set) => {
           const localWon = set.local_points > set.visitor_points;
           return (
             <div
               key={set.slug_set}
-              className="flex items-center bg-slate-800/50 border border-slate-700/50 rounded-xl px-2.5 py-1 shadow-inner"
+              className="flex items-center bg-white/10 border border-white/20 rounded-xl px-3 py-1.5 transition-all group"
             >
-              <span className="text-[9px] text-slate-500 font-black mr-2">S{set.set_number}</span>
-              <div className="flex items-center gap-1.5 text-xs font-mono tracking-tighter">
-                <span className={`${localWon ? "text-blue-400 font-black" : "text-slate-500"}`}>{set.local_points}</span>
-                <span className="text-slate-700 font-bold">:</span>
-                <span className={`${!localWon ? "text-blue-400 font-black" : "text-slate-500"}`}>{set.visitor_points}</span>
+              <span className="text-[10px] text-blue-100/70 font-black mr-3">S{set.set_number}</span>
+
+              <div className="flex items-center gap-2 text-[13px] font-black tabular-nums tracking-tighter">
+                <span className={`${localWon ? "text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]" : "text-white/60"}`}>
+                  {set.local_points}
+                </span>
+
+                <span className="text-white/40 font-light mx-0.5">-</span>
+
+                <span className={`${!localWon ? "text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]" : "text-white/60"}`}>
+                  {set.visitor_points}
+                </span>
               </div>
             </div>
           );

@@ -11,7 +11,6 @@ import { StatsTable } from "@/components/coach/stats/StatsTable";
 import LoadingFallback from "@/components/LoadingFallback";
 
 const OtherTeamsStats = () => {
-  // 1. Carga de equipos y manejo de equipo activo
   const { data: teams, isLoading: isTeamsLoading } = useTeamsQuery();
   const [selectedTeam, setSelectedTeam] = useState<{ slug: string; name: string } | null>(null);
 
@@ -25,7 +24,6 @@ const OtherTeamsStats = () => {
 
   const teamSlug = activeTeam?.slug || "";
 
-  // 2. Queries Colectivas (Igual que YourTeamStats)
   const { data: serveFor, isLoading: loadingServeFor } = useTypeStatsForTeamQuery(teamSlug, "SERVE");
   const { data: attackFor, isLoading: loadingAttackFor } = useTypeStatsForTeamQuery(teamSlug, "ATTACK");
   const { data: blockFor, isLoading: loadingBlockFor } = useTypeStatsForTeamQuery(teamSlug, "BLOCK");
@@ -44,7 +42,6 @@ const OtherTeamsStats = () => {
     loadingReceptionAgainst ||
     loadingBlockAgainst;
 
-  // 3. Manejo de Jugadores y Queries Individuales
   const [selectedPlayerSlug, setSelectedPlayerSlug] = useState<string>("");
   const { data: players } = usePlayersFromTeamQuery(teamSlug);
 
@@ -66,7 +63,6 @@ const OtherTeamsStats = () => {
 
   return (
     <div className="space-y-12 animate-in fade-in duration-500 pb-20">
-      {/* SECCIÓN EQUIPO */}
       <section className="space-y-6">
         <div className="bg-white p-6 rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 flex flex-col lg:flex-row justify-between items-center gap-6">
           <div className="space-y-1 text-center lg:text-left">
@@ -74,7 +70,6 @@ const OtherTeamsStats = () => {
             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">Balance Colectivo: {activeTeam?.name}</p>
           </div>
 
-          {/* SELECTOR DE EQUIPO */}
           <div className="w-full lg:w-auto">
             <select
               value={teamSlug}
@@ -82,7 +77,7 @@ const OtherTeamsStats = () => {
                 const team = teams?.find((t) => t.slug_team === e.target.value);
                 if (team) {
                   setSelectedTeam({ slug: team.slug_team, name: team.name });
-                  setSelectedPlayerSlug(""); // Resetear jugador al cambiar equipo
+                  setSelectedPlayerSlug("");
                 }
               }}
               className="w-full sm:w-64 px-5 py-3.5 bg-blue-600 border border-transparent rounded-2xl text-xs font-bold text-white outline-none focus:ring-4 focus:ring-blue-500/20 transition-all appearance-none cursor-pointer"
@@ -121,7 +116,6 @@ const OtherTeamsStats = () => {
         )}
       </section>
 
-      {/* TABLA DE EFICACIA */}
       <section className="bg-white p-8 rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100">
         <div className="mb-6">
           <h4 className="text-sm font-black text-slate-800 uppercase tracking-widest italic">Eficacia de {activeTeam?.name}</h4>
@@ -130,7 +124,6 @@ const OtherTeamsStats = () => {
         <StatsTable slug_team={teamSlug} />
       </section>
 
-      {/* SECCIÓN JUGADORES */}
       <section className="space-y-6">
         <div className="bg-white p-6 rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 flex flex-col lg:flex-row justify-between items-center gap-6">
           <div className="space-y-1 text-center lg:text-left">

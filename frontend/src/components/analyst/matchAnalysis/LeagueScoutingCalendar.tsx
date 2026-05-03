@@ -18,11 +18,10 @@ interface CalendarEvent {
   title: string;
   start: Date;
   end: Date;
-  resource: Match; // Aquí usamos tu interfaz Match
+  resource: Match;
 }
 
 interface LeagueScoutingCalendarProps {
-  // Esta función recibirá el slug del partido y el slug del equipo seleccionado
   onSelectMatch: (matchSlug: string, teamSlug: string) => void;
 }
 
@@ -39,8 +38,6 @@ export const LeagueScoutingCalendar = ({ onSelectMatch }: LeagueScoutingCalendar
   const handleSelectEvent = (event: CalendarEvent) => {
     const match: Match = event.resource;
 
-    // Solo permitimos analizar partidos que no hayan terminado (o según tu lógica)
-    // Pero aquí abrimos el modal para elegir equipo
     Swal.fire({
       title: "Seleccionar equipo para análisis",
       text: `¿A qué equipo quieres analizar en el partido ${match.name}?`,
@@ -54,10 +51,8 @@ export const LeagueScoutingCalendar = ({ onSelectMatch }: LeagueScoutingCalendar
       cancelButtonText: "Cancelar",
     }).then((result) => {
       if (result.isConfirmed) {
-        // Seleccionó Local
         onSelectMatch(match.slug_match, match.slug_team_local);
       } else if (result.isDenied) {
-        // Seleccionó Visitante
         onSelectMatch(match.slug_match, match.slug_team_visitor);
       }
     });
@@ -82,7 +77,7 @@ export const LeagueScoutingCalendar = ({ onSelectMatch }: LeagueScoutingCalendar
             endAccessor="end"
             views={[Views.MONTH, Views.AGENDA]}
             culture="es"
-            onSelectEvent={handleSelectEvent} // <--- IMPORTANTE: Al clicar, abre el modal
+            onSelectEvent={handleSelectEvent}
             messages={{
               next: "Sig.",
               previous: "Ant.",
@@ -93,10 +88,10 @@ export const LeagueScoutingCalendar = ({ onSelectMatch }: LeagueScoutingCalendar
             }}
             eventPropGetter={(event) => {
               const status = event.resource.status;
-              let bgColor = "#64748b"; // Por defecto slate
-              if (status === "live") bgColor = "#ef4444"; // Rojo para directo
-              if (status === "finished") bgColor = "#10b981"; // Esmeralda para terminados
-              if (status === "scheduled") bgColor = "#3b82f6"; // Azul para programados
+              let bgColor = "#64748b";
+              if (status === "live") bgColor = "#ef4444";
+              if (status === "finished") bgColor = "#10b981";
+              if (status === "scheduled") bgColor = "#3b82f6";
 
               return {
                 style: {
@@ -114,7 +109,6 @@ export const LeagueScoutingCalendar = ({ onSelectMatch }: LeagueScoutingCalendar
         </div>
       </div>
 
-      {/* Leyenda */}
       <div className="mt-6 flex flex-wrap gap-6 px-4">
         <div className="flex items-center gap-2">
           <span className="w-3 h-3 rounded-full bg-blue-500"></span>

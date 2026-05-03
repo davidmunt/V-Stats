@@ -29,7 +29,6 @@ export const FilterLeagues = () => {
         </button>
       </div>
 
-      {/* Badge de estado (informativo) */}
       <div className="flex gap-2">
         {filters.q && (
           <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold animate-fade-in">

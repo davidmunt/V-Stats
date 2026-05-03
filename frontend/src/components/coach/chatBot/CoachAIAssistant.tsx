@@ -18,7 +18,6 @@ export const CoachAIAssistant = () => {
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Scroll automático al último mensaje
   useEffect(() => {
     if (isOpen) {
       scrollRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -33,20 +32,16 @@ export const CoachAIAssistant = () => {
     if (!input.trim() || chatMutation.isPending) return;
 
     const userText = input.trim();
-    // Guardamos nuestro mensaje (derecha)
     setMessages((prev) => [...prev, { role: "user", content: userText }]);
     setInput("");
 
-    // Enviamos al backend
     chatMutation.mutate({ text: userText });
   };
 
   return (
     <div className="fixed bottom-8 right-8 z-[100] flex flex-col items-end">
-      {/* VENTANA DEL CHAT */}
       {isOpen && (
         <div className="mb-4 w-[350px] sm:w-[400px] h-[500px] bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden flex flex-col animate-in slide-in-from-bottom-10 duration-300">
-          {/* Header del Chat */}
           <div className="p-5 bg-slate-900 text-white flex justify-between items-center">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-lg">🤖</div>
@@ -65,7 +60,6 @@ export const CoachAIAssistant = () => {
             </button>
           </div>
 
-          {/* Mensajes */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50 custom-scrollbar">
             {messages.map((msg, idx) => (
               <div key={idx} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
@@ -95,7 +89,6 @@ export const CoachAIAssistant = () => {
             <div ref={scrollRef} />
           </div>
 
-          {/* Input */}
           <div className="p-4 bg-white border-t border-slate-100">
             <div className="relative flex items-center gap-2">
               <input
@@ -120,7 +113,6 @@ export const CoachAIAssistant = () => {
         </div>
       )}
 
-      {/* BOTÓN FLOTANTE (Trigger) */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`

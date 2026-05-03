@@ -100,7 +100,6 @@ export const TeamForm = ({ leagueSlug, initialData, onCancel, onSuccess }: TeamF
             />
           </div>
 
-          {/* Sede */}
           <div>
             <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Sede Principal</label>
             <select
@@ -119,7 +118,6 @@ export const TeamForm = ({ leagueSlug, initialData, onCancel, onSuccess }: TeamF
             </select>
           </div>
 
-          {/* Escudo */}
           <div>
             <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">URL Escudo</label>
             <input
@@ -135,7 +133,6 @@ export const TeamForm = ({ leagueSlug, initialData, onCancel, onSuccess }: TeamF
             <>
               <div className="md:col-span-2 border-t border-slate-100 my-4"></div>
 
-              {/* Entrenador */}
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Entrenador</label>
                 <select

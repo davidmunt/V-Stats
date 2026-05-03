@@ -13,7 +13,6 @@ const AdminDashboardPage = lazy(() => import("@/pages/AdminDashboardPage"));
 const AnalystDashboardPage = lazy(() => import("@/pages/AnalystDashboardPage"));
 const CoachDashboardPage = lazy(() => import("@/pages/CoachDashboardPage"));
 const LeaguesExplorerPage = lazy(() => import("@/pages/LeaguesExplorerPage"));
-// const LeagueViewPage = lazy(() => import("@/pages/LeagueViewPage"));
 
 const Router = () => {
   return (
@@ -59,17 +58,6 @@ const Router = () => {
               </ProtectedRoute>
             }
           />
-
-          {/* <Route
-            path="/league/:leagueSlug"
-            element={
-              <ProtectedRoute isAuth>
-                <RoleProtectedRoute allowedRoles={["user"]}>
-                  <LeagueViewPage />
-                </RoleProtectedRoute>
-              </ProtectedRoute>
-            }
-          /> */}
 
           <Route
             path="/admin"

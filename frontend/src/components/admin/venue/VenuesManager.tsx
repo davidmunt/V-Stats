@@ -3,7 +3,6 @@ import type { Venue } from "@/interfaces/venue.interface";
 import { VenuesList } from "./VenuesList";
 import { VenueForm } from "./VenueForm";
 
-// Componente principal que controla la vista de sedes/estadios
 export const VenuesManager = () => {
   const [view, setView] = useState<"list" | "form">("list");
   const [selectedVenue, setSelectedVenue] = useState<Venue | null>(null);
