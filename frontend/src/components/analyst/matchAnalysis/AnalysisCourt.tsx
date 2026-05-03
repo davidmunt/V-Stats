@@ -6,7 +6,7 @@ import { getGamePhase } from "@/utils/courtPositioning";
 interface AnalysisCourtProps {
   homeLineup: Record<number, LineupPosition | null>;
   awayLineup: Record<number, LineupPosition | null>;
-  onPlayerClick: (position: LineupPosition, isHomeTeam: boolean) => void;
+  onPlayerClick: (position: LineupPosition, isHomeTeam: boolean, rect: DOMRect | null) => void;
 }
 
 export const AnalysisCourt = ({ homeLineup, awayLineup, onPlayerClick }: AnalysisCourtProps) => {
@@ -26,7 +26,7 @@ export const AnalysisCourt = ({ homeLineup, awayLineup, onPlayerClick }: Analysi
     if (currentPhase === "SERVE_OWN" && lastAction?.result === "++" && homeLineup[1]) {
       const timer = setTimeout(() => {
         console.log("Punto ganado: Auto-seleccionando sacador en P1");
-        onPlayerClick(homeLineup[1]!, true);
+        onPlayerClick(homeLineup[1]!, true, null);
       }, 500);
 
       return () => clearTimeout(timer);

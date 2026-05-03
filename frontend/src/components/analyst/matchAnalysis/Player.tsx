@@ -5,7 +5,7 @@ interface PlayerNodeProps {
   player: LineupPosition | null;
   position: number;
   isHome: boolean;
-  onPlayerClick: (position: LineupPosition, isHomeTeam: boolean) => void;
+  onPlayerClick: (position: LineupPosition, isHomeTeam: boolean, rect: DOMRect | null) => void;
   phase: GamePhase;
   setterPos: number;
 }
@@ -29,7 +29,7 @@ export const PlayerNode = ({ player, position, isHome, onPlayerClick, phase, set
   return (
     <button
       type="button"
-      onClick={() => isHome && onPlayerClick(player, isHome)}
+      onClick={(e) => isHome && onPlayerClick(player, isHome, (e.currentTarget as HTMLButtonElement).getBoundingClientRect())}
       style={offsetStyle}
       className={`
       group relative w-16 h-16 rounded-3xl border-2 flex items-center justify-center shadow-lg

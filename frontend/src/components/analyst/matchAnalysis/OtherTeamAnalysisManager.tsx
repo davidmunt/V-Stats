@@ -5,7 +5,7 @@ import { useMatchLineupsQuery } from "@/queries/lineups/useMatchLineupsQuery";
 import { StartAnalysing } from "./StartAnalysing";
 import { Scoreboard } from "./Scoreboard";
 import { AnalysisCourt } from "./AnalysisCourt";
-import { ActionPanel } from "./ActionPanel";
+import { FloatingActionMenu } from "./FloatingActionMenu";
 import LoadingFallback from "@/components/LoadingFallback";
 import type { LineupPosition } from "@/interfaces/lineupPosition.interface";
 import Swal from "sweetalert2";
@@ -22,6 +22,7 @@ export const OtherTeamAnalysisManager = ({
   targetTeamSlug: string | null;
 }) => {
   const [selectedPosition, setSelectedPosition] = useState<LineupPosition | null>(null);
+  const [anchorRect, setAnchorRect] = useState<DOMRect | null>(null);
   const { data: match, isLoading: isLoadingMatch } = useMatchQuery(matchSlug);
   const { data: actualSet, isLoading: isLoadingSet } = useActualSetQuery(matchSlug);
   const { data: lineups, isLoading: isLoadingMatchLineups } = useMatchLineupsQuery(matchSlug);
@@ -140,32 +141,29 @@ export const OtherTeamAnalysisManager = ({
   if (isLoadingMatch || isLoadingSet || isLoadingMatchLineups) return <LoadingFallback />;
   if (!match) return <div className="p-8 text-center text-gray-500">No se encontró el partido.</div>;
 
+  const handlePlayerClick = (player: LineupPosition, _isHome: boolean, rect: DOMRect | null) => {
+    setSelectedPosition(player);
+    setAnchorRect(rect);
+  };
+
   return (
-    <div className="flex flex-col gap-6 max-w-[1600px] mx-auto p-4">
+    <div className="flex flex-col gap-3 max-w-[1600px] mx-auto pt-1 px-4 pb-4">
       <Scoreboard matchSlug={match.slug_match} />
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        <div className="lg:col-span-8 bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-          <AnalysisCourt homeLineup={homeLineupMap} awayLineup={awayLineupMap} onPlayerClick={(player) => setSelectedPosition(player)} />
-        </div>
-        <div className="lg:col-span-4 h-full">
-          {selectedPosition ? (
-            <>
-              <ActionPanel
-                setSlug={actualSet.slug_set}
-                selectedPosition={selectedPosition}
-                teamLocalSlug={match.slug_team_local}
-                teamVisitorSlug={match.slug_team_visitor}
-                onSuccess={() => setSelectedPosition(null)}
-                onFinishMatch={handleManualFinish}
-              />
-            </>
-          ) : (
-            <div className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl h-[500px] flex flex-col items-center justify-center text-center p-8">
-              <p className="text-gray-400 font-medium">Selecciona un jugador para registrar una accion</p>
-            </div>
-          )}
-        </div>
+      <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 max-w-4xl mx-auto w-full">
+        <AnalysisCourt homeLineup={homeLineupMap} awayLineup={awayLineupMap} onPlayerClick={handlePlayerClick} />
       </div>
+      {selectedPosition && (
+        <FloatingActionMenu
+          anchorRect={anchorRect}
+          setSlug={actualSet.slug_set}
+          selectedPosition={selectedPosition}
+          teamLocalSlug={match.slug_team_local}
+          teamVisitorSlug={match.slug_team_visitor}
+          onSuccess={() => { setSelectedPosition(null); setAnchorRect(null); }}
+          onFinishMatch={handleManualFinish}
+          onClose={() => { setSelectedPosition(null); setAnchorRect(null); }}
+        />
+      )}
     </div>
   );
 };
