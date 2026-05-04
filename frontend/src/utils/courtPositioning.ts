@@ -6,24 +6,26 @@ export interface HistoryItem {
 
 export type GamePhase = "SERVE_OWN" | "RECEIVE_OWN" | "IN_PLAY_AFTER_SERVE" | "IN_PLAY_AFTER_RECEIVE";
 
-export const getGamePhase = (history: HistoryItem[]): GamePhase => {
-  const lastAction = history[0];
+export const getGamePhase = (history: HistoryItem[], homeTeamSlug?: string): GamePhase => {
+  const filtered = history.filter((a) => a.action_type !== "POINT_ADJUSTMENT");
+  const lastAction = filtered[0];
   if (!lastAction) return "SERVE_OWN";
 
   const lastResult = lastAction.result;
 
   if (lastResult === "++" || lastResult === "--") {
-    const weWonPoint = lastResult === "++";
+    const sameTeam = !homeTeamSlug || lastAction.slug_team === homeTeamSlug;
+    const weWonPoint = (lastResult === "++" && sameTeam) || (lastResult === "--" && !sameTeam);
     return weWonPoint ? "SERVE_OWN" : "RECEIVE_OWN";
   }
 
   let rallyStartAction = null;
 
-  for (let i = 0; i < history.length; i++) {
-    if (history[i].result === "++" || history[i].result === "--") {
+  for (let i = 0; i < filtered.length; i++) {
+    if (filtered[i].result === "++" || filtered[i].result === "--") {
       break;
     }
-    rallyStartAction = history[i];
+    rallyStartAction = filtered[i];
   }
 
   if (rallyStartAction) {
@@ -144,16 +146,16 @@ export const getPlayerVisualOffset = (position: number, isSetter: boolean, phase
       case 1:
         if (position === 4) {
           x = 0;
-          y = 400;
+          y = 480;
         } else if (position === 2) {
           x = 0;
-          y = -400;
+          y = -480;
         } else if (position === 5) {
           x = 0;
-          y = 200;
+          y = 240;
         } else if (position === 6) {
           x = 0;
-          y = -200;
+          y = -240;
         } else if (position === 1 || position === 3) {
           x = 0;
           y = 0;
@@ -163,16 +165,16 @@ export const getPlayerVisualOffset = (position: number, isSetter: boolean, phase
       case 2:
         if (position === 4) {
           x = 0;
-          y = 200;
+          y = 240;
         } else if (position === 3) {
           x = 0;
-          y = -200;
+          y = -240;
         } else if (position === 5) {
           x = 0;
-          y = 400;
+          y = 480;
         } else if (position === 1) {
           x = 0;
-          y = -400;
+          y = -480;
         } else if (position === 2 || position === 6) {
           x = 0;
           y = 0;
@@ -182,16 +184,16 @@ export const getPlayerVisualOffset = (position: number, isSetter: boolean, phase
       case 3:
         if (position === 3) {
           x = 0;
-          y = 200;
+          y = 240;
         } else if (position === 2) {
           x = 0;
-          y = -200;
+          y = -240;
         } else if (position === 6) {
           x = 0;
-          y = 200;
+          y = 240;
         } else if (position === 1) {
           x = 0;
-          y = -200;
+          y = -240;
         } else if (position === 4) {
           x = 0;
           y = 0;
@@ -204,16 +206,16 @@ export const getPlayerVisualOffset = (position: number, isSetter: boolean, phase
       case 4:
         if (position === 4) {
           x = 0;
-          y = 400;
+          y = 480;
         } else if (position === 2) {
           x = 0;
-          y = -400;
+          y = -480;
         } else if (position === 5) {
           x = 0;
-          y = 200;
+          y = 240;
         } else if (position === 6) {
           x = 0;
-          y = -200;
+          y = -240;
         } else if (position === 1 || position === 3) {
           x = 0;
           y = 0;
@@ -223,16 +225,16 @@ export const getPlayerVisualOffset = (position: number, isSetter: boolean, phase
       case 5:
         if (position === 5) {
           x = 0;
-          y = 400;
+          y = 480;
         } else if (position === 1) {
           x = 0;
-          y = -400;
+          y = -480;
         } else if (position === 4) {
           x = 0;
-          y = 200;
+          y = 240;
         } else if (position === 3) {
           x = 0;
-          y = -200;
+          y = -240;
         } else if (position === 6 || position === 2) {
           x = 0;
           y = 0;
@@ -242,13 +244,13 @@ export const getPlayerVisualOffset = (position: number, isSetter: boolean, phase
       case 6:
         if (position === 1) {
           x = 0;
-          y = -200;
+          y = -240;
         } else if (position === 2) {
           x = 0;
-          y = -200;
+          y = -240;
         } else if (position === 3) {
           x = 0;
-          y = 200;
+          y = 240;
         } else if (position === 4) {
           x = 0;
           y = 0;
@@ -257,7 +259,7 @@ export const getPlayerVisualOffset = (position: number, isSetter: boolean, phase
           y = 0;
         } else if (position === 6) {
           x = 0;
-          y = 200;
+          y = 240;
         }
         break;
 
@@ -273,10 +275,10 @@ export const getPlayerVisualOffset = (position: number, isSetter: boolean, phase
       case 1:
         if (position === 5) {
           x = 0;
-          y = 200;
+          y = 240;
         } else if (position === 6) {
           x = 0;
-          y = -200;
+          y = -240;
         } else if ([1, 2, 3, 4].includes(position)) {
           x = 0;
           y = 0;
@@ -286,16 +288,16 @@ export const getPlayerVisualOffset = (position: number, isSetter: boolean, phase
       case 2:
         if (position === 3) {
           x = 0;
-          y = -200;
+          y = -240;
         } else if (position === 4) {
           x = 0;
-          y = 200;
+          y = 240;
         } else if (position === 5) {
           x = 0;
-          y = 400;
+          y = 480;
         } else if (position === 1) {
           x = 0;
-          y = -400;
+          y = -480;
         } else if (position === 2 || position === 6) {
           x = 0;
           y = 0;
@@ -305,16 +307,16 @@ export const getPlayerVisualOffset = (position: number, isSetter: boolean, phase
       case 3:
         if (position === 3) {
           x = 0;
-          y = 200;
+          y = 240;
         } else if (position === 2) {
           x = 0;
-          y = -200;
+          y = -240;
         } else if (position === 6) {
           x = 0;
-          y = 200;
+          y = 240;
         } else if (position === 1) {
           x = 0;
-          y = -200;
+          y = -240;
         } else if (position === 5) {
           x = 0;
           y = 0;
@@ -327,16 +329,16 @@ export const getPlayerVisualOffset = (position: number, isSetter: boolean, phase
       case 4:
         if (position === 4) {
           x = 0;
-          y = 400;
+          y = 480;
         } else if (position === 2) {
           x = 0;
-          y = -400;
+          y = -480;
         } else if (position === 6) {
           x = 0;
-          y = -200;
+          y = -240;
         } else if (position === 5) {
           x = 0;
-          y = 200;
+          y = 240;
         } else if (position === 1 || position === 3) {
           x = 0;
           y = 0;
@@ -346,16 +348,16 @@ export const getPlayerVisualOffset = (position: number, isSetter: boolean, phase
       case 5:
         if (position === 5) {
           x = 0;
-          y = 400;
+          y = 480;
         } else if (position === 1) {
           x = 0;
-          y = -400;
+          y = -480;
         } else if (position === 3) {
           x = 0;
-          y = -200;
+          y = -240;
         } else if (position === 4) {
           x = 0;
-          y = 200;
+          y = 240;
         } else if (position === 2 || position === 6) {
           x = 0;
           y = 0;
@@ -368,19 +370,19 @@ export const getPlayerVisualOffset = (position: number, isSetter: boolean, phase
           y = 0;
         } else if (position === 1) {
           x = -50;
-          y = -200;
+          y = -240;
         } else if (position === 6) {
           x = 0;
-          y = 200;
+          y = 240;
         } else if (position === 4) {
           x = 0;
           y = 0;
         } else if (position === 3) {
           x = 0;
-          y = 200;
+          y = 240;
         } else if (position === 2) {
           x = 0;
-          y = -200;
+          y = -240;
         }
         break;
     }

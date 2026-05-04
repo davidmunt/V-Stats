@@ -111,9 +111,6 @@ export const Scoreboard = ({ matchSlug }: ScoreboardProps) => {
         <div className="flex flex-col items-center gap-1 px-6 border-x border-white/10 shrink-0">
           <span className="text-white/60 font-black text-[9px] tracking-[0.2em] uppercase">Set</span>
           <span className="text-3xl font-black text-white italic leading-none">{actualSet.set_number}</span>
-          <div className="mt-1">
-            <FinishedSets matchSlug={matchSlug} />
-          </div>
         </div>
 
         <div className="flex items-center gap-3 flex-1 justify-end">
@@ -160,6 +157,10 @@ export const Scoreboard = ({ matchSlug }: ScoreboardProps) => {
             <img src={teamAway.image} alt={teamAway.name} className="w-full h-full object-contain rounded-lg" />
           </div>
         </div>
+      </div>
+
+      <div className="mt-2 pt-2 border-t border-white/10 flex justify-center">
+        <FinishedSets matchSlug={matchSlug} />
       </div>
     </div>
   );

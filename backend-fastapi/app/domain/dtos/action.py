@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional, Literal
 
-ActionType = Literal["SERVE", "RECEPTION", "SET", "ATTACK", "BLOCK", "ERROR"]
+ActionType = Literal["SERVE", "RECEPTION", "SET", "ATTACK", "BLOCK", "DIG", "ERROR", "POINT_ADJUSTMENT"]
 ResultType = Literal["SUCCESS", "FAIL", "ACE", "BLOCKED", "ERROR"]
 
 @dataclass

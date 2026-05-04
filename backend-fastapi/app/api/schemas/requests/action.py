@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 from typing import Optional, Literal
 
-ActionType = Literal["SERVE", "RECEPTION", "SET", "ATTACK", "BLOCK", "ERROR", "POINT_ADJUSTMENT"]
+ActionType = Literal["SERVE", "RECEPTION", "SET", "ATTACK", "BLOCK", "DIG", "ERROR", "POINT_ADJUSTMENT"]
 ResultType = Literal["++", "+", "-", "--", "SUCCESS", "FAIL", "ACE", "BLOCKED", "ERROR"]
 
 class ActionCreateRequest(BaseModel):

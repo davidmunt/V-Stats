@@ -10,10 +10,15 @@ interface AnalysisCourtProps {
 }
 
 export const AnalysisCourt = ({ homeLineup, awayLineup, onPlayerClick }: AnalysisCourtProps) => {
+  const homeTeamSlug = useMemo(() => {
+    const player = Object.values(homeLineup).find((p) => p !== null);
+    return player?.slug_team;
+  }, [homeLineup]);
+
   const currentPhase = useMemo(() => {
     const history = JSON.parse(sessionStorage.getItem("vstats_last_actions") || "[]");
-    return getGamePhase(history);
-  }, [homeLineup]);
+    return getGamePhase(history, homeTeamSlug);
+  }, [homeLineup, homeTeamSlug]);
 
   const setterCurrentPos = useMemo(() => {
     const setterNode = Object.values(homeLineup).find((p) => p?.is_setter);
@@ -22,16 +27,16 @@ export const AnalysisCourt = ({ homeLineup, awayLineup, onPlayerClick }: Analysi
 
   useEffect(() => {
     const history = JSON.parse(sessionStorage.getItem("vstats_last_actions") || "[]");
-    const lastAction = history[0];
-    if (currentPhase === "SERVE_OWN" && lastAction?.result === "++" && homeLineup[1]) {
+    const lastAction = history.filter((a: { action_type: string }) => a.action_type !== "POINT_ADJUSTMENT")[0];
+    const weScored = lastAction?.result === "++" && lastAction?.slug_team === homeTeamSlug;
+    if (currentPhase === "SERVE_OWN" && weScored && homeLineup[1]) {
       const timer = setTimeout(() => {
-        console.log("Punto ganado: Auto-seleccionando sacador en P1");
         onPlayerClick(homeLineup[1]!, true, null);
       }, 500);
 
       return () => clearTimeout(timer);
     }
-  }, [currentPhase, homeLineup, onPlayerClick]);
+  }, [currentPhase, homeLineup, homeTeamSlug, onPlayerClick]);
 
   return (
     <div className="relative w-full aspect-[18/11] bg-slate-100 rounded-[2.5rem] border border-slate-200 shadow-2xl overflow-hidden flex select-none p-4">

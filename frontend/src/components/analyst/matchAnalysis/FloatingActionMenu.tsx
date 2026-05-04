@@ -163,7 +163,6 @@ export const FloatingActionMenu = ({
         <CoordinatePicker onComplete={handleSaveWithCoords} onCancel={() => setShowPicker(false)} />
       ) : (
         <>
-          <div className="fixed inset-0 z-[299]" onClick={onClose} />
           <div style={menuStyle} className="bg-white rounded-2xl shadow-2xl border border-slate-200 p-2.5 flex flex-col gap-2 animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5 min-w-0">

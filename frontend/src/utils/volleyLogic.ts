@@ -9,7 +9,7 @@ interface ActionHistoryItem {
 }
 
 export const getAllowedActions = (history: ActionHistoryItem[], selectedPlayer: LineupPosition): ActionType[] => {
-  const lastAction = history[0];
+  const lastAction = history.filter((a) => a.action_type !== "POINT_ADJUSTMENT")[0];
   const currentPos = selectedPlayer.current_position;
   let allowedActions: ActionType[] = [];
 
@@ -20,7 +20,9 @@ export const getAllowedActions = (history: ActionHistoryItem[], selectedPlayer: 
     const lastType = lastAction.action_type;
 
     if (lastResult === "++" || lastResult === "--") {
-      if (lastResult === "++") {
+      const sameTeam = lastAction.slug_team === selectedPlayer.slug_team;
+      const weWonPoint = (lastResult === "++" && sameTeam) || (lastResult === "--" && !sameTeam);
+      if (weWonPoint) {
         allowedActions = ["SERVE"];
       } else {
         if (currentPos === 3 || currentPos === 6) {
