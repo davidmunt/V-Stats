@@ -17,7 +17,7 @@ cd V-Stats
 
 ### 2. Configurar variables de entorno
 
-Asegúrate de configurar los archivos de entorno (si aplica) para las claves de Stripe y la conexión con la base de datos en los directorios correspondientes.
+Asegúrate de configurar los archivos .env en cada directorio.
 
 ### 3. Levantar el proyecto con Docker
 
@@ -57,11 +57,11 @@ Una vez que los contenedores estén en estado `Running`, podrás acceder a los s
 
 ## Funcionalidades clave
 
-- **Análisis en vivo:** Registro de acciones (saques, remates, recepciones) con un solo clic.
-- **Gráficas Dinámicas:** Visualización de trayectorias de balón mediante SVG.
-- **Gestión de Plantillas:** Sistema de Drag and Drop para organizar las rotaciones del equipo.
+- **Análisis en vivo:** Registro de acciones (saques, remates, recepciones, bloqueos, etc).
+- **Gráficas:** Visualización de datos mediante dos modalidades principales: gráficas de trayectoria del balón para saques o ataques, y mapas de calor (heatmaps) para el resto de acciones, permitiendo identificar los puntos ganados y perdidos por ambos equipos.
+- **Gestión de Plantillas:** Componente que usa Drag and Drop para organizar la plantilla titular del equipo para un partido, junto al banquillo de suplentes.
 - **Asistente IA:** Chatbot integrado para consultas rápidas sobre el rendimiento.
-- **Pagos Integrados:** Gestión de suscripciones mediante Stripe.
+- **Pagos Integrados:** Gestión de pagos mediante Stripe.
 
 ---
 
