@@ -13,7 +13,15 @@ from app.domain.repositories.coach import ICoachRepository
 from app.domain.repositories.lineup import ILineupRepository
 from app.infrastructure.models.action import Action
 from app.infrastructure.mappers.action import ActionModelMapper
-from app.domain.dtos.action import ActionDTO, ActionStatDTO, ActionGeneralStatsDTO
+from app.domain.dtos.action import (
+    ActionDTO,
+    ActionStatDTO,
+    ActionGeneralStatsDTO,
+    TeamActionResultBreakdownDTO,
+    PlayerActionResultBreakdownDTO,
+    TeamActionResultBreakdownByMatchDTO,
+    PlayerActionResultBreakdownByMatchDTO,
+)
 
 class ActionService(IActionService):
     def __init__(
@@ -531,3 +539,183 @@ class ActionService(IActionService):
 
         actions = await self._action_repo.get_actions_type_from_player_match_against_team(session, player.id_player, action_type, match.id_match)
         return [ActionModelMapper.to_stat_dto(a) for a in actions]
+
+    async def get_action_result_breakdown_by_team(
+        self,
+        session: Any,
+        team_slug: str,
+        user_email: str,
+        role: str
+    ) -> TeamActionResultBreakdownDTO:
+        team = await self._team_repo.get_by_slug(session, team_slug)
+        if not team:
+            raise ValueError("TEAM_NOT_FOUND")
+
+        id_analyst_to_query = None
+
+        if role.lower() == "analyst":
+            analyst = await self._analyst_repo.get_by_email(session, user_email)
+            if not analyst:
+                raise ValueError("ANALYST_NOT_FOUND")
+            id_analyst_to_query = analyst.id_analyst
+
+        elif role.lower() == "coach":
+            coach = await self._coach_repo.get_by_email(session, user_email)
+            if not coach:
+                raise ValueError("COACH_NOT_FOUND")
+
+            if coach.id_team != team.id_team:
+                raise PermissionError("No tienes permiso para ver estadísticas de este equipo.")
+
+            analyst_of_team = await self._analyst_repo.get_by_team_id(session, coach.id_team)
+            if not analyst_of_team:
+                raise ValueError("TEAM_ANALYST_NOT_FOUND")
+
+            id_analyst_to_query = analyst_of_team.id_analyst
+
+        if id_analyst_to_query is None:
+            raise PermissionError("Acceso denegado: Rol no autorizado.")
+
+        return await self._action_repo.get_action_result_breakdown_by_team(
+            session,
+            team.id_team,
+            team_slug,
+            id_analyst_to_query,
+        )
+
+    async def get_action_result_breakdown_by_player(
+        self,
+        session: Any,
+        player_slug: str,
+        user_email: str,
+        role: str
+    ) -> PlayerActionResultBreakdownDTO:
+        player = await self._player_repo.get_by_slug(session, player_slug)
+        if not player:
+            raise ValueError("PLAYER_NOT_FOUND")
+
+        id_analyst_to_query = None
+
+        if role.lower() == "analyst":
+            analyst = await self._analyst_repo.get_by_email(session, user_email)
+            if not analyst:
+                raise ValueError("ANALYST_NOT_FOUND")
+            id_analyst_to_query = analyst.id_analyst
+
+        elif role.lower() == "coach":
+            coach = await self._coach_repo.get_by_email(session, user_email)
+            if not coach:
+                raise ValueError("COACH_NOT_FOUND")
+
+            analyst_of_team = await self._analyst_repo.get_by_team_id(session, coach.id_team)
+            if not analyst_of_team:
+                raise ValueError("TEAM_ANALYST_NOT_FOUND")
+
+            id_analyst_to_query = analyst_of_team.id_analyst
+
+        if id_analyst_to_query is None:
+            raise PermissionError("Acceso denegado: Rol no autorizado.")
+
+        return await self._action_repo.get_action_result_breakdown_by_player(
+            session,
+            player.id_player,
+            player_slug,
+            id_analyst_to_query,
+        )
+
+    async def get_action_result_breakdown_by_team_match(
+        self,
+        session: Any,
+        team_slug: str,
+        match_slug: str,
+        user_email: str,
+        role: str
+    ) -> TeamActionResultBreakdownByMatchDTO:
+        team = await self._team_repo.get_by_slug(session, team_slug)
+        if not team:
+            raise ValueError("TEAM_NOT_FOUND")
+
+        match = await self._match_repo.get_model_by_slug(session, match_slug)
+        if not match:
+            raise ValueError("MATCH_NOT_FOUND")
+
+        id_analyst_to_query = None
+
+        if role.lower() == "analyst":
+            analyst = await self._analyst_repo.get_by_email(session, user_email)
+            if not analyst:
+                raise ValueError("ANALYST_NOT_FOUND")
+            id_analyst_to_query = analyst.id_analyst
+
+        elif role.lower() == "coach":
+            coach = await self._coach_repo.get_by_email(session, user_email)
+            if not coach:
+                raise ValueError("COACH_NOT_FOUND")
+
+            if coach.id_team != team.id_team:
+                raise PermissionError("No tienes permiso para ver estadísticas de este equipo.")
+
+            analyst_of_team = await self._analyst_repo.get_by_team_id(session, coach.id_team)
+            if not analyst_of_team:
+                raise ValueError("TEAM_ANALYST_NOT_FOUND")
+
+            id_analyst_to_query = analyst_of_team.id_analyst
+
+        if id_analyst_to_query is None:
+            raise PermissionError("Acceso denegado: Rol no autorizado.")
+
+        return await self._action_repo.get_action_result_breakdown_by_team_match(
+            session,
+            team.id_team,
+            team_slug,
+            match.id_match,
+            match_slug,
+            id_analyst_to_query,
+        )
+
+    async def get_action_result_breakdown_by_player_match(
+        self,
+        session: Any,
+        player_slug: str,
+        match_slug: str,
+        user_email: str,
+        role: str
+    ) -> PlayerActionResultBreakdownByMatchDTO:
+        player = await self._player_repo.get_by_slug(session, player_slug)
+        if not player:
+            raise ValueError("PLAYER_NOT_FOUND")
+
+        match = await self._match_repo.get_model_by_slug(session, match_slug)
+        if not match:
+            raise ValueError("MATCH_NOT_FOUND")
+
+        id_analyst_to_query = None
+
+        if role.lower() == "analyst":
+            analyst = await self._analyst_repo.get_by_email(session, user_email)
+            if not analyst:
+                raise ValueError("ANALYST_NOT_FOUND")
+            id_analyst_to_query = analyst.id_analyst
+
+        elif role.lower() == "coach":
+            coach = await self._coach_repo.get_by_email(session, user_email)
+            if not coach:
+                raise ValueError("COACH_NOT_FOUND")
+
+            analyst_of_team = await self._analyst_repo.get_by_team_id(session, coach.id_team)
+            if not analyst_of_team:
+                raise ValueError("TEAM_ANALYST_NOT_FOUND")
+
+            id_analyst_to_query = analyst_of_team.id_analyst
+
+        if id_analyst_to_query is None:
+            raise PermissionError("Acceso denegado: Rol no autorizado.")
+
+        return await self._action_repo.get_action_result_breakdown_by_player_match(
+            session,
+            player.id_player,
+            player_slug,
+            match.id_match,
+            match_slug,
+            id_analyst_to_query,
+        )

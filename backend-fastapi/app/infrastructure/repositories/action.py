@@ -5,7 +5,16 @@ from app.domain.repositories.action import IActionRepository
 from app.infrastructure.models.action import Action
 from app.infrastructure.models.set import Set 
 from app.infrastructure.models.player import Player
-from app.domain.dtos.action import ActionDTO, ActionStatDTO, ActionGeneralStatsDTO
+from app.domain.dtos.action import (
+    ActionDTO,
+    ActionStatDTO,
+    ActionGeneralStatsDTO,
+    ActionResultBreakdownStatsDTO,
+    TeamActionResultBreakdownDTO,
+    PlayerActionResultBreakdownDTO,
+    TeamActionResultBreakdownByMatchDTO,
+    PlayerActionResultBreakdownByMatchDTO,
+)
 from app.domain.mapper import IModelMapper
 from sqlalchemy.orm import joinedload
 
@@ -331,3 +340,148 @@ class ActionRepository(IActionRepository):
             percentage_attack_success=calc_pct(stats_map["ATTACK"]["ok"], stats_map["ATTACK"]["total"]),
             percentage_attack_error=calc_pct(stats_map["ATTACK"]["err"], stats_map["ATTACK"]["total"])
         )
+
+    async def get_action_result_breakdown_by_team(
+        self,
+        session: AsyncSession,
+        id_team: int,
+        team_slug: str,
+        id_analyst: int
+    ) -> TeamActionResultBreakdownDTO:
+        return TeamActionResultBreakdownDTO(
+            slug_team=team_slug,
+            stats=await self._build_action_result_breakdown_stats(
+                session=session,
+                id_team=id_team,
+                id_player=None,
+                id_match=None,
+                id_analyst=id_analyst,
+                slug_team=team_slug,
+            ),
+        )
+
+    async def get_action_result_breakdown_by_player(
+        self,
+        session: AsyncSession,
+        id_player: int,
+        player_slug: str,
+        id_analyst: int
+    ) -> PlayerActionResultBreakdownDTO:
+        return PlayerActionResultBreakdownDTO(
+            slug_player=player_slug,
+            stats=await self._build_action_result_breakdown_stats(
+                session=session,
+                id_team=None,
+                id_player=id_player,
+                id_match=None,
+                id_analyst=id_analyst,
+                slug_player=player_slug,
+            ),
+        )
+
+    async def get_action_result_breakdown_by_team_match(
+        self,
+        session: AsyncSession,
+        id_team: int,
+        team_slug: str,
+        id_match: int,
+        match_slug: str,
+        id_analyst: int
+    ) -> TeamActionResultBreakdownByMatchDTO:
+        return TeamActionResultBreakdownByMatchDTO(
+            slug_team=team_slug,
+            slug_match=match_slug,
+            stats=await self._build_action_result_breakdown_stats(
+                session=session,
+                id_team=id_team,
+                id_player=None,
+                id_match=id_match,
+                id_analyst=id_analyst,
+                slug_team=team_slug,
+                slug_match=match_slug,
+            ),
+        )
+
+    async def get_action_result_breakdown_by_player_match(
+        self,
+        session: AsyncSession,
+        id_player: int,
+        player_slug: str,
+        id_match: int,
+        match_slug: str,
+        id_analyst: int
+    ) -> PlayerActionResultBreakdownByMatchDTO:
+        return PlayerActionResultBreakdownByMatchDTO(
+            slug_player=player_slug,
+            slug_match=match_slug,
+            stats=await self._build_action_result_breakdown_stats(
+                session=session,
+                id_team=None,
+                id_player=id_player,
+                id_match=id_match,
+                id_analyst=id_analyst,
+                slug_player=player_slug,
+                slug_match=match_slug,
+            ),
+        )
+
+    async def _build_action_result_breakdown_stats(
+        self,
+        session: AsyncSession,
+        id_team: int = None,
+        id_player: int = None,
+        id_match: int = None,
+        id_analyst: int = None,
+        slug_team: str = None,
+        slug_player: str = None,
+        slug_match: str = None,
+    ) -> ActionResultBreakdownStatsDTO:
+        action_types = {
+            "SERVE": "serve",
+            "ATTACK": "attack",
+            "BLOCK": "block",
+            "RECEPTION": "reception",
+            "SET": "colocacion",
+            "DIG": "defensa",
+        }
+        result_codes = ["++", "+", "-", "--"]
+
+        filters = [Action.is_active == True, Action.action_type.in_(action_types.keys()), Action.result.in_(result_codes)]
+        if id_team is not None:
+            filters.append(Action.id_team == id_team)
+        if id_player is not None:
+            filters.append(Action.id_player == id_player)
+        if id_match is not None:
+            filters.append(Action.id_match == id_match)
+        if id_analyst is not None:
+            filters.append(Action.id_analyst == id_analyst)
+
+        query = (
+            select(Action.action_type, Action.result, func.count(Action.id_action).label("total"))
+            .where(and_(*filters))
+            .group_by(Action.action_type, Action.result)
+        )
+
+        result = await session.execute(query)
+        rows = result.all()
+
+        counts: dict[str, dict[str, int]] = {action_type: {code: 0 for code in result_codes} for action_type in action_types}
+        for row in rows:
+            counts[row.action_type][row.result] = row.total or 0
+
+        def pct(part: int, total: int) -> float:
+            return round((part / total) * 100, 2) if total > 0 else 0.0
+
+        stats_kwargs = {
+            "slug_team": slug_team,
+            "slug_player": slug_player,
+            "slug_match": slug_match,
+        }
+        for action_type, prefix in action_types.items():
+            total = sum(counts[action_type].values())
+            stats_kwargs[f"percentage_{prefix}_double_plus"] = pct(counts[action_type]["++"], total)
+            stats_kwargs[f"percentage_{prefix}_plus"] = pct(counts[action_type]["+"], total)
+            stats_kwargs[f"percentage_{prefix}_minus"] = pct(counts[action_type]["-"], total)
+            stats_kwargs[f"percentage_{prefix}_double_minus"] = pct(counts[action_type]["--"], total)
+
+        return ActionResultBreakdownStatsDTO(**stats_kwargs)

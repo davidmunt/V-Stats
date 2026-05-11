@@ -58,3 +58,60 @@ class ActionGeneralStatsDTO:
     percentage_block_error: float
     percentage_attack_success: float
     percentage_attack_error: float
+
+
+@dataclass
+class ActionResultBreakdownStatsDTO:
+    slug_team: Optional[str] = None
+    slug_player: Optional[str] = None
+    slug_match: Optional[str] = None
+    percentage_serve_double_plus: float = 0.0
+    percentage_serve_plus: float = 0.0
+    percentage_serve_minus: float = 0.0
+    percentage_serve_double_minus: float = 0.0
+    percentage_attack_double_plus: float = 0.0
+    percentage_attack_plus: float = 0.0
+    percentage_attack_minus: float = 0.0
+    percentage_attack_double_minus: float = 0.0
+    percentage_block_double_plus: float = 0.0
+    percentage_block_plus: float = 0.0
+    percentage_block_minus: float = 0.0
+    percentage_block_double_minus: float = 0.0
+    percentage_reception_double_plus: float = 0.0
+    percentage_reception_plus: float = 0.0
+    percentage_reception_minus: float = 0.0
+    percentage_reception_double_minus: float = 0.0
+    percentage_colocacion_double_plus: float = 0.0
+    percentage_colocacion_plus: float = 0.0
+    percentage_colocacion_minus: float = 0.0
+    percentage_colocacion_double_minus: float = 0.0
+    percentage_defensa_double_plus: float = 0.0
+    percentage_defensa_plus: float = 0.0
+    percentage_defensa_minus: float = 0.0
+    percentage_defensa_double_minus: float = 0.0
+
+
+@dataclass
+class TeamActionResultBreakdownDTO:
+    slug_team: str
+    stats: ActionResultBreakdownStatsDTO
+
+
+@dataclass
+class PlayerActionResultBreakdownDTO:
+    slug_player: str
+    stats: ActionResultBreakdownStatsDTO
+
+
+@dataclass
+class TeamActionResultBreakdownByMatchDTO:
+    slug_team: str
+    slug_match: str
+    stats: ActionResultBreakdownStatsDTO
+
+
+@dataclass
+class PlayerActionResultBreakdownByMatchDTO:
+    slug_player: str
+    slug_match: str
+    stats: ActionResultBreakdownStatsDTO

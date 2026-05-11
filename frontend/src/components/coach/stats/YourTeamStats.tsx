@@ -4,10 +4,13 @@ import { usePlayersFromTeamQuery } from "@/queries/players/usePlayersFromTeam";
 import { useTypeStatsAgainstTeamQuery } from "@/queries/stats/useTypeStatsAgainstTeam";
 import { useTypeStatsForPlayerQuery } from "@/queries/stats/useTypeStatsForPlayer";
 import { useTypeStatsAgainstPlayerQuery } from "@/queries/stats/useTypeStatsAgainstPlayer";
+import { useChartStatsTeamQuery } from "@/queries/stats/useChartStatsTeam";
+import { useChartStatsPlayerQuery } from "@/queries/stats/useChartStatsPlayer";
 import { useAuthContext } from "@/hooks/useAuthContext";
 import HeatMap from "@/components/coach/stats/HeatMap";
 import CourtTrajectories from "@/components/coach/stats/CourtTrajectories";
 import { StatsTable } from "@/components/coach/stats/StatsTable";
+import ChartStats from "./ChartStats";
 
 const YourTeamStats = () => {
   const { user } = useAuthContext();
@@ -21,6 +24,7 @@ const YourTeamStats = () => {
   const { data: attackAgainst, isLoading: loadingAttackAgainst } = useTypeStatsAgainstTeamQuery(teamSlug, "ATTACK");
   const { data: receptionAgainst, isLoading: loadingReceptionAgainst } = useTypeStatsAgainstTeamQuery(teamSlug, "RECEPTION");
   const { data: blockAgainst, isLoading: loadingBlockAgainst } = useTypeStatsAgainstTeamQuery(teamSlug, "BLOCK");
+  const { data: teamChartStats, isLoading: loadingTeamChartStats } = useChartStatsTeamQuery(teamSlug);
 
   const isTeamLoading =
     loadingServeFor ||
@@ -44,6 +48,7 @@ const YourTeamStats = () => {
   const { data: pAttackAgainst, isLoading: lpAttackAgainst } = useTypeStatsAgainstPlayerQuery(activePlayerSlug, "ATTACK");
   const { data: pReceptionAgainst, isLoading: lpReceptionAgainst } = useTypeStatsAgainstPlayerQuery(activePlayerSlug, "RECEPTION");
   const { data: pBlockAgainst, isLoading: lpBlockAgainst } = useTypeStatsAgainstPlayerQuery(activePlayerSlug, "BLOCK");
+  const { data: playerChartStats, isLoading: loadingPlayerChartStats } = useChartStatsPlayerQuery(activePlayerSlug);
 
   const isPlayerLoading =
     lpServeFor || lpAttackFor || lpBlockFor || lpServeAgainst || lpAttackAgainst || lpReceptionAgainst || lpBlockAgainst;
@@ -82,13 +87,26 @@ const YourTeamStats = () => {
           </div>
         )}
       </section>
-
       <section className="bg-white p-8 rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100">
         <div className="mb-6">
           <h4 className="text-sm font-black text-slate-800 uppercase tracking-widest italic">Porcentajes de Eficacia Global</h4>
           <div className="h-1 w-12 bg-blue-600 rounded-full mt-1"></div>
         </div>
         <StatsTable slug_team={teamSlug} />
+      </section>
+
+      <section>
+        {loadingTeamChartStats ? (
+          <div className="py-16 text-center text-slate-400 font-bold uppercase tracking-widest animate-pulse bg-white rounded-[2.5rem] border-2 border-dashed border-slate-100">
+            Construyendo gráfico del equipo...
+          </div>
+        ) : (
+          <ChartStats
+            stats={teamChartStats}
+            title="Distribución de acciones del equipo"
+            subtitle="Porcentaje de ++, +, -, -- en saque, ataque, bloqueo, recepción, colocación y defensa"
+          />
+        )}
       </section>
 
       <section className="space-y-6">
@@ -134,6 +152,18 @@ const YourTeamStats = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <HeatMap stats={pReceptionAgainst || []} mode="against" title="Sus Recepciones - Errores" />
             </div>
+
+            {loadingPlayerChartStats ? (
+              <div className="py-16 text-center text-slate-400 font-bold uppercase tracking-widest animate-pulse bg-white rounded-[2.5rem] border-2 border-dashed border-slate-100">
+                Construyendo gráfico del jugador...
+              </div>
+            ) : (
+              <ChartStats
+                stats={playerChartStats}
+                title={`Distribución de acciones de ${players?.find((player) => player.slug_player === activePlayerSlug)?.name || "jugador seleccionado"}`}
+                subtitle="Porcentaje de ++, +, -, -- por tipo de acción"
+              />
+            )}
           </div>
         )}
       </section>

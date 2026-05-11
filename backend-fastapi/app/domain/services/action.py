@@ -106,3 +106,49 @@ class IActionService(abc.ABC):
         Lógica para obtener todas las acciones de un tipo de un jugador específico en un partido específico que han hecho punto contra otro equipo.
         """
         ...
+
+    @abc.abstractmethod
+    async def get_action_result_breakdown_by_team(
+        self,
+        session: Any,
+        team_slug: str,
+        user_email: str,
+        role: str
+    ) -> dict[str, Any]:
+        """Lógica para obtener porcentajes de ++, +, -, -- por acción para un equipo."""
+        ...
+
+    @abc.abstractmethod
+    async def get_action_result_breakdown_by_player(
+        self,
+        session: Any,
+        player_slug: str,
+        user_email: str,
+        role: str
+    ) -> dict[str, Any]:
+        """Lógica para obtener porcentajes de ++, +, -, -- por acción para un jugador."""
+        ...
+
+    @abc.abstractmethod
+    async def get_action_result_breakdown_by_team_match(
+        self,
+        session: Any,
+        team_slug: str,
+        match_slug: str,
+        user_email: str,
+        role: str
+    ) -> dict[str, Any]:
+        """Lógica para obtener porcentajes de ++, +, -, -- por acción para un equipo en un partido."""
+        ...
+
+    @abc.abstractmethod
+    async def get_action_result_breakdown_by_player_match(
+        self,
+        session: Any,
+        player_slug: str,
+        match_slug: str,
+        user_email: str,
+        role: str
+    ) -> dict[str, Any]:
+        """Lógica para obtener porcentajes de ++, +, -, -- por acción para un jugador en un partido."""
+        ...

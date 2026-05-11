@@ -16,3 +16,30 @@ export interface Stat {
   end_y: number;
   timestamp: string;
 }
+
+export interface chartStat {
+  percentage_serve_double_plus: number;
+  percentage_serve_plus: number;
+  percentage_serve_minus: number;
+  percentage_serve_double_minus: number;
+  percentage_attack_double_plus: number;
+  percentage_attack_plus: number;
+  percentage_attack_minus: number;
+  percentage_attack_double_minus: number;
+  percentage_block_double_plus: number;
+  percentage_block_plus: number;
+  percentage_block_minus: number;
+  percentage_block_double_minus: number;
+  percentage_reception_double_plus: number;
+  percentage_reception_plus: number;
+  percentage_reception_minus: number;
+  percentage_reception_double_minus: number;
+  percentage_colocacion_double_plus: number;
+  percentage_colocacion_plus: number;
+  percentage_colocacion_minus: number;
+  percentage_colocacion_double_minus: number;
+  percentage_defensa_double_plus: number;
+  percentage_defensa_plus: number;
+  percentage_defensa_minus: number;
+  percentage_defensa_double_minus: number;
+}

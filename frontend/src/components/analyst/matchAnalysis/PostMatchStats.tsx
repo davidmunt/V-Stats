@@ -3,9 +3,12 @@ import { useTypeStatsForTeamMatchQuery } from "@/queries/stats/useTypeStatsForTe
 import { useTypeStatsAgainstTeamMatchQuery } from "@/queries/stats/useTypeStatsAgainstTeamMatch";
 import { useTypeStatsForPlayerMatchQuery } from "@/queries/stats/useTypeStatsForPlayerMatch";
 import { useTypeStatsAgainstPlayerMatchQuery } from "@/queries/stats/useTypeStatsAgainstPlayerMatch";
+import { useChartStatsTeamMatchQuery } from "@/queries/stats/useChartStatsTeamMatch";
+import { useChartStatsPlayerMatchQuery } from "@/queries/stats/useChartStatsPlayerMatch";
 import { usePlayersFromTeamQuery } from "@/queries/players/usePlayersFromTeam";
 import HeatMap from "@/components/coach/stats/HeatMap";
 import CourtTrajectories from "@/components/coach/stats/CourtTrajectories";
+import ChartStats from "@/components/coach/stats/ChartStats";
 
 interface PostMatchStatsProps {
   teamSlug: string;
@@ -31,13 +34,15 @@ export const PostMatchStats = ({ teamSlug, matchSlug, score }: PostMatchStatsPro
   const { data: pAttackFor, isLoading: lp2 } = useTypeStatsForPlayerMatchQuery(activePlayerSlug, "ATTACK", matchSlug);
   const { data: pServeAgainst, isLoading: lp3 } = useTypeStatsAgainstPlayerMatchQuery(activePlayerSlug, "SERVE", matchSlug);
   const { data: pAttackAgainst, isLoading: lp4 } = useTypeStatsAgainstPlayerMatchQuery(activePlayerSlug, "ATTACK", matchSlug);
+  const { data: teamChartStats, isLoading: lChartTeam } = useChartStatsTeamMatchQuery(teamSlug, matchSlug);
+  const { data: playerChartStats, isLoading: lChartPlayer } = useChartStatsPlayerMatchQuery(activePlayerSlug, matchSlug);
 
   const isTeamLoading = l1 || l2 || l3 || l4 || l5 || l6;
   const isPlayerLoading = lp1 || lp2 || lp3 || lp4;
 
   return (
     <div className="fixed inset-0 z-[100] bg-slate-50 overflow-y-auto animate-in fade-in slide-in-from-bottom-8 duration-500">
-      <div className="bg-slate-900 text-white p-8 sticky top-0 z-10 shadow-2xl">
+      <div className="bg-slate-900 text-white p-8 sticky top-0 z-50 shadow-2xl">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div>
             <h2 className="text-3xl font-black italic uppercase tracking-tighter text-blue-400">Match Review</h2>
@@ -84,6 +89,19 @@ export const PostMatchStats = ({ teamSlug, matchSlug, score }: PostMatchStatsPro
               <CourtTrajectories stats={attackAgainst || []} title="Ataques - Errores" />
               <HeatMap stats={blockFor || []} mode="for" title="Bloqueos - Éxito" />
               <HeatMap stats={receptionAgainst || []} mode="against" title="Recepción - Fallos" />
+              <div className="lg:col-span-2">
+                {lChartTeam ? (
+                  <div className="h-64 flex items-center justify-center bg-white rounded-[3rem] border-2 border-dashed border-slate-200 text-slate-400 font-bold uppercase animate-pulse">
+                    Generando tabla de acciones del equipo...
+                  </div>
+                ) : (
+                  <ChartStats
+                    stats={teamChartStats}
+                    title="Distribución de acciones del equipo"
+                    subtitle="Porcentaje de ++, +, -, -- en este partido"
+                  />
+                )}
+              </div>
             </div>
           )}
         </section>
@@ -118,6 +136,19 @@ export const PostMatchStats = ({ teamSlug, matchSlug, score }: PostMatchStatsPro
               <CourtTrajectories stats={pServeAgainst || []} title="Sus Errores de Saque" />
               <CourtTrajectories stats={pAttackFor || []} title="Sus Ataques (Puntos)" />
               <CourtTrajectories stats={pAttackAgainst || []} title="Sus Ataques (Errores)" />
+              <div className="lg:col-span-2">
+                {lChartPlayer ? (
+                  <div className="h-64 flex items-center justify-center bg-white rounded-[3rem] border-2 border-dashed border-slate-200 text-slate-400 font-bold uppercase animate-pulse">
+                    Generando tabla de acciones del jugador...
+                  </div>
+                ) : (
+                  <ChartStats
+                    stats={playerChartStats}
+                    title="Distribución de acciones del jugador"
+                    subtitle="Porcentaje de ++, +, -, -- en este partido"
+                  />
+                )}
+              </div>
             </div>
           )}
         </section>

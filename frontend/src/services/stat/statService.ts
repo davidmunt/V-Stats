@@ -1,9 +1,13 @@
 import apiClient from "@/services/apiClient";
-import type { Stat } from "@/interfaces/stat.interface";
+import type { Stat, chartStat } from "@/interfaces/stat.interface";
 import type { StatGeneral } from "@/interfaces/statGeneral.interface";
 
 export interface StatsResponse {
   stats: Stat[];
+}
+
+export interface ChartStatsResponse {
+  stats: chartStat;
 }
 
 export const getStatsForTeam = async (teamSlug: string, actionType: string) => {
@@ -54,5 +58,25 @@ export const getStatsAgainstPlayerTeamMatch = async (playerSlug: string, actionT
     "fastapi",
     `/api/stats/player/${playerSlug}/type/${actionType}/match/${matchSlug}/against`,
   );
+  return response.data;
+};
+
+export const getChartStatsForTeam = async (teamSlug: string) => {
+  const response = await apiClient.get<ChartStatsResponse>("fastapi", `/api/stats/team/${teamSlug}/chart`);
+  return response.data;
+};
+
+export const getChartStatsForPlayer = async (playerSlug: string) => {
+  const response = await apiClient.get<ChartStatsResponse>("fastapi", `/api/stats/player/${playerSlug}/chart`);
+  return response.data;
+};
+
+export const getChartStatsForTeamMatch = async (teamSlug: string, matchSlug: string) => {
+  const response = await apiClient.get<ChartStatsResponse>("fastapi", `/api/stats/team/${teamSlug}/match/${matchSlug}/chart`);
+  return response.data;
+};
+
+export const getChartStatsForPlayerMatch = async (playerSlug: string, matchSlug: string) => {
+  const response = await apiClient.get<ChartStatsResponse>("fastapi", `/api/stats/player/${playerSlug}/match/${matchSlug}/chart`);
   return response.data;
 };
